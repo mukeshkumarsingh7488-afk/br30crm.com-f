@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /leads
+Disallow: /contacts
+Disallow: /companies
+Disallow: /deals
+Disallow: /activities
+Disallow: /tasks
+Disallow: /calendar
+Disallow: /members
+Disallow: /roles
+Disallow: /permissions
+Disallow: /integrations
+Disallow: /settings
+Disallow: /profile
+Disallow: /admin
+Disallow: /api/
+Disallow: /internal/
+Disallow: /private/
+
+Sitemap: https://br30crm.com/sitemap.xml

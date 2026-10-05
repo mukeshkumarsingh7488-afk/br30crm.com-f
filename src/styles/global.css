@@ -1,0 +1,56 @@
+
+/* BR30 CRM shared polish */
+.crm-main > div:not(.crm-shell),
+.crm-page,
+.crm-resource-page {
+  width: 100%;
+}
+.crm-main table {
+  width: 100%;
+}
+.crm-main .crm-ops-card,
+.crm-main .crm-resource-card,
+.crm-main .crm-table-card,
+.crm-main .activities-card,
+.crm-main .contacts-table-card,
+.crm-main .deals-table-card {
+  width: 100%;
+  max-width: none;
+}
+.crm-main .crm-ops-table,
+.crm-main .crm-resource-table {
+  width: 100%;
+}
+.crm-main [class$="-stats"],
+.crm-main [class*="-stats-grid"] {
+  align-items: stretch;
+}
+.crm-main [class$="-stat"],
+.crm-main [class*="-stat-card"] {
+  min-height: 104px;
+}
+.crm-main [class$="-stat-icon"],
+.crm-main [class*="-stat-icon"] {
+  flex: 0 0 auto;
+}
+.crm-main [class$="-stat-value"],
+.crm-main [class*="-stat-value"] {
+  line-height: 1.15;
+}
+.crm-main .crm-ops-table th,
+.crm-main .crm-ops-table td {
+  white-space: nowrap;
+}
+@media (max-width: 900px) {
+  .crm-main .crm-ops-card,
+  .crm-main .crm-resource-card,
+  .crm-main .crm-table-card {
+    overflow-x: auto;
+  }
+}
+
+/* CRM table header color — match Tags page muted header */
+.crm-main table thead th {
+  color: var(--crm-muted) !important;
+  font-weight: 400 !important;
+}

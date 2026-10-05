@@ -1,0 +1,13 @@
+import api from "./api";
+const unwrap = (response) => response?.data?.data ?? response?.data ?? response ?? {};
+export const getWebhooks = async (businessId, params = {}) => unwrap(await api.get(`/webhooks/business/${businessId}`, { params }));
+export const getWebhook = async (businessId, webhookId) => unwrap(await api.get(`/webhooks/business/${businessId}/${webhookId}`));
+export const createWebhook = async (businessId, data) => unwrap(await api.post(`/webhooks/business/${businessId}`, data));
+export const updateWebhook = async (businessId, webhookId, data) => unwrap(await api.patch(`/webhooks/business/${businessId}/${webhookId}`, data));
+export const deleteWebhook = async (businessId, webhookId) => unwrap(await api.delete(`/webhooks/business/${businessId}/${webhookId}`));
+export const regenerateWebhookSecret = async (businessId, webhookId) => unwrap(await api.patch(`/webhooks/business/${businessId}/${webhookId}/regenerate-secret`));
+export const testWebhook = async (businessId, webhookId) => unwrap(await api.post(`/webhooks/business/${businessId}/${webhookId}/test`));
+export const getWebhookDeliveries = async (businessId, webhookId, params = {}) => unwrap(await api.get(`/webhooks/business/${businessId}/${webhookId}/deliveries`, { params }));
+export const getWebhookDelivery = async (businessId, deliveryId) => unwrap(await api.get(`/webhooks/business/${businessId}/deliveries/${deliveryId}`));
+export const retryWebhookDelivery = async (businessId, deliveryId) => unwrap(await api.post(`/webhooks/business/${businessId}/deliveries/${deliveryId}/retry`));
+export default { getWebhooks, getWebhook, createWebhook, updateWebhook, deleteWebhook, regenerateWebhookSecret, testWebhook, getWebhookDeliveries, getWebhookDelivery, retryWebhookDelivery };
