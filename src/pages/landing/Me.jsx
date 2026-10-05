@@ -79,7 +79,7 @@ function Me() {
         .me-review-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:65px}
         .me-review-item{display:flex;align-items:center;gap:7px;padding:8px 13px;border:1px solid var(--me-border);border-radius:999px;background:transparent;color:var(--me-muted);font-size:12px;font-weight:400}
         .me-review-item svg{color:var(--me-primary)}
-        .me-companies{position:relative;padding:8px 0 48px;background:transparent;border-top:0;border-bottom:0;overflow:hidden}
+        .me-companies{position:relative;padding:8px 0 48px;margin-top:-0.5in;background:transparent;border-top:0;border-bottom:0;overflow:hidden}
         .me-companies-heading{margin-bottom:22px;text-align:center;color:var(--me-muted);font-size:13px;font-weight:400}
         .me-marquee-wrapper{position:relative;width:100%;overflow:hidden}
         .me-marquee-wrapper::before,.me-marquee-wrapper::after{content:"";position:absolute;z-index:2;top:0;bottom:0;width:110px;pointer-events:none}

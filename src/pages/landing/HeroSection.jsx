@@ -114,7 +114,7 @@ function HeroSection() {
 
               <div className="lp-trust-items">
                 <div className="lp-trust-item">
-                  <div className="lp-trust-number">10+</div>
+                  <div className="lp-trust-number">40+</div>
                   <div className="lp-trust-text">Core CRM modules</div>
                 </div>
 

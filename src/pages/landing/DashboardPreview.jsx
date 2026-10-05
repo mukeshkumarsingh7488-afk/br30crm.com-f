@@ -566,7 +566,7 @@ function DashboardPreview() {
 function DashboardHome({ period, setPeriod, periodLabel, showActions, setShowActions, selectPage }) {
   const currentHour = new Date().getHours();
 
-  const greeting = currentHour >= 5 && currentHour < 12 ? "Good morning" : currentHour >= 12 && currentHour < 17 ? "Good afternoon" : currentHour >= 17 && currentHour < 21 ? "Good evening" : "Good night";
+  const greeting = currentHour >= 5 && currentHour < 12 ? "Hello" : currentHour >= 12 && currentHour < 17 ? "Hello" : currentHour >= 17 && currentHour < 21 ? "Hello" : "Hello";
   return (
     <section className="lp-crm-dashboard">
       <div className="lp-crm-dashboard-head">
@@ -986,7 +986,227 @@ function DashboardHome({ period, setPeriod, periodLabel, showActions, setShowAct
 
 function PreviewPage({ page, selectPage }) {
   const config = {
-    "Tags": { icon: Tag, subtitle: "Manage tags in your CRM workspace", stats: [["Total", "48"], ["Active", "36"], ["Updated Today", "12"], ["Status", "Healthy"]] },    "Meetings": { icon: CalendarDays, subtitle: "Manage meetings in your CRM workspace", stats: [["Total", "48"], ["Active", "36"], ["Updated Today", "12"], ["Status", "Healthy"]] },    "Sales Report": { icon: BarChart3, subtitle: "Manage sales report in your CRM workspace", stats: [["Total", "48"], ["Active", "36"], ["Updated Today", "12"], ["Status", "Healthy"]] },    "Leads Report": { icon: Target, subtitle: "Manage leads report in your CRM workspace", stats: [["Total", "48"], ["Active", "36"], ["Updated Today", "12"], ["Status", "Healthy"]] },    "Deals Report": { icon: CircleDollarSign, subtitle: "Manage deals report in your CRM workspace", stats: [["Total", "48"], ["Active", "36"], ["Updated Today", "12"], ["Status", "Healthy"]] },    "Activity Report": { icon: Activity, subtitle: "Manage activity report in your CRM workspace", stats: [["Total", "48"], ["Active", "36"], ["Updated Today", "12"], ["Status", "Healthy"]] },    "Email": { icon: FileText, subtitle: "Manage email in your CRM workspace", stats: [["Total", "48"], ["Active", "36"], ["Updated Today", "12"], ["Status", "Healthy"]] },    "WhatsApp": { icon: MessageCircle, subtitle: "Manage whatsapp in your CRM workspace", stats: [["Total", "48"], ["Active", "36"], ["Updated Today", "12"], ["Status", "Healthy"]] },    "SMS": { icon: Smartphone, subtitle: "Manage sms in your CRM workspace", stats: [["Total", "48"], ["Active", "36"], ["Updated Today", "12"], ["Status", "Healthy"]] },    "Communication History": { icon: FileText, subtitle: "Manage communication history in your CRM workspace", stats: [["Total", "48"], ["Active", "36"], ["Updated Today", "12"], ["Status", "Healthy"]] },    "Forms": { icon: FileText, subtitle: "Manage forms in your CRM workspace", stats: [["Total", "48"], ["Active", "36"], ["Updated Today", "12"], ["Status", "Healthy"]] },    "Public Links": { icon: Link2, subtitle: "Manage public links in your CRM workspace", stats: [["Total", "48"], ["Active", "36"], ["Updated Today", "12"], ["Status", "Healthy"]] },    "QR": { icon: QrCode, subtitle: "Manage qr in your CRM workspace", stats: [["Total", "48"], ["Active", "36"], ["Updated Today", "12"], ["Status", "Healthy"]] },    "Sources / Campaigns": { icon: Globe, subtitle: "Manage sources / campaigns in your CRM workspace", stats: [["Total", "48"], ["Active", "36"], ["Updated Today", "12"], ["Status", "Healthy"]] },    "Automations": { icon: Workflow, subtitle: "Manage automations in your CRM workspace", stats: [["Total", "48"], ["Active", "36"], ["Updated Today", "12"], ["Status", "Healthy"]] },    "Workflows": { icon: Network, subtitle: "Manage workflows in your CRM workspace", stats: [["Total", "48"], ["Active", "36"], ["Updated Today", "12"], ["Status", "Healthy"]] },    "Webhooks": { icon: Link2, subtitle: "Manage webhooks in your CRM workspace", stats: [["Total", "48"], ["Active", "36"], ["Updated Today", "12"], ["Status", "Healthy"]] },    "Members": { icon: UsersRound, subtitle: "Manage members in your CRM workspace", stats: [["Total", "48"], ["Active", "36"], ["Updated Today", "12"], ["Status", "Healthy"]] },    "Roles": { icon: ShieldCheck, subtitle: "Manage roles in your CRM workspace", stats: [["Total", "48"], ["Active", "36"], ["Updated Today", "12"], ["Status", "Healthy"]] },    "Permissions": { icon: ShieldCheck, subtitle: "Manage permissions in your CRM workspace", stats: [["Total", "48"], ["Active", "36"], ["Updated Today", "12"], ["Status", "Healthy"]] },    "Integrations": { icon: Network, subtitle: "Manage integrations in your CRM workspace", stats: [["Total", "48"], ["Active", "36"], ["Updated Today", "12"], ["Status", "Healthy"]] },    "Subscription": { icon: CreditCard, subtitle: "Manage subscription in your CRM workspace", stats: [["Total", "48"], ["Active", "36"], ["Updated Today", "12"], ["Status", "Healthy"]] },    Leads: {
+    Tags: {
+      icon: Tag,
+      subtitle: "Manage tags in your CRM workspace",
+      stats: [
+        ["Total", "48"],
+        ["Active", "36"],
+        ["Updated Today", "12"],
+        ["Status", "Healthy"],
+      ],
+    },
+    Meetings: {
+      icon: CalendarDays,
+      subtitle: "Manage meetings in your CRM workspace",
+      stats: [
+        ["Total", "48"],
+        ["Active", "36"],
+        ["Updated Today", "12"],
+        ["Status", "Healthy"],
+      ],
+    },
+    "Sales Report": {
+      icon: BarChart3,
+      subtitle: "Manage sales report in your CRM workspace",
+      stats: [
+        ["Total", "48"],
+        ["Active", "36"],
+        ["Updated Today", "12"],
+        ["Status", "Healthy"],
+      ],
+    },
+    "Leads Report": {
+      icon: Target,
+      subtitle: "Manage leads report in your CRM workspace",
+      stats: [
+        ["Total", "48"],
+        ["Active", "36"],
+        ["Updated Today", "12"],
+        ["Status", "Healthy"],
+      ],
+    },
+    "Deals Report": {
+      icon: CircleDollarSign,
+      subtitle: "Manage deals report in your CRM workspace",
+      stats: [
+        ["Total", "48"],
+        ["Active", "36"],
+        ["Updated Today", "12"],
+        ["Status", "Healthy"],
+      ],
+    },
+    "Activity Report": {
+      icon: Activity,
+      subtitle: "Manage activity report in your CRM workspace",
+      stats: [
+        ["Total", "48"],
+        ["Active", "36"],
+        ["Updated Today", "12"],
+        ["Status", "Healthy"],
+      ],
+    },
+    Email: {
+      icon: FileText,
+      subtitle: "Manage email in your CRM workspace",
+      stats: [
+        ["Total", "48"],
+        ["Active", "36"],
+        ["Updated Today", "12"],
+        ["Status", "Healthy"],
+      ],
+    },
+    WhatsApp: {
+      icon: MessageCircle,
+      subtitle: "Manage whatsapp in your CRM workspace",
+      stats: [
+        ["Total", "48"],
+        ["Active", "36"],
+        ["Updated Today", "12"],
+        ["Status", "Healthy"],
+      ],
+    },
+    SMS: {
+      icon: Smartphone,
+      subtitle: "Manage sms in your CRM workspace",
+      stats: [
+        ["Total", "48"],
+        ["Active", "36"],
+        ["Updated Today", "12"],
+        ["Status", "Healthy"],
+      ],
+    },
+    "Communication History": {
+      icon: FileText,
+      subtitle: "Manage communication history in your CRM workspace",
+      stats: [
+        ["Total", "48"],
+        ["Active", "36"],
+        ["Updated Today", "12"],
+        ["Status", "Healthy"],
+      ],
+    },
+    Forms: {
+      icon: FileText,
+      subtitle: "Manage forms in your CRM workspace",
+      stats: [
+        ["Total", "48"],
+        ["Active", "36"],
+        ["Updated Today", "12"],
+        ["Status", "Healthy"],
+      ],
+    },
+    "Public Links": {
+      icon: Link2,
+      subtitle: "Manage public links in your CRM workspace",
+      stats: [
+        ["Total", "48"],
+        ["Active", "36"],
+        ["Updated Today", "12"],
+        ["Status", "Healthy"],
+      ],
+    },
+    QR: {
+      icon: QrCode,
+      subtitle: "Manage qr in your CRM workspace",
+      stats: [
+        ["Total", "48"],
+        ["Active", "36"],
+        ["Updated Today", "12"],
+        ["Status", "Healthy"],
+      ],
+    },
+    "Sources / Campaigns": {
+      icon: Globe,
+      subtitle: "Manage sources / campaigns in your CRM workspace",
+      stats: [
+        ["Total", "48"],
+        ["Active", "36"],
+        ["Updated Today", "12"],
+        ["Status", "Healthy"],
+      ],
+    },
+    Automations: {
+      icon: Workflow,
+      subtitle: "Manage automations in your CRM workspace",
+      stats: [
+        ["Total", "48"],
+        ["Active", "36"],
+        ["Updated Today", "12"],
+        ["Status", "Healthy"],
+      ],
+    },
+    Workflows: {
+      icon: Network,
+      subtitle: "Manage workflows in your CRM workspace",
+      stats: [
+        ["Total", "48"],
+        ["Active", "36"],
+        ["Updated Today", "12"],
+        ["Status", "Healthy"],
+      ],
+    },
+    Webhooks: {
+      icon: Link2,
+      subtitle: "Manage webhooks in your CRM workspace",
+      stats: [
+        ["Total", "48"],
+        ["Active", "36"],
+        ["Updated Today", "12"],
+        ["Status", "Healthy"],
+      ],
+    },
+    Members: {
+      icon: UsersRound,
+      subtitle: "Manage members in your CRM workspace",
+      stats: [
+        ["Total", "48"],
+        ["Active", "36"],
+        ["Updated Today", "12"],
+        ["Status", "Healthy"],
+      ],
+    },
+    Roles: {
+      icon: ShieldCheck,
+      subtitle: "Manage roles in your CRM workspace",
+      stats: [
+        ["Total", "48"],
+        ["Active", "36"],
+        ["Updated Today", "12"],
+        ["Status", "Healthy"],
+      ],
+    },
+    Permissions: {
+      icon: ShieldCheck,
+      subtitle: "Manage permissions in your CRM workspace",
+      stats: [
+        ["Total", "48"],
+        ["Active", "36"],
+        ["Updated Today", "12"],
+        ["Status", "Healthy"],
+      ],
+    },
+    Integrations: {
+      icon: Network,
+      subtitle: "Manage integrations in your CRM workspace",
+      stats: [
+        ["Total", "48"],
+        ["Active", "36"],
+        ["Updated Today", "12"],
+        ["Status", "Healthy"],
+      ],
+    },
+    Subscription: {
+      icon: CreditCard,
+      subtitle: "Manage subscription in your CRM workspace",
+      stats: [
+        ["Total", "48"],
+        ["Active", "36"],
+        ["Updated Today", "12"],
+        ["Status", "Healthy"],
+      ],
+    },
+    Leads: {
       icon: Target,
       subtitle: "Manage and track your sales leads",
       stats: [

@@ -1,6 +1,9 @@
 // Support Forms
 export const SUPPORT_FORM_URL = "http://localhost:5173/public/forms/6ab9993df52b3f8b48b1d9d7/br30-crm-support-ticket?utm_source=br30-crm-support&utm_medium=support&lead_source=br30-crm-support&form_id=6ac236c9961d1033e0b7bbb5&source_id=6ac237ad961d1033e0b7bbb7";
 
+// Custome plan support form
+export const CUSTOM_PLAN_SUPPORT_FORM_URL = "http://localhost:5173/public/forms/6ab9993df52b3f8b48b1d9d7/br30-crm-custom-plan-request?utm_source=br30-crm-custom-plan&utm_medium=website&lead_source=br30-crm-custom-plan&form_id=6ac3e39fcf2cad28844a5a4d&source_id=6ac3e400cf2cad28844a5a4e";
+
 // Legal Support Forms
 export const LEGAL_PRIVACY_POLICY_SUPPORT_FORM_URL =
   "http://localhost:5173/public/forms/6ab9993df52b3f8b48b1d9d7/br30-crm-legal-support-ticket?utm_source=br30-crm-legal-privacy-policy&utm_medium=website&lead_source=br30-crm-legal-privacy-policy&form_id=6ac2de8b45d94386aa073fad&source_id=6ac2e1ba45d94386aa073fb2";
