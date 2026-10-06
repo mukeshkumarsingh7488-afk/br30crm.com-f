@@ -5,20 +5,22 @@ import Topbar from "./Topbar";
 
 function AppLayout() {
   const [theme, setTheme] = useState(localStorage.getItem("crm-theme") || "light");
+
   const [sidebarMode, setSidebarMode] = useState(() => {
     const saved = localStorage.getItem("crm-sidebar-mode");
-    if (!saved || saved === "topnav") {
+
+    if (!saved) {
       localStorage.setItem("crm-sidebar-mode", "rail");
       return "rail";
     }
+
     return saved;
   });
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
-    const savedMode = localStorage.getItem("crm-sidebar-mode");
     const saved = localStorage.getItem("crm-sidebar-collapsed");
-    if (savedMode === "rail") return true;
-    return saved !== null ? saved === "true" : false;
+
+    return saved !== null ? saved === "true" : true;
   });
 
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -30,6 +32,7 @@ function AppLayout() {
 
     root.setAttribute("data-theme", activeTheme);
     root.style.colorScheme = activeTheme;
+
     localStorage.setItem("crm-theme", theme);
   }, [theme]);
 
@@ -38,22 +41,35 @@ function AppLayout() {
   }, [sidebarCollapsed]);
 
   useEffect(() => {
-    if (sidebarMode === "rail") {
-      setSidebarCollapsed(true);
-    }
-  }, [sidebarMode]);
-
-  useEffect(() => {
     const handleThemeChange = (event) => {
       const nextTheme = event.detail || localStorage.getItem("crm-theme") || "system";
+
       setTheme(nextTheme);
     };
 
     const handleSidebarModeChange = (event) => {
       const nextMode = event.detail || localStorage.getItem("crm-sidebar-mode") || "rail";
 
+      /*
+       * On mobile, Top Navigation is not used.
+       * Keep the user's desktop preference in localStorage,
+       * but visually use Rail while the viewport is mobile.
+       */
+      if (window.innerWidth <= 768 && nextMode === "topnav") {
+        setSidebarMode("rail");
+        setSidebarCollapsed(true);
+        setMobileOpen(false);
+        return;
+      }
+
       setSidebarMode(nextMode);
 
+      /*
+       * Rail starts compact when the user explicitly changes
+       * the sidebar mode to Rail.
+       *
+       * After that, the user's open/close state is persisted.
+       */
       if (nextMode === "rail") {
         setSidebarCollapsed(true);
       } else {
@@ -71,6 +87,51 @@ function AppLayout() {
       window.removeEventListener("crm-sidebar-mode-change", handleSidebarModeChange);
     };
   }, []);
+
+  /*
+   * Mobile protection for Top Navigation.
+   *
+   * Important:
+   * We do NOT overwrite the saved desktop preference.
+   * If the user selected Top Navigation on desktop, it remains
+   * saved as Top Navigation. On mobile, only the active layout
+   * becomes Rail.
+   */
+  useEffect(() => {
+    const handleViewportMode = () => {
+      const isMobile = window.innerWidth <= 768;
+
+      if (isMobile) {
+        if (sidebarMode === "topnav") {
+          setSidebarMode("rail");
+          setSidebarCollapsed(true);
+          setMobileOpen(false);
+        }
+
+        return;
+      }
+
+      /*
+       * When returning to desktop, restore the user's saved
+       * sidebar preference if it was Top Navigation.
+       */
+      const savedMode = localStorage.getItem("crm-sidebar-mode");
+
+      if (savedMode === "topnav" && sidebarMode === "rail") {
+        setSidebarMode("topnav");
+        setSidebarCollapsed(false);
+        setMobileOpen(false);
+      }
+    };
+
+    handleViewportMode();
+
+    window.addEventListener("resize", handleViewportMode);
+
+    return () => {
+      window.removeEventListener("resize", handleViewportMode);
+    };
+  }, [sidebarMode]);
 
   useEffect(() => {
     const root = document.documentElement;

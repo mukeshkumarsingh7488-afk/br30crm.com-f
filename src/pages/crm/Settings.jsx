@@ -7,6 +7,12 @@ import { getBusinessSettings, updateBusinessSettings } from "../../api/settings.
 
 const SIDEBAR_MODES = [
   {
+    value: "topnav",
+    label: "Top Navigation",
+    description: "Keep CRM navigation in a horizontal top navigation bar for a wide workspace layout.",
+    icon: "↔",
+  },
+  {
     value: "split",
     label: "Split Sidebar",
     description: "Section navigation and page navigation stay separated for a clean enterprise workspace.",
