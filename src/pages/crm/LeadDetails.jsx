@@ -86,7 +86,7 @@ const statusLabel = (value) => STATUS_OPTIONS.find((item) => item.value === valu
 const ratingLabel = (value) => RATING_OPTIONS.find((item) => item.value === value)?.label || value || "—";
 
 const getTagId = (tag) => (typeof tag === "string" ? tag : tag?._id || tag?.id || tag?.tagId || "");
-const getTagName = (tag) => (typeof tag === "string" ? tag : tag?.name || tag?.title || tag?.label || tag?.slug || getTagId(tag) || "Unnamed tag");
+const getTagName = (tag) => (typeof tag === "string" ? "" : tag?.name || tag?.title || tag?.label || tag?.slug || "Unnamed tag");
 const normalizeTagIds = (value) => (Array.isArray(value) ? value.map(getTagId).filter(Boolean).map(String) : []);
 const getTagDisplayNames = (value) => (Array.isArray(value) ? value.map(getTagName).filter(Boolean) : []);
 

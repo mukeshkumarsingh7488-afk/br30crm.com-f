@@ -43,12 +43,6 @@ const SIDEBAR_MODES = [
     icon: "▤",
   },
   {
-    value: "topnav",
-    label: "Top Navigation",
-    description: "Move the main CRM navigation horizontally across the top of the workspace.",
-    icon: "━",
-  },
-  {
     value: "section",
     label: "Section Rail",
     description: "Show section icons only and reveal the complete section menu when you hover.",
@@ -58,7 +52,7 @@ const SIDEBAR_MODES = [
 
 export default function Settings() {
   const [theme, setTheme] = useState(localStorage.getItem("crm-theme") || "system");
-  const [sidebarMode, setSidebarMode] = useState(localStorage.getItem("crm-sidebar-mode") || "topnav");
+  const [sidebarMode, setSidebarMode] = useState(localStorage.getItem("crm-sidebar-mode") || "rail");
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");

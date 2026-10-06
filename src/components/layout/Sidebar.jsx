@@ -110,14 +110,14 @@ const sections = [
 
 const normalizeMode = (mode) =>
   ({
-    default: "topnav",
+    default: "rail",
     classic: "accordion",
     overlay: "dual",
   })[mode] ||
   mode ||
-  "topnav";
+  "rail";
 
-function Sidebar({ collapsed, mobileOpen, sidebarMode = "topnav", onToggle, onMobileClose }) {
+function Sidebar({ collapsed, mobileOpen, sidebarMode = "rail", onToggle, onMobileClose }) {
   const navigate = useNavigate();
   const activeMode = normalizeMode(sidebarMode);
   const { permissions, isBusinessOwner } = useBusiness();

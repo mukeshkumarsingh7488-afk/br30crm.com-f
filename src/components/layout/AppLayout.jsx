@@ -5,10 +5,19 @@ import Topbar from "./Topbar";
 
 function AppLayout() {
   const [theme, setTheme] = useState(localStorage.getItem("crm-theme") || "light");
-  const [sidebarMode, setSidebarMode] = useState(localStorage.getItem("crm-sidebar-mode") || "topnav");
+  const [sidebarMode, setSidebarMode] = useState(() => {
+    const saved = localStorage.getItem("crm-sidebar-mode");
+    if (!saved || saved === "topnav") {
+      localStorage.setItem("crm-sidebar-mode", "rail");
+      return "rail";
+    }
+    return saved;
+  });
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    const savedMode = localStorage.getItem("crm-sidebar-mode");
     const saved = localStorage.getItem("crm-sidebar-collapsed");
+    if (savedMode === "rail") return true;
     return saved !== null ? saved === "true" : false;
   });
 
@@ -29,13 +38,19 @@ function AppLayout() {
   }, [sidebarCollapsed]);
 
   useEffect(() => {
+    if (sidebarMode === "rail") {
+      setSidebarCollapsed(true);
+    }
+  }, [sidebarMode]);
+
+  useEffect(() => {
     const handleThemeChange = (event) => {
       const nextTheme = event.detail || localStorage.getItem("crm-theme") || "system";
       setTheme(nextTheme);
     };
 
     const handleSidebarModeChange = (event) => {
-      const nextMode = event.detail || localStorage.getItem("crm-sidebar-mode") || "topnav";
+      const nextMode = event.detail || localStorage.getItem("crm-sidebar-mode") || "rail";
 
       setSidebarMode(nextMode);
 

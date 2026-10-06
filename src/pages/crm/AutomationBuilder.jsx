@@ -111,8 +111,21 @@ function ActionConfig({ action, onChange, members = [], teams = [], tags = [] })
           <input style={inputStyle} type="datetime-local" value={c.dueDate ? String(c.dueDate).slice(0, 16) : ""} onChange={(e) => set("dueDate", e.target.value ? new Date(e.target.value).toISOString() : "")} />
         </label>
         <label>Assigned user{select("assignedTo", members, "Optional assignee")}</label>
-        <label>Tags{selectMany("tagIds", tags, "No tags available")}</label>
-        <span className="auto-help auto-span">Optional: select one or more tags to apply to the task created by this automation.</span>
+        <label>
+          Tag
+          <select
+            style={inputStyle}
+            value={c.tagId || (Array.isArray(c.tagIds) ? c.tagIds[0] || "" : "")}
+            onChange={(e) => onChange({ ...action, config: { ...c, tagId: e.target.value, tagIds: e.target.value ? [e.target.value] : [] } })}>
+            <option value="">Optional task tag</option>
+            {tags.map((x) => (
+              <option key={idOf(x)} value={idOf(x)}>
+                {optionName(x)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <span className="auto-help auto-span">Optional: select a business tag to apply to the task created by this automation.</span>
       </div>
     );
   if (action.type === "create_note")

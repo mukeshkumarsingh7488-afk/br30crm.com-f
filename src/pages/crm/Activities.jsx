@@ -138,7 +138,7 @@ const getTagName = (tag) => {
   if (!tag) return "";
 
   if (typeof tag === "string") {
-    return tag;
+    return "";
   }
 
   return tag?.name || tag?.title || tag?.label || tag?.slug || "Unnamed tag";
@@ -826,14 +826,14 @@ function Activities() {
   };
 
   const toggleTag = (tagId) => {
+    const normalizedTagId = String(tagId || "");
+    if (!normalizedTagId) return;
     setForm((current) => {
       const currentTags = Array.isArray(current.tags) ? current.tags.map(getTagId).filter(Boolean).map(String) : [];
-
-      const exists = currentTags.includes(tagId);
-
+      const exists = currentTags.includes(normalizedTagId);
       return {
         ...current,
-        tags: exists ? currentTags.filter((id) => id !== tagId) : [...currentTags, tagId],
+        tags: exists ? currentTags.filter((id) => id !== normalizedTagId) : [...currentTags, normalizedTagId],
       };
     });
   };
@@ -1882,7 +1882,7 @@ function Activities() {
                             tags.map((tag) => {
                               const id = getTagId(tag);
 
-                              const selected = (form.tags || []).includes(id);
+                              const selected = (form.tags || []).map(String).includes(String(id));
 
                               return (
                                 <button type="button" className={`activities-tag-option ${selected ? "selected" : ""}`} key={id} onClick={() => toggleTag(id)}>

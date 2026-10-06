@@ -415,10 +415,10 @@ export default function Members() {
 
     const result = await showAuthAlert({
       icon: "warning",
-      title: "Remove Member?",
-      text: `${memberName} will be deactivated from this business. Are you sure you want to continue?`,
+      title: "Delete Member?",
+      text: `${memberName} will be permanently deleted from this business. This cannot be undone. Are you sure you want to continue?`,
       showCancelButton: true,
-      confirmButtonText: "Remove",
+      confirmButtonText: "Delete",
       cancelButtonText: "Cancel",
     });
 
@@ -433,8 +433,8 @@ export default function Members() {
 
       await showAuthAlert({
         icon: "success",
-        title: "Member Removed",
-        text: "Business member deactivated successfully.",
+        title: "Member Deleted",
+        text: "Business member deleted successfully.",
         confirmButtonText: "Done",
       });
     } catch (err) {
