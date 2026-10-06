@@ -14,10 +14,11 @@ export const getPublicForm = async (businessId, slug, params = {}) =>
   unwrap(
     await api.get(`/public-forms/public/${businessId}/${slug}`, {
       params,
+      timeout: 15000,
     })
   );
 
-export const submitPublicForm = async (businessId, slug, data) => unwrap(await api.post(`/public-forms/public/${businessId}/${slug}/submit`, data));
+export const submitPublicForm = async (businessId, slug, data) => unwrap(await api.post(`/public-forms/public/${businessId}/${slug}/submit`, data, { timeout: 20000 }));
 
 export const getPublicFormQr = async (businessId, slug) => unwrap(await api.get(`/public-forms/public/${businessId}/${slug}/qr`));
 

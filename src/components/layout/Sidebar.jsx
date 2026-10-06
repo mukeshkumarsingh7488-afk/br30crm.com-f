@@ -17,6 +17,7 @@ import {
   CircleDollarSign,
   ContactRound,
   FileText,
+  FolderOpen,
   GitBranch,
   Globe,
   LayoutDashboard,
@@ -53,6 +54,8 @@ const crmMenu = [
   { label: "Pipelines", path: "/pipelines", icon: GitBranch },
   { label: "Tasks", path: "/tasks", icon: CheckSquare },
   { label: "Activities", path: "/activities", icon: Activity },
+  { label: "Notes", path: "/notes", icon: FileText },
+  { label: "Files", path: "/files", icon: FolderOpen },
   { label: "Meetings", path: "/meetings", icon: CalendarDays },
   { label: "Calendar", path: "/calendar", icon: CalendarDays },
 ];
@@ -239,6 +242,8 @@ function Sidebar({ collapsed, mobileOpen, sidebarMode = "rail", onToggle, onMobi
     if (path === "/companies") return PERMISSIONS.COMPANIES_VIEW;
     if (path === "/deals") return PERMISSIONS.DEALS_VIEW;
     if (path === "/activities") return PERMISSIONS.ACTIVITIES_VIEW;
+    if (path === "/notes") return PERMISSIONS.NOTES_VIEW;
+    if (path === "/files") return PERMISSIONS.FILES_VIEW;
     if (path === "/tasks") return PERMISSIONS.TASKS_VIEW;
     if (path === "/pipelines") return PERMISSIONS.PIPELINES_VIEW;
     if (path === "/tags") return PERMISSIONS.TAGS_VIEW;

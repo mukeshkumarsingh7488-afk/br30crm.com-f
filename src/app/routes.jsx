@@ -20,6 +20,8 @@ import Contacts from "../pages/crm/Contacts";
 import Companies from "../pages/crm/Companies";
 import Deals from "../pages/crm/Deals";
 import Activities from "../pages/crm/Activities";
+import Notes from "../pages/crm/Notes";
+import Files from "../pages/crm/Files";
 import Tasks from "../pages/crm/Tasks";
 import Pipelines from "../pages/crm/Pipelines";
 import Settings from "../pages/crm/Settings";
@@ -159,6 +161,8 @@ function AppRoutes() {
             <Route path="/deals" element={<Deals />} />
             <Route path="/deals/:id" element={<DealDetails />} />
             <Route path="/activities" element={<Activities />} />
+            <Route path="/notes" element={<Notes />} />
+            <Route path="/files" element={<Files />} />
             <Route path="/tasks" element={<Tasks />} />
             <Route path="/pipelines" element={<Pipelines />} />
             <Route path="/settings" element={<Settings />} />
