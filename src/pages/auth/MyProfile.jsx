@@ -8,6 +8,8 @@ import { getCurrentUser, updateProfile, removeProfileImage } from "../../api/aut
 
 import { getBusinessById } from "../../api/business.api";
 
+import { getMembers } from "../../api/member.api";
+
 import { showAuthSuccess, showAuthError, showAuthWarning } from "../../components/auth/authAlert";
 
 import useBusiness from "../../hooks/useBusiness";
@@ -71,15 +73,24 @@ function MyProfile() {
   const isBusinessOwner = Boolean(user?._id && businessDetails?.ownerId && String(user._id) === String(businessDetails.ownerId));
 
   useEffect(() => {
+    if (!businessId) return;
     loadProfile();
-  }, []);
+  }, [businessId]);
 
   useEffect(() => {
-    if (!businessId) return;
+    if (!businessId || !user?._id) return;
+
+    if (String(business?.ownerId || "") !== String(user._id)) {
+      setBusinessDetails(null);
+      return;
+    }
+
     getBusinessById(businessId)
       .then((response) => {
         const details = response?.data?.business || response?.business || response?.data || response || null;
+
         setBusinessDetails(details);
+
         setBusinessForm({
           name: details?.name || "",
           legalName: details?.legalName || user?.name || "",
@@ -98,7 +109,7 @@ function MyProfile() {
         });
       })
       .catch(() => setBusinessDetails(null));
-  }, [businessId, user?.name]);
+  }, [businessId, user?._id, business?.ownerId]);
 
   const loadProfile = async () => {
     try {
@@ -114,19 +125,45 @@ function MyProfile() {
         throw new Error("Unable to load profile.");
       }
 
+      let membershipId = null;
+
+      if (businessId) {
+        try {
+          const memberResponse = await getMembers(businessId, {
+            page: 1,
+            limit: 100,
+          });
+
+          const memberData = memberResponse?.data || memberResponse || {};
+
+          const members = Array.isArray(memberData?.members) ? memberData.members : Array.isArray(memberData?.items) ? memberData.items : Array.isArray(memberData?.results) ? memberData.results : Array.isArray(memberData) ? memberData : [];
+
+          const currentMember = members.find((member) => {
+            const memberUserId = typeof member?.userId === "string" ? member.userId : member?.userId?._id || member?.userId?.id;
+
+            return String(memberUserId || "") === String(currentUser?._id || "");
+          });
+
+          membershipId = currentMember?._id || currentMember?.membershipId || null;
+        } catch (membershipError) {
+          console.error("Membership load failed:", membershipError);
+        }
+      }
+
       const profileData = {
         name: currentUser.name || "",
-
         email: currentUser.email || "",
-
         phone: currentUser.phone || "",
-
         profileImage: currentUser.profileImage || "",
-
         profileImagePublicId: currentUser.profileImagePublicId || "",
       };
 
-      setUser(currentUser);
+      const mergedUser = {
+        ...currentUser,
+        membershipId,
+      };
+
+      setUser(mergedUser);
 
       setForm(profileData);
 
@@ -134,10 +171,11 @@ function MyProfile() {
 
       setImagePreview(profileData.profileImage || "");
     } catch (error) {
+      console.error("My Profile load failed:", error);
+
       setMessage({
         type: "error",
-
-        text: error.message || "Failed to load profile.",
+        text: error?.response?.data?.message || error.message || "Failed to load profile.",
       });
     } finally {
       setLoading(false);
@@ -591,17 +629,13 @@ function MyProfile() {
       return;
     }
 
-    const confirmation = await showAuthWarning(
-      "Remove profile photo?",
-      "Your current profile photo will be removed. This action cannot be undone.",
-      {
-        showCancelButton: true,
-        confirmButtonText: "Yes, remove",
-        cancelButtonText: "Cancel",
-        reverseButtons: true,
-        focusCancel: true,
-      }
-    );
+    const confirmation = await showAuthWarning("Remove profile photo?", "Your current profile photo will be removed. This action cannot be undone.", {
+      showCancelButton: true,
+      confirmButtonText: "Yes, remove",
+      cancelButtonText: "Cancel",
+      reverseButtons: true,
+      focusCancel: true,
+    });
 
     if (!confirmation?.isConfirmed) {
       return;
@@ -860,6 +894,8 @@ function MyProfile() {
     { label: "Full name", value: user?.name, icon: User },
     { label: "Email", value: user?.email, icon: Mail },
     { label: "Phone", value: user?.phone, icon: Phone },
+    { label: "Business ID", value: businessId || user?.businessId, icon: Building2 },
+    { label: "Membership ID", value: user?.membershipId, icon: ShieldCheck },
     { label: "User ID", value: user?._id, icon: User },
     { label: "Role", value: accountRole, icon: ShieldCheck },
     { label: "Access level", value: user?.accessLevel, icon: ShieldCheck },

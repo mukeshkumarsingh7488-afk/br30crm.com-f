@@ -859,8 +859,6 @@ function AdminAnnouncement() {
     <main className="admin-announcement-page">
       <section className="admin-announcement-header">
         <div className="admin-announcement-heading">
-          <div className="admin-announcement-eyebrow">CONTENT MANAGEMENT</div>
-
           <h1>Announcements</h1>
 
           <p>Manage public announcements, releases, updates and important platform messages.</p>
@@ -1562,7 +1560,6 @@ function AdminAnnouncement() {
 .admin-announcement-page{width:100%;max-width:1480px;margin:0 auto;padding:28px 30px 60px;box-sizing:border-box;color:var(--admin-text,#111827)}
 .admin-announcement-header{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:25px}
 .admin-announcement-heading{min-width:0}
-.admin-announcement-eyebrow{display:flex;align-items:center;gap:6px;margin:0 0 7px;color:var(--admin-primary);font-size:13px;font-weight:400;letter-spacing:.08em;line-height:1;text-transform:uppercase}
 .admin-announcement-heading h1{margin:0;font-size:29px;line-height:1.2;color:var(--admin-text)}
 .admin-announcement-heading p{margin:7px 0 0;color:var(--admin-muted);font-size:14px;line-height:1.55}
 .admin-announcement-header-actions{display:flex;align-items:center;gap:10px}

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Ban, CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, Clock3, Edit3, Eye, Mail, Phone, RefreshCw, Search, ShieldCheck, Trash2, UserCheck, UserX, Users, X } from "lucide-react";
 import Swal from "sweetalert2";
 
-import { getAdminOverview, updateAdminUser, updateAdminUserStatus, deleteAdminUser } from "../../api/admin.api";
+import { getAdminOverview, getAdminUser, updateAdminUser, updateAdminUserStatus, deleteAdminUser } from "../../api/admin.api";
 
 /* ============================================================
  * DATE HELPERS
@@ -298,8 +298,36 @@ function AdminUsers() {
     await loadUsers(false);
   };
 
-  const handleView = (user) => {
-    setSelectedUser(user);
+  const handleView = async (user) => {
+    const userId = getUserId(user);
+
+    if (!userId) return;
+
+    try {
+      const response = await getAdminUser(userId);
+
+      const data = response?.data || response;
+
+      const detailedUser = data?.user || data?.data?.user || data;
+
+      setSelectedUser({
+        ...user,
+        ...detailedUser,
+        businessId: detailedUser?.businessId || user?.businessId || null,
+        membershipId: detailedUser?.membershipId || user?.membershipId || null,
+      });
+    } catch (error) {
+      console.error("Admin user details load failed:", error);
+
+      setSelectedUser(user);
+
+      await fireAlert({
+        icon: "error",
+        title: "Unable to load user details",
+        text: error?.response?.data?.message || error?.message || "Something went wrong while loading user details.",
+        confirmButtonText: "OK",
+      });
+    }
   };
 
   const handleEditOpen = (user) => {
@@ -548,7 +576,6 @@ function AdminUsers() {
       <style>{`
 .admin-users-page{width:100%;min-width:0;padding:28px 28px 45px;box-sizing:border-box;color:var(--admin-text);background:transparent;}
 .admin-users-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:24px;}
-.admin-users-eyebrow{color:var(--admin-primary);font-size:13px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px;}
 .admin-users-title{margin:0;color:var(--admin-text);font-size:29px;line-height:1.2}
 .admin-users-subtitle{margin:8px 0 0;color:var(--admin-muted);font-size:14px;line-height:1.6;}
 .admin-users-head-actions{display:flex;align-items:center;gap:10px;flex-shrink:0;}
@@ -652,6 +679,13 @@ function AdminUsers() {
 .admin-user-detail-avatar{width:50px;height:50px;border-radius:13px;background:var(--admin-primary-soft);color:var(--admin-primary);display:flex;align-items:center;justify-content:center;font-weight:400;}
 .admin-user-detail-name{margin:0 0 4px;font-size:17px;font-weight:400;color:var(--admin-text);}
 .admin-user-detail-email{color:var(--admin-muted);font-size:13px;}
+.admin-user-detail-top-info{min-width:0;flex:1;display:flex;align-items:center;justify-content:space-between;gap:20px;}
+.admin-user-detail-business{min-width:0;flex:0 0 250px;display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+.admin-user-detail-business-item{min-width:0;text-align:right;}
+.admin-user-detail-business-label{color:var(--admin-muted);font-size:11px;font-weight:400;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;}
+.admin-user-detail-business-value{color:var(--admin-text);font-size:11px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:250px;}
+.admin-user-detail-business-label{color:var(--admin-muted);font-size:11px;font-weight:400;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.admin-user-detail-business-value{color:var(--admin-text);font-size:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px;}
 .admin-user-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
 .admin-user-detail-item{padding:13px;border:1px solid var(--admin-border);border-radius:10px;min-width:0;background:var(--admin-surface);color:var(--admin-text);}
 .admin-user-detail-label{color:var(--admin-muted);font-size:13px;font-weight:400;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;}
@@ -773,8 +807,6 @@ function AdminUsers() {
 
         <div className="admin-users-head">
           <div>
-            <div className="admin-users-eyebrow">Master Admin</div>
-
             <h1 className="admin-users-title">Users</h1>
 
             <p className="admin-users-subtitle">Manage CRM users, account status, verification and contact information.</p>
@@ -1168,10 +1200,30 @@ function AdminUsers() {
                   </div>
                 </div>
 
-                <div>
-                  <h3 className="admin-user-detail-name">{selectedUser?.name || "Unnamed user"}</h3>
+                <div className="admin-user-detail-top-info">
+                  <div>
+                    <h3 className="admin-user-detail-name">{selectedUser?.name || "Unnamed user"}</h3>
 
-                  <div className="admin-user-detail-email">{selectedUser?.email || "No email"}</div>
+                    <div className="admin-user-detail-email">{selectedUser?.email || "No email"}</div>
+                  </div>
+
+                  <div className="admin-user-detail-business">
+                    <div className="admin-user-detail-business-item">
+                      <div className="admin-user-detail-business-label">Business ID</div>
+
+                      <div className="admin-user-detail-business-value" title={selectedUser?.businessId?._id || selectedUser?.businessId || "—"}>
+                        {selectedUser?.businessId?._id || selectedUser?.businessId || "—"}
+                      </div>
+                    </div>
+
+                    <div className="admin-user-detail-business-item">
+                      <div className="admin-user-detail-business-label">Membership ID</div>
+
+                      <div className="admin-user-detail-business-value" title={selectedUser?.membershipId || "—"}>
+                        {selectedUser?.membershipId || "—"}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
