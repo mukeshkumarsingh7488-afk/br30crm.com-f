@@ -304,7 +304,7 @@ function HelpCenter() {
               </div>
               <div>
                 <strong>BR30 CRM Support</strong>
-                <a href={RESOURCES_HELP_CENTER_SUPPORT_FORM_URL} className="br30-support-ticket-link" target="_blank" rel="noopener noreferrer">
+                <a href={RESOURCES_HELP_CENTER_SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
                   Create Support Ticket
                 </a>
               </div>

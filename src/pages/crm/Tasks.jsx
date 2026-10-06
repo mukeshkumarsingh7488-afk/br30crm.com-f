@@ -216,7 +216,7 @@ const labelFor = (options, value) => options.find((item) => item.value === value
 function Tasks() {
   const { businessId, loading: businessLoading, error: businessError, role, isBusinessOwner } = useBusiness();
   const canManage = isManagementRole({ role, isBusinessOwner });
-    const [assigneeDetail, setAssigneeDetail] = useState(null);
+  const [assigneeDetail, setAssigneeDetail] = useState(null);
 
   const [tasks, setTasks] = useState([]);
 
@@ -1228,140 +1228,142 @@ function Tasks() {
 
       <div className="tasks-card">
         <div className="tasks-table-wrap">
-        <table className="tasks-table">
-          <thead>
-            <tr>
-              <th>Task</th>
-              <th>Status</th>
-              <th>Priority</th>
-              <th>Due</th>
-              <th>Assigned to</th>
-              <th>Related to</th>
-              <th>Tags</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {loading || businessLoading ? (
+          <table className="tasks-table">
+            <thead>
               <tr>
-                <td colSpan={8}>
-                  <div className="tasks-empty">Loading tasks...</div>
-                </td>
+                <th>Task</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th>Due</th>
+                <th>Assigned to</th>
+                <th>Related to</th>
+                <th>Tags</th>
+                <th>Actions</th>
               </tr>
-            ) : tasks.length === 0 ? (
-              <tr>
-                <td colSpan={8}>
-                  <div className="tasks-empty">No tasks found.</div>
-                </td>
-              </tr>
-            ) : (
-              tasks.map((task) => {
-                const assigned = task?.assignedTo;
+            </thead>
 
-                const assignedName = String(getAssignedUserName(task) || "Unassigned");
+            <tbody>
+              {loading || businessLoading ? (
+                <tr>
+                  <td colSpan={8}>
+                    <div className="tasks-empty">Loading tasks...</div>
+                  </td>
+                </tr>
+              ) : tasks.length === 0 ? (
+                <tr>
+                  <td colSpan={8}>
+                    <div className="tasks-empty">No tasks found.</div>
+                  </td>
+                </tr>
+              ) : (
+                tasks.map((task) => {
+                  const assigned = task?.assignedTo;
 
-                const initials =
-                  assignedName !== "Unassigned"
-                    ? assignedName
-                        .split(" ")
-                        .filter(Boolean)
-                        .slice(0, 2)
-                        .map((part) => part[0])
-                        .join("")
-                        .toUpperCase()
-                    : "—";
+                  const assignedName = String(getAssignedUserName(task) || "Unassigned");
 
-                return (
-                  <tr key={task._id}>
-                    <td>
-                      <div className="task-title-cell">
-                        <div className="task-title-icon">
-                          <CheckSquareIcon size={14} />
+                  const initials =
+                    assignedName !== "Unassigned"
+                      ? assignedName
+                          .split(" ")
+                          .filter(Boolean)
+                          .slice(0, 2)
+                          .map((part) => part[0])
+                          .join("")
+                          .toUpperCase()
+                      : "—";
+
+                  return (
+                    <tr key={task._id}>
+                      <td>
+                        <div className="task-title-cell">
+                          <div className="task-title-icon">
+                            <CheckSquareIcon size={14} />
+                          </div>
+
+                          <div>
+                            <div className="task-title-main">{task.title || "Untitled task"}</div>
+
+                            {task.description ? <div className="task-title-desc">{task.description}</div> : null}
+                          </div>
                         </div>
+                      </td>
 
-                        <div>
-                          <div className="task-title-main">{task.title || "Untitled task"}</div>
+                      <td>
+                        <span className={`task-badge ${getStatusClass(task.status)}`}>{labelFor(STATUS_OPTIONS, task.status)}</span>
+                      </td>
 
-                          {task.description ? <div className="task-title-desc">{task.description}</div> : null}
+                      <td>
+                        <span className={`task-badge ${getPriorityClass(task.priority)}`}>{labelFor(PRIORITY_OPTIONS, task.priority)}</span>
+                      </td>
+
+                      <td>{formatDate(task.dueDate)}</td>
+
+                      <td>
+                        <div className="task-assignee">
+                          <span className="task-avatar">{initials}</span>
+
+                          <button type="button" className="crm-assignee-name" onClick={() => assigned && typeof assigned === "object" && setAssigneeDetail({ type: "user", name: assignedName, email: assigned?.email || "" })}>
+                            {assigned ? assignedName : "Unassigned"}
+                          </button>
                         </div>
-                      </div>
-                    </td>
+                      </td>
 
-                    <td>
-                      <span className={`task-badge ${getStatusClass(task.status)}`}>{labelFor(STATUS_OPTIONS, task.status)}</span>
-                    </td>
+                      <td>{renderRelated(task)}</td>
 
-                    <td>
-                      <span className={`task-badge ${getPriorityClass(task.priority)}`}>{labelFor(PRIORITY_OPTIONS, task.priority)}</span>
-                    </td>
+                      <td>
+                        <div className="task-tags">
+                          {Array.isArray(task.tags) && task.tags.length ? (
+                            task.tags.slice(0, 3).map((tag) => (
+                              <span className="task-tag" key={getTagId(tag)}>
+                                {getTagName(tag)}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="task-muted">—</span>
+                          )}
 
-                    <td>{formatDate(task.dueDate)}</td>
+                          {Array.isArray(task.tags) && task.tags.length > 3 ? <span className="task-tag">+{task.tags.length - 3}</span> : null}
+                        </div>
+                      </td>
 
-                    <td>
-                      <div className="task-assignee">
-                        <span className="task-avatar">{initials}</span>
-
-                        <button type="button" className="crm-assignee-name" onClick={() => assigned && typeof assigned === "object" && setAssigneeDetail({ type: "user", name: assignedName, email: assigned?.email || "" })}>{assigned ? assignedName : "Unassigned"}</button>
-                      </div>
-                    </td>
-
-                    <td>{renderRelated(task)}</td>
-
-                    <td>
-                      <div className="task-tags">
-                        {Array.isArray(task.tags) && task.tags.length ? (
-                          task.tags.slice(0, 3).map((tag) => (
-                            <span className="task-tag" key={getTagId(tag)}>
-                              {getTagName(tag)}
-                            </span>
-                          ))
-                        ) : (
-                          <span className="task-muted">—</span>
-                        )}
-
-                        {Array.isArray(task.tags) && task.tags.length > 3 ? <span className="task-tag">+{task.tags.length - 3}</span> : null}
-                      </div>
-                    </td>
-
-                    <td>
-                      <div className="tasks-actions">
-                        <button type="button" className="tasks-icon-btn" title="View" onClick={() => openView(task)}>
-                          <Eye size={14} />
-                        </button>
-
-                        <button
-                          type="button"
-                          className="tasks-icon-btn"
-                          title="Edit"
-                          onClick={(event) => {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            openEdit(task);
-                          }}>
-                          <Pencil size={14} />
-                        </button>
-
-                        {task.status !== "COMPLETED" ? (
-                          <button type="button" className="tasks-icon-btn complete" title="Complete" onClick={() => handleComplete(task)}>
-                            <Check size={14} />
+                      <td>
+                        <div className="tasks-actions">
+                          <button type="button" className="tasks-icon-btn" title="View" onClick={() => openView(task)}>
+                            <Eye size={14} />
                           </button>
-                        ) : null}
 
-                        {canManage && (
-                          <button type="button" className="tasks-icon-btn delete" title="Delete" onClick={() => handleDelete(task)}>
-                            <Trash2 size={14} />
+                          <button
+                            type="button"
+                            className="tasks-icon-btn"
+                            title="Edit"
+                            onClick={(event) => {
+                              event.preventDefault();
+                              event.stopPropagation();
+                              openEdit(task);
+                            }}>
+                            <Pencil size={14} />
                           </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
+
+                          {task.status !== "COMPLETED" ? (
+                            <button type="button" className="tasks-icon-btn complete" title="Complete" onClick={() => handleComplete(task)}>
+                              <Check size={14} />
+                            </button>
+                          ) : null}
+
+                          {canManage && (
+                            <button type="button" className="tasks-icon-btn delete" title="Delete" onClick={() => handleDelete(task)}>
+                              <Trash2 size={14} />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
 
         <div className="tasks-pagination">
           <span>{pagination.total ?? tasks.length} total</span>
@@ -1767,7 +1769,7 @@ function Tasks() {
           </div>
         </div>
       ) : null}
-    {assigneeDetail ? <AssigneeDetailsPopup detail={assigneeDetail} onClose={() => setAssigneeDetail(null)} /> : null}
+      {assigneeDetail ? <AssigneeDetailsPopup detail={assigneeDetail} onClose={() => setAssigneeDetail(null)} /> : null}
     </div>
   );
 }

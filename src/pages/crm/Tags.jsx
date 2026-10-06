@@ -276,10 +276,12 @@ export default function Tags() {
             <RefreshCw size={14} />
             {loading ? "Refreshing..." : "Refresh"}
           </button>
-          {canManage && <button type="button" className="tags-btn primary" onClick={openCreate} disabled={!businessId}>
-            <Plus size={15} />
-            New tag
-          </button>}
+          {canManage && (
+            <button type="button" className="tags-btn primary" onClick={openCreate} disabled={!businessId}>
+              <Plus size={15} />
+              New tag
+            </button>
+          )}
         </div>
       </div>
 
@@ -430,15 +432,16 @@ export default function Tags() {
                               <Edit3 size={14} />
                             </button>
                           )}
-                          {canManage && (activeState ? (
-                            <button type="button" className="tags-icon danger" title={system ? "System tags cannot be deactivated" : "Deactivate"} disabled={system} onClick={() => deactivateTag(tag)}>
-                              <Trash2 size={14} />
-                            </button>
-                          ) : canManage ? (
-                            <button type="button" className="tags-icon" title="Restore" onClick={() => restoreTagRecord(tag)}>
-                              <RotateCcw size={14} />
-                            </button>
-                          ) : null)}
+                          {canManage &&
+                            (activeState ? (
+                              <button type="button" className="tags-icon danger" title={system ? "System tags cannot be deactivated" : "Deactivate"} disabled={system} onClick={() => deactivateTag(tag)}>
+                                <Trash2 size={14} />
+                              </button>
+                            ) : canManage ? (
+                              <button type="button" className="tags-icon" title="Restore" onClick={() => restoreTagRecord(tag)}>
+                                <RotateCcw size={14} />
+                              </button>
+                            ) : null)}
                         </div>
                       </td>
                     </tr>

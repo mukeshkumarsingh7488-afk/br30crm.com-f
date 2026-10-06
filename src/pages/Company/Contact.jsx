@@ -196,7 +196,7 @@ function Contact() {
               <div>
                 <strong>BR30 Support Ticket</strong>
                 <p>Create a ticket for account, technical, billing, product, security, or general support requests.</p>
-                <a href={SUPPORT_FORM_URL} className="br30-contact-submit" target="_blank" rel="noopener noreferrer">
+                <a href={SUPPORT_FORM_URL} className="br30-contact-submit" rel="noopener noreferrer">
                   <Ticket size={14} />
                   Create Support Ticket
                 </a>
@@ -222,7 +222,7 @@ function Contact() {
               <div>
                 <strong>Create Support Ticket</strong>
                 <p>Please submit your request through the official BR30 CRM support form.</p>
-                <a href={SUPPORT_FORM_URL} className="br30-contact-submit" target="_blank" rel="noopener noreferrer">
+                <a href={SUPPORT_FORM_URL} className="br30-contact-submit" rel="noopener noreferrer">
                   <Ticket size={14} />
                   Open Support Form
                 </a>

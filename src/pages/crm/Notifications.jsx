@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Check, Eye, RefreshCw, Trash2, X } from "lucide-react";
 import useBusiness from "../../hooks/useBusiness";
 import { showAuthAlert } from "../../components/auth/authAlert";
-import { deleteNotification, getNotification, getNotifications, markNotificationRead } from "../../api/notification.api";
+import { deleteNotification, getNotification, getNotifications, markAllNotificationsRead, markNotificationRead } from "../../api/notification.api";
 
 const unwrap = (response) => {
   const root = response?.data || response || {};
@@ -22,9 +22,12 @@ const getSourceMeta = (notification) => {
   const type = String(source.type || "").toUpperCase();
   if (type === "AUTOMATION") return "Automation";
   if (source.role) return source.role;
+  if (type === "SYSTEM") return "System";
   if (type === "TEAM") return "Team";
   return "Business member";
 };
+
+const getSourceEmail = (notification) => notification?.source?.email || notification?.createdBy?.email || "—";
 
 const formatDateTime = (value) => {
   if (!value) return "—";
@@ -64,8 +67,25 @@ export default function Notifications() {
   }, [businessId]);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    let active = true;
+
+    const openNotifications = async () => {
+      if (!businessId) return;
+
+      try {
+        await markAllNotificationsRead(businessId);
+        window.dispatchEvent(new CustomEvent("br30:notifications-changed"));
+      } catch {}
+
+      if (active) await load();
+    };
+
+    openNotifications();
+
+    return () => {
+      active = false;
+    };
+  }, [businessId, load]);
 
   const unreadCount = useMemo(() => items.filter((item) => item?.status === "UNREAD").length, [items]);
 
@@ -136,9 +156,17 @@ export default function Notifications() {
           </thead>
           <tbody>
             {loading || businessLoading ? (
-              <tr><td colSpan={7} className="crm-notifications-empty">Loading...</td></tr>
+              <tr>
+                <td colSpan={7} className="crm-notifications-empty">
+                  Loading...
+                </td>
+              </tr>
             ) : !items.length ? (
-              <tr><td colSpan={7} className="crm-notifications-empty">No notifications found.</td></tr>
+              <tr>
+                <td colSpan={7} className="crm-notifications-empty">
+                  No notifications found.
+                </td>
+              </tr>
             ) : (
               items.map((item) => (
                 <tr key={item._id}>
@@ -150,17 +178,38 @@ export default function Notifications() {
                     <div className="crm-notification-source">
                       <span className="crm-notification-source-name">{getSourceLabel(item)}</span>
                       <span className="crm-notification-source-meta">{getSourceMeta(item)}</span>
+                      {getSourceEmail(item) !== "—" && <span className="crm-notification-source-meta">{getSourceEmail(item)}</span>}
                     </div>
                   </td>
                   <td>{item.type || "—"}</td>
                   <td className="crm-notification-priority">{item.priority || "—"}</td>
-                  <td><span className={`crm-notification-status ${item.status === "UNREAD" ? "unread" : "read"}`}>{item.status || "—"}</span></td>
+                  <td>
+                    <span className={`crm-notification-status ${item.status === "UNREAD" ? "unread" : "read"}`}>{item.status || "—"}</span>
+                  </td>
                   <td>{formatDateTime(item.createdAt)}</td>
                   <td>
                     <div className="crm-notification-actions">
-                      <button type="button" className="crm-notification-icon" title="View" onClick={() => handleView(item)}><Eye size={14} /></button>
-                      {item.status === "UNREAD" && <button type="button" className="crm-notification-icon" title="Mark read" onClick={async () => { try { await markNotificationRead(businessId, item._id); setItems((current) => current.map((x) => x._id === item._id ? { ...x, status: "READ", readAt: new Date().toISOString() } : x)); window.dispatchEvent(new CustomEvent("br30:notifications-changed")); } catch {} }}><Check size={14} /></button>}
-                      <button type="button" className="crm-notification-icon danger" title="Delete" onClick={() => handleDelete(item)}><Trash2 size={14} /></button>
+                      <button type="button" className="crm-notification-icon" title="View" onClick={() => handleView(item)}>
+                        <Eye size={14} />
+                      </button>
+                      {item.status === "UNREAD" && (
+                        <button
+                          type="button"
+                          className="crm-notification-icon"
+                          title="Mark read"
+                          onClick={async () => {
+                            try {
+                              await markNotificationRead(businessId, item._id);
+                              setItems((current) => current.map((x) => (x._id === item._id ? { ...x, status: "READ", readAt: new Date().toISOString() } : x)));
+                              window.dispatchEvent(new CustomEvent("br30:notifications-changed"));
+                            } catch {}
+                          }}>
+                          <Check size={14} />
+                        </button>
+                      )}
+                      <button type="button" className="crm-notification-icon danger" title="Delete" onClick={() => handleDelete(item)}>
+                        <Trash2 size={14} />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -178,26 +227,72 @@ export default function Notifications() {
                 <div style={{ color: "var(--crm-muted)", fontSize: 11, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 5 }}>Notification details</div>
                 <h2>{modal.title || "Notification"}</h2>
               </div>
-              <button type="button" className="crm-notifications-modal-close" onClick={() => setModal(null)}><X size={15} /></button>
+              <button type="button" className="crm-notifications-modal-close" onClick={() => setModal(null)}>
+                <X size={15} />
+              </button>
             </div>
             <div className="crm-notifications-modal-body">
               <div className="crm-notification-detail-grid">
-                <div className="crm-notification-detail"><div className="crm-notification-detail-label">Source</div><div className="crm-notification-detail-value">{getSourceLabel(modal)}</div></div>
-                <div className="crm-notification-detail"><div className="crm-notification-detail-label">Source type / role</div><div className="crm-notification-detail-value">{getSourceMeta(modal)}</div></div>
-                <div className="crm-notification-detail"><div className="crm-notification-detail-label">Type</div><div className="crm-notification-detail-value">{modal.type || "—"}</div></div>
-                <div className="crm-notification-detail"><div className="crm-notification-detail-label">Priority</div><div className="crm-notification-detail-value">{modal.priority || "—"}</div></div>
-                <div className="crm-notification-detail"><div className="crm-notification-detail-label">Status</div><div className="crm-notification-detail-value">{modal.status || "—"}</div></div>
-                <div className="crm-notification-detail"><div className="crm-notification-detail-label">Notification date &amp; time</div><div className="crm-notification-detail-value">{formatDateTime(modal.createdAt)}</div></div>
-                <div className="crm-notification-detail"><div className="crm-notification-detail-label">Read at</div><div className="crm-notification-detail-value">{formatDateTime(modal.readAt)}</div></div>
-                <div className="crm-notification-detail"><div className="crm-notification-detail-label">Updated / archived</div><div className="crm-notification-detail-value">{formatDateTime(modal.archivedAt)}</div></div>
-                <div className="crm-notification-detail full"><div className="crm-notification-detail-label">Message</div><div className="crm-notification-detail-value message">{modal.message || "—"}</div></div>
-                <div className="crm-notification-detail"><div className="crm-notification-detail-label">Entity</div><div className="crm-notification-detail-value">{modal.entityType || "—"}</div></div>
-                <div className="crm-notification-detail"><div className="crm-notification-detail-label">Entity ID</div><div className="crm-notification-detail-value">{modal.entityId || "—"}</div></div>
-                {modal.actionUrl && <div className="crm-notification-detail full"><div className="crm-notification-detail-label">Action</div><div className="crm-notification-detail-value">{modal.actionUrl}</div></div>}
+                <div className="crm-notification-detail">
+                  <div className="crm-notification-detail-label">Source</div>
+                  <div className="crm-notification-detail-value">{getSourceLabel(modal)}</div>
+                </div>
+                <div className="crm-notification-detail">
+                  <div className="crm-notification-detail-label">Source type / role</div>
+                  <div className="crm-notification-detail-value">{getSourceMeta(modal)}</div>
+                </div>
+                <div className="crm-notification-detail">
+                  <div className="crm-notification-detail-label">Source email</div>
+                  <div className="crm-notification-detail-value">{getSourceEmail(modal)}</div>
+                </div>
+                <div className="crm-notification-detail">
+                  <div className="crm-notification-detail-label">Type</div>
+                  <div className="crm-notification-detail-value">{modal.type || "—"}</div>
+                </div>
+                <div className="crm-notification-detail">
+                  <div className="crm-notification-detail-label">Priority</div>
+                  <div className="crm-notification-detail-value">{modal.priority || "—"}</div>
+                </div>
+                <div className="crm-notification-detail">
+                  <div className="crm-notification-detail-label">Status</div>
+                  <div className="crm-notification-detail-value">{modal.status || "—"}</div>
+                </div>
+                <div className="crm-notification-detail">
+                  <div className="crm-notification-detail-label">Notification date &amp; time</div>
+                  <div className="crm-notification-detail-value">{formatDateTime(modal.createdAt)}</div>
+                </div>
+                <div className="crm-notification-detail">
+                  <div className="crm-notification-detail-label">Read at</div>
+                  <div className="crm-notification-detail-value">{formatDateTime(modal.readAt)}</div>
+                </div>
+                <div className="crm-notification-detail">
+                  <div className="crm-notification-detail-label">Updated / archived</div>
+                  <div className="crm-notification-detail-value">{formatDateTime(modal.archivedAt)}</div>
+                </div>
+                <div className="crm-notification-detail full">
+                  <div className="crm-notification-detail-label">Message</div>
+                  <div className="crm-notification-detail-value message">{modal.message || "—"}</div>
+                </div>
+                <div className="crm-notification-detail">
+                  <div className="crm-notification-detail-label">Entity</div>
+                  <div className="crm-notification-detail-value">{modal.entityType || "—"}</div>
+                </div>
+                <div className="crm-notification-detail">
+                  <div className="crm-notification-detail-label">Entity ID</div>
+                  <div className="crm-notification-detail-value">{modal.entityId || "—"}</div>
+                </div>
+                {modal.actionUrl && (
+                  <div className="crm-notification-detail full">
+                    <div className="crm-notification-detail-label">Action</div>
+                    <div className="crm-notification-detail-value">{modal.actionUrl}</div>
+                  </div>
+                )}
               </div>
             </div>
             <div className="crm-notifications-modal-foot">
-              <button type="button" className="crm-notifications-btn" onClick={() => setModal(null)}>Close</button>
+              <button type="button" className="crm-notifications-btn" onClick={() => setModal(null)}>
+                Close
+              </button>
             </div>
           </div>
         </div>

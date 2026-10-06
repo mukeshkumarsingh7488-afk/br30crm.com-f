@@ -369,7 +369,7 @@ function AssignmentDropdown({ type, value, onChange, members, teams, loadingOpti
   const isUser = type === "user";
   const options = isUser ? members : teams;
 
-  const getId = (item) => (isUser ? (item?.userId?._id || item?.userId?.id || item?.userId || item?._userId || "") : item?._id || item?.id || "");
+  const getId = (item) => (isUser ? item?.userId?._id || item?.userId?.id || item?.userId || item?._userId || "" : item?._id || item?.id || "");
   const getName = (item) => {
     if (!isUser) return item?.name || item?.title || item?.teamName || "Unnamed team";
     const user = item?.userId && typeof item.userId === "object" ? item.userId : item;
@@ -887,7 +887,7 @@ export default function Contacts() {
 
   const { businessId, loading: businessLoading, error: businessError, role, isBusinessOwner } = useBusiness();
   const canManage = isManagementRole({ role, isBusinessOwner });
-    const [assigneeDetail, setAssigneeDetail] = useState(null);
+  const [assigneeDetail, setAssigneeDetail] = useState(null);
 
   const [contacts, setContacts] = useState([]);
 
@@ -1702,7 +1702,7 @@ export default function Contacts() {
       )}
 
       {modal?.mode === "assign" ? <AssignModal contact={modal.contact} form={assignForm} setForm={setAssignForm} saving={actionLoading} members={members} teams={teams} loadingOptions={assignmentOptionsLoading} onCancel={() => setModal(null)} onSubmit={handleAssign} /> : null}
-    {assigneeDetail ? <AssigneeDetailsPopup detail={assigneeDetail} onClose={() => setAssigneeDetail(null)} /> : null}
+      {assigneeDetail ? <AssigneeDetailsPopup detail={assigneeDetail} onClose={() => setAssigneeDetail(null)} /> : null}
     </>
   );
 }

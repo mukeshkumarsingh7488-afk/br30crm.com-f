@@ -560,7 +560,7 @@ function ReportingAnalytics() {
               <div>
                 <strong>BR30 CRM Support</strong>
 
-                <a href={SOLUTIONS_REPORTING_ANALYTICS_SUPPORT_FORM_URL} className="br30-support-ticket-link" target="_blank" rel="noopener noreferrer">
+                <a href={SOLUTIONS_REPORTING_ANALYTICS_SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
                   Create Support Ticket
                 </a>
               </div>

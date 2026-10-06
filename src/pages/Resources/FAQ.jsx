@@ -296,7 +296,7 @@ function FAQ() {
               </div>
             </div>
 
-            <a href={RESOURCES_FAQ_SUPPORT_FORM_URL} target="_blank" rel="noopener noreferrer" className="br30-faq-contact-link">
+            <a href={RESOURCES_FAQ_SUPPORT_FORM_URL} rel="noopener noreferrer" className="br30-faq-contact-link">
               Create Support Ticket
               <ChevronRight size={13} />
             </a>

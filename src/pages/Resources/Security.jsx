@@ -435,7 +435,7 @@ function Security() {
               <div>
                 <strong>Security & Support</strong>
 
-                <a href={RESOURCES_SECURITY_SUPPORT_FORM_URL} className="br30-support-ticket-link" target="_blank" rel="noopener noreferrer">
+                <a href={RESOURCES_SECURITY_SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
                   Create Support Ticket
                 </a>
               </div>

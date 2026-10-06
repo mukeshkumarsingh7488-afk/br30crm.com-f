@@ -458,7 +458,7 @@ function GDPRCompliance() {
               <div>
                 <strong>Privacy & Support</strong>
 
-                <a href={LEGAL_GDPR_COMPLIANCE_SUPPORT_FORM_URL} className="br30-support-ticket-link" target="_blank" rel="noopener noreferrer">
+                <a href={LEGAL_GDPR_COMPLIANCE_SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
                   Create Support Ticket
                 </a>
               </div>

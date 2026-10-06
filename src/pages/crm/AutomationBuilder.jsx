@@ -53,8 +53,17 @@ function ActionConfig({ action, onChange, members = [], teams = [], tags = [] })
         style={{ ...inputStyle, minHeight: 82, height: 82, padding: "8px 10px" }}
         multiple
         value={val}
-        onChange={(e) => set(key, Array.from(e.target.selectedOptions).map((option) => option.value))}>
-        {items.length === 0 ? <option disabled value="">{placeholder}</option> : null}
+        onChange={(e) =>
+          set(
+            key,
+            Array.from(e.target.selectedOptions).map((option) => option.value)
+          )
+        }>
+        {items.length === 0 ? (
+          <option disabled value="">
+            {placeholder}
+          </option>
+        ) : null}
         {items.map((x) => (
           <option key={idOf(x)} value={idOf(x)}>
             {optionName(x)}
@@ -113,10 +122,7 @@ function ActionConfig({ action, onChange, members = [], teams = [], tags = [] })
         <label>Assigned user{select("assignedTo", members, "Optional assignee")}</label>
         <label>
           Tag
-          <select
-            style={inputStyle}
-            value={c.tagId || (Array.isArray(c.tagIds) ? c.tagIds[0] || "" : "")}
-            onChange={(e) => onChange({ ...action, config: { ...c, tagId: e.target.value, tagIds: e.target.value ? [e.target.value] : [] } })}>
+          <select style={inputStyle} value={c.tagId || (Array.isArray(c.tagIds) ? c.tagIds[0] || "" : "")} onChange={(e) => onChange({ ...action, config: { ...c, tagId: e.target.value, tagIds: e.target.value ? [e.target.value] : [] } })}>
             <option value="">Optional task tag</option>
             {tags.map((x) => (
               <option key={idOf(x)} value={idOf(x)}>

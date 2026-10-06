@@ -302,7 +302,7 @@ const getRelatedLabel = (type, record) => {
 function Activities() {
   const { businessId, loading: businessLoading, error: businessError, role, isBusinessOwner } = useBusiness();
   const canManage = isManagementRole({ role, isBusinessOwner });
-    const [assigneeDetail, setAssigneeDetail] = useState(null);
+  const [assigneeDetail, setAssigneeDetail] = useState(null);
 
   const [activities, setActivities] = useState([]);
 
@@ -1349,138 +1349,140 @@ function Activities() {
 
       <div className="activities-card">
         <div className="activities-table-wrap">
-        <table className="activities-table">
-          <thead>
-            <tr>
-              <th>Activity</th>
-
-              <th>Type</th>
-
-              <th>Status</th>
-
-              <th>Priority</th>
-
-              <th>Due</th>
-
-              <th>Assigned to</th>
-
-              <th>Related to</th>
-
-              <th>Tags</th>
-
-              <th>Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {loading || businessLoading ? (
+          <table className="activities-table">
+            <thead>
               <tr>
-                <td colSpan={9}>
-                  <div className="activities-empty">Loading activities...</div>
-                </td>
+                <th>Activity</th>
+
+                <th>Type</th>
+
+                <th>Status</th>
+
+                <th>Priority</th>
+
+                <th>Due</th>
+
+                <th>Assigned to</th>
+
+                <th>Related to</th>
+
+                <th>Tags</th>
+
+                <th>Actions</th>
               </tr>
-            ) : activities.length === 0 ? (
-              <tr>
-                <td colSpan={9}>
-                  <div className="activities-empty">No activities found.</div>
-                </td>
-              </tr>
-            ) : (
-              activities.map((activity) => {
-                const assignedName = String(getAssignedUserName(activity) || "Unassigned");
+            </thead>
 
-                const initials = getInitials(assignedName);
+            <tbody>
+              {loading || businessLoading ? (
+                <tr>
+                  <td colSpan={9}>
+                    <div className="activities-empty">Loading activities...</div>
+                  </td>
+                </tr>
+              ) : activities.length === 0 ? (
+                <tr>
+                  <td colSpan={9}>
+                    <div className="activities-empty">No activities found.</div>
+                  </td>
+                </tr>
+              ) : (
+                activities.map((activity) => {
+                  const assignedName = String(getAssignedUserName(activity) || "Unassigned");
 
-                const Icon = getTypeIcon(activity.type);
+                  const initials = getInitials(assignedName);
 
-                return (
-                  <tr key={activity._id}>
-                    <td>
-                      <div className="activity-title-cell">
-                        <div className="activity-title-icon">
-                          <Icon size={14} />
+                  const Icon = getTypeIcon(activity.type);
+
+                  return (
+                    <tr key={activity._id}>
+                      <td>
+                        <div className="activity-title-cell">
+                          <div className="activity-title-icon">
+                            <Icon size={14} />
+                          </div>
+
+                          <div>
+                            <div className="activity-title-main">{activity.subject || "Untitled activity"}</div>
+
+                            {activity.description ? <div className="activity-title-desc">{activity.description}</div> : null}
+                          </div>
                         </div>
+                      </td>
 
-                        <div>
-                          <div className="activity-title-main">{activity.subject || "Untitled activity"}</div>
+                      <td>
+                        <span className="activity-badge info">{labelFor(TYPE_OPTIONS, activity.type)}</span>
+                      </td>
 
-                          {activity.description ? <div className="activity-title-desc">{activity.description}</div> : null}
+                      <td>
+                        <span className={`activity-badge ${getStatusClass(activity.status)}`}>{labelFor(STATUS_OPTIONS, activity.status)}</span>
+                      </td>
+
+                      <td>
+                        <span className={`activity-badge ${getPriorityClass(activity.priority)}`}>{labelFor(PRIORITY_OPTIONS, activity.priority)}</span>
+                      </td>
+
+                      <td>
+                        <span className={isOverdue(activity) ? "activity-due-overdue" : ""}>{formatDate(activity.dueAt)}</span>
+                      </td>
+
+                      <td>
+                        <div className="activity-assignee">
+                          <span className="activity-avatar">{initials}</span>
+
+                          <button type="button" className="crm-assignee-name" onClick={() => activity?.assignedTo && typeof activity.assignedTo === "object" && setAssigneeDetail({ type: "user", name: assignedName, email: activity?.assignedTo?.email || "" })}>
+                            {assignedName}
+                          </button>
                         </div>
-                      </div>
-                    </td>
+                      </td>
 
-                    <td>
-                      <span className="activity-badge info">{labelFor(TYPE_OPTIONS, activity.type)}</span>
-                    </td>
+                      <td>{renderRelated(activity)}</td>
 
-                    <td>
-                      <span className={`activity-badge ${getStatusClass(activity.status)}`}>{labelFor(STATUS_OPTIONS, activity.status)}</span>
-                    </td>
+                      <td>
+                        <div className="activity-tags">
+                          {Array.isArray(activity.tags) && activity.tags.length ? (
+                            activity.tags.slice(0, 3).map((tag) => (
+                              <span className="activity-tag" key={getTagId(tag)}>
+                                {getTagName(tag)}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="activity-muted">—</span>
+                          )}
 
-                    <td>
-                      <span className={`activity-badge ${getPriorityClass(activity.priority)}`}>{labelFor(PRIORITY_OPTIONS, activity.priority)}</span>
-                    </td>
+                          {Array.isArray(activity.tags) && activity.tags.length > 3 ? <span className="activity-tag">+{activity.tags.length - 3}</span> : null}
+                        </div>
+                      </td>
 
-                    <td>
-                      <span className={isOverdue(activity) ? "activity-due-overdue" : ""}>{formatDate(activity.dueAt)}</span>
-                    </td>
-
-                    <td>
-                      <div className="activity-assignee">
-                        <span className="activity-avatar">{initials}</span>
-
-                        <button type="button" className="crm-assignee-name" onClick={() => activity?.assignedTo && typeof activity.assignedTo === "object" && setAssigneeDetail({ type: "user", name: assignedName, email: activity?.assignedTo?.email || "" })}>{assignedName}</button>
-                      </div>
-                    </td>
-
-                    <td>{renderRelated(activity)}</td>
-
-                    <td>
-                      <div className="activity-tags">
-                        {Array.isArray(activity.tags) && activity.tags.length ? (
-                          activity.tags.slice(0, 3).map((tag) => (
-                            <span className="activity-tag" key={getTagId(tag)}>
-                              {getTagName(tag)}
-                            </span>
-                          ))
-                        ) : (
-                          <span className="activity-muted">—</span>
-                        )}
-
-                        {Array.isArray(activity.tags) && activity.tags.length > 3 ? <span className="activity-tag">+{activity.tags.length - 3}</span> : null}
-                      </div>
-                    </td>
-
-                    <td>
-                      <div className="activities-actions">
-                        <button type="button" className="activities-icon-btn" title="View" onClick={() => openView(activity)}>
-                          <Eye size={14} />
-                        </button>
-
-                        <button type="button" className="activities-icon-btn" title="Edit" onClick={() => openEdit(activity)}>
-                          <Pencil size={14} />
-                        </button>
-
-                        {activity.status !== "COMPLETED" ? (
-                          <button type="button" className="activities-icon-btn complete" title="Complete" onClick={() => handleComplete(activity)}>
-                            <Check size={14} />
+                      <td>
+                        <div className="activities-actions">
+                          <button type="button" className="activities-icon-btn" title="View" onClick={() => openView(activity)}>
+                            <Eye size={14} />
                           </button>
-                        ) : null}
 
-                        {canManage && (
-                          <button type="button" className="activities-icon-btn delete" title="Delete" onClick={() => handleDelete(activity)}>
-                            <Trash2 size={14} />
+                          <button type="button" className="activities-icon-btn" title="Edit" onClick={() => openEdit(activity)}>
+                            <Pencil size={14} />
                           </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
+
+                          {activity.status !== "COMPLETED" ? (
+                            <button type="button" className="activities-icon-btn complete" title="Complete" onClick={() => handleComplete(activity)}>
+                              <Check size={14} />
+                            </button>
+                          ) : null}
+
+                          {canManage && (
+                            <button type="button" className="activities-icon-btn delete" title="Delete" onClick={() => handleDelete(activity)}>
+                              <Trash2 size={14} />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
 
         <div className="activities-pagination">
           <span>{pagination.total ?? activities.length} total</span>
@@ -1937,7 +1939,7 @@ function Activities() {
           </div>
         </div>
       ) : null}
-    {assigneeDetail ? <AssigneeDetailsPopup detail={assigneeDetail} onClose={() => setAssigneeDetail(null)} /> : null}
+      {assigneeDetail ? <AssigneeDetailsPopup detail={assigneeDetail} onClose={() => setAssigneeDetail(null)} /> : null}
     </div>
   );
 }

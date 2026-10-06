@@ -474,7 +474,7 @@ function Consultants() {
               <div>
                 <strong>Consulting & Business Support</strong>
 
-                <a href={COMPANY_CONSULTANTS_SUPPORT_FORM_URL} className="br30-support-ticket-link" target="_blank" rel="noopener noreferrer">
+                <a href={COMPANY_CONSULTANTS_SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
                   Create Support Ticket
                 </a>
               </div>

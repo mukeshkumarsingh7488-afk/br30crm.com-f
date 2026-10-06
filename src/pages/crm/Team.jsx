@@ -606,10 +606,12 @@ export default function Team() {
             Refresh
           </button>
 
-          {canManage && <button className="team-page-btn team-page-btn-primary" onClick={openCreate}>
-            <Plus size={16} />
-            Add Team
-          </button>}
+          {canManage && (
+            <button className="team-page-btn team-page-btn-primary" onClick={openCreate}>
+              <Plus size={16} />
+              Add Team
+            </button>
+          )}
         </div>
       </div>
 

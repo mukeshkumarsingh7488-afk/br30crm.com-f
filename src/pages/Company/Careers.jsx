@@ -320,13 +320,13 @@ function Careers() {
 
                 <p>Share your name, experience, role of interest, relevant skills, and any additional information that may help us understand your profile.</p>
 
-                <a href={COMPANY_CAREERS_SUPPORT_FORM_URL} className="br30-support-ticket-link" target="_blank" rel="noopener noreferrer">
+                <a href={COMPANY_CAREERS_SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
                   Create Support Ticket <ArrowRight size={12} />
                 </a>
 
                 <br />
 
-                <a href={COMPANY_CAREERS_SUPPORT_FORM_URL} className="br30-careers-button" target="_blank" rel="noopener noreferrer">
+                <a href={COMPANY_CAREERS_SUPPORT_FORM_URL} className="br30-careers-button" rel="noopener noreferrer">
                   <Ticket size={13} />
                   Create Support Ticket
                 </a>
@@ -352,7 +352,7 @@ function Careers() {
               <div>
                 <strong>Career & Support</strong>
 
-                <a href={COMPANY_CAREERS_SUPPORT_FORM_URL} className="br30-support-ticket-link" target="_blank" rel="noopener noreferrer">
+                <a href={COMPANY_CAREERS_SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
                   Create Support Ticket
                 </a>
               </div>

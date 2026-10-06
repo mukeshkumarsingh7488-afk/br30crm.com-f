@@ -78,7 +78,10 @@ export default function Settings() {
   useEffect(() => {
     if (!businessId) return;
     setSettingsLoading(true);
-    getBusinessSettings(businessId).then((r) => setBusinessSettings(r)).catch(() => {}).finally(() => setSettingsLoading(false));
+    getBusinessSettings(businessId)
+      .then((r) => setBusinessSettings(r))
+      .catch(() => {})
+      .finally(() => setSettingsLoading(false));
   }, [businessId]);
 
   useEffect(() => {
@@ -116,8 +119,12 @@ export default function Settings() {
 
       window.dispatchEvent(new CustomEvent("crm-sidebar-mode-change", { detail: sidebarMode }));
 
-      if (name.trim()) { await updateProfile({ name: name.trim() }); }
-      if (businessId && businessSettings) { await updateBusinessSettings(businessId, { general: businessSettings.general, regional: businessSettings.regional, notifications: businessSettings.notifications, security: businessSettings.security, crm: businessSettings.crm }); }
+      if (name.trim()) {
+        await updateProfile({ name: name.trim() });
+      }
+      if (businessId && businessSettings) {
+        await updateBusinessSettings(businessId, { general: businessSettings.general, regional: businessSettings.regional, notifications: businessSettings.notifications, security: businessSettings.security, crm: businessSettings.crm });
+      }
 
       setMessage("Settings saved successfully.");
 
@@ -227,17 +234,41 @@ export default function Settings() {
         <div className="crm-business-settings">
           <div className="crm-sidebar-settings-title">Business & CRM controls</div>
           <div className="crm-sidebar-settings-description">Workspace-wide preferences backed by the BR30 CRM settings API.</div>
-          {settingsLoading ? <div className="crm-setting-message">Loading business settings…</div> : businessSettings && (
-            <div className="crm-business-grid">
-              <label>Business name<input value={businessSettings.general?.businessName || ""} placeholder="e.g. BR30 CRM" onChange={(e)=>setBusinessSettings({...businessSettings,general:{...businessSettings.general,businessName:e.target.value}})}/></label>
-              <label>Timezone<input value={businessSettings.regional?.timezone || "Asia/Kolkata"} placeholder="e.g. Asia/Kolkata" onChange={(e)=>setBusinessSettings({...businessSettings,regional:{...businessSettings.regional,timezone:e.target.value}})}/></label>
-              <label>Currency<input value={businessSettings.regional?.currency || "INR"} placeholder="e.g. INR" onChange={(e)=>setBusinessSettings({...businessSettings,regional:{...businessSettings.regional,currency:e.target.value}})}/></label>
-              <label>Default page size<input type="number" min="5" max="100" value={businessSettings.crm?.defaultPageSize || 20} placeholder="e.g. 20" onChange={(e)=>setBusinessSettings({...businessSettings,crm:{...businessSettings.crm,defaultPageSize:Number(e.target.value)||20}})}/></label>
-              <label className="crm-setting-toggle"><input type="checkbox" checked={businessSettings.notifications?.emailEnabled!==false} onChange={(e)=>setBusinessSettings({...businessSettings,notifications:{...businessSettings.notifications,emailEnabled:e.target.checked}})}/> Email notifications</label>
-              <label className="crm-setting-toggle"><input type="checkbox" checked={businessSettings.notifications?.inAppEnabled!==false} onChange={(e)=>setBusinessSettings({...businessSettings,notifications:{...businessSettings.notifications,inAppEnabled:e.target.checked}})}/> In-app notifications</label>
-              <label className="crm-setting-toggle"><input type="checkbox" checked={Boolean(businessSettings.crm?.autoAssignLeads)} onChange={(e)=>setBusinessSettings({...businessSettings,crm:{...businessSettings.crm,autoAssignLeads:e.target.checked}})}/> Auto-assign leads</label>
-              <label className="crm-setting-toggle"><input type="checkbox" checked={Boolean(businessSettings.crm?.autoCreateActivities)} onChange={(e)=>setBusinessSettings({...businessSettings,crm:{...businessSettings.crm,autoCreateActivities:e.target.checked}})}/> Auto-create activities</label>
-            </div>
+          {settingsLoading ? (
+            <div className="crm-setting-message">Loading business settings…</div>
+          ) : (
+            businessSettings && (
+              <div className="crm-business-grid">
+                <label>
+                  Business name
+                  <input value={businessSettings.general?.businessName || ""} placeholder="e.g. BR30 CRM" onChange={(e) => setBusinessSettings({ ...businessSettings, general: { ...businessSettings.general, businessName: e.target.value } })} />
+                </label>
+                <label>
+                  Timezone
+                  <input value={businessSettings.regional?.timezone || "Asia/Kolkata"} placeholder="e.g. Asia/Kolkata" onChange={(e) => setBusinessSettings({ ...businessSettings, regional: { ...businessSettings.regional, timezone: e.target.value } })} />
+                </label>
+                <label>
+                  Currency
+                  <input value={businessSettings.regional?.currency || "INR"} placeholder="e.g. INR" onChange={(e) => setBusinessSettings({ ...businessSettings, regional: { ...businessSettings.regional, currency: e.target.value } })} />
+                </label>
+                <label>
+                  Default page size
+                  <input type="number" min="5" max="100" value={businessSettings.crm?.defaultPageSize || 20} placeholder="e.g. 20" onChange={(e) => setBusinessSettings({ ...businessSettings, crm: { ...businessSettings.crm, defaultPageSize: Number(e.target.value) || 20 } })} />
+                </label>
+                <label className="crm-setting-toggle">
+                  <input type="checkbox" checked={businessSettings.notifications?.emailEnabled !== false} onChange={(e) => setBusinessSettings({ ...businessSettings, notifications: { ...businessSettings.notifications, emailEnabled: e.target.checked } })} /> Email notifications
+                </label>
+                <label className="crm-setting-toggle">
+                  <input type="checkbox" checked={businessSettings.notifications?.inAppEnabled !== false} onChange={(e) => setBusinessSettings({ ...businessSettings, notifications: { ...businessSettings.notifications, inAppEnabled: e.target.checked } })} /> In-app notifications
+                </label>
+                <label className="crm-setting-toggle">
+                  <input type="checkbox" checked={Boolean(businessSettings.crm?.autoAssignLeads)} onChange={(e) => setBusinessSettings({ ...businessSettings, crm: { ...businessSettings.crm, autoAssignLeads: e.target.checked } })} /> Auto-assign leads
+                </label>
+                <label className="crm-setting-toggle">
+                  <input type="checkbox" checked={Boolean(businessSettings.crm?.autoCreateActivities)} onChange={(e) => setBusinessSettings({ ...businessSettings, crm: { ...businessSettings.crm, autoCreateActivities: e.target.checked } })} /> Auto-create activities
+                </label>
+              </div>
+            )
           )}
         </div>
 

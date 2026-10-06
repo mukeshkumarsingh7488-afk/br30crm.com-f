@@ -599,7 +599,7 @@ export default function Deals() {
 
   const { businessId, loading: businessLoading, error: businessError, role, isBusinessOwner } = useBusiness();
   const canManage = isManagementRole({ role, isBusinessOwner });
-    const [assigneeDetail, setAssigneeDetail] = useState(null);
+  const [assigneeDetail, setAssigneeDetail] = useState(null);
 
   const [deals, setDeals] = useState([]);
 
@@ -1662,7 +1662,9 @@ export default function Deals() {
                             <div className="deal-assignee">
                               <span className="deal-assignee-avatar">{String(assignedName).slice(0, 2).toUpperCase()}</span>
 
-                              <button type="button" className="crm-assignee-name" onClick={() => assigned && typeof assigned === "object" && setAssigneeDetail({ type: "user", name: assignedName, email: assigned?.email || "" })}>{assignedName}</button>
+                              <button type="button" className="crm-assignee-name" onClick={() => assigned && typeof assigned === "object" && setAssigneeDetail({ type: "user", name: assignedName, email: assigned?.email || "" })}>
+                                {assignedName}
+                              </button>
                             </div>
                           ) : (
                             <span className="deal-unassigned">Unassigned</span>
@@ -1917,7 +1919,7 @@ export default function Deals() {
           </div>
         </div>
       )}
-    {assigneeDetail ? <AssigneeDetailsPopup detail={assigneeDetail} onClose={() => setAssigneeDetail(null)} /> : null}
+      {assigneeDetail ? <AssigneeDetailsPopup detail={assigneeDetail} onClose={() => setAssigneeDetail(null)} /> : null}
     </>
   );
 }

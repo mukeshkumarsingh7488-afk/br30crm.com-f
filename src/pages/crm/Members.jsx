@@ -594,10 +594,12 @@ export default function Members() {
             Refresh
           </button>
 
-          {canManage && <button type="button" className="members-btn primary" onClick={openCreate}>
-            <Plus size={15} />
-            Add Member
-          </button>}
+          {canManage && (
+            <button type="button" className="members-btn primary" onClick={openCreate}>
+              <Plus size={15} />
+              Add Member
+            </button>
+          )}
         </div>
       </div>
 

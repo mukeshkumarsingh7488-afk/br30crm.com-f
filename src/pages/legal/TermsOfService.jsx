@@ -437,7 +437,7 @@ function TermsOfService() {
               <div>
                 <strong>BR30 CRM Support</strong>
 
-                <a href={LEGAL_TERMS_OF_SERVICE_SUPPORT_FORM_URL} className="br30-support-ticket-link" target="_blank" rel="noopener noreferrer">
+                <a href={LEGAL_TERMS_OF_SERVICE_SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
                   Create Support Ticket
                 </a>
               </div>

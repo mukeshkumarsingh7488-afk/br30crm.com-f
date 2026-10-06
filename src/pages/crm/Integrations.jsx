@@ -44,7 +44,9 @@ function Integrations() {
     }
   }, [businessId]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const connectedTypes = useMemo(() => new Set(items.filter((item) => item.status === "ACTIVE").map((item) => item.type)), [items]);
 
@@ -125,8 +127,18 @@ function Integrations() {
         @media(max-width:1050px){.crm-integration-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:680px){.crm-integration-page{padding:18px}.crm-integration-head{flex-direction:column}.crm-integration-grid{grid-template-columns:1fr}.crm-integration-fields{grid-template-columns:1fr}.crm-integration-field.full{grid-column:auto}}
       `}</style>
       <div className="crm-integration-head">
-        <div><h1 className="crm-integration-title">Integrations</h1><p className="crm-integration-sub">Connect communication and future-ready provider capabilities for this business.</p></div>
-        <div className="crm-integration-actions"><button className="crm-integration-btn" onClick={load} disabled={loading}><RefreshCw size={14}/> Refresh</button><button className="crm-integration-btn primary" onClick={() => openCreate()}><Plus size={14}/> Add integration</button></div>
+        <div>
+          <h1 className="crm-integration-title">Integrations</h1>
+          <p className="crm-integration-sub">Connect communication and future-ready provider capabilities for this business.</p>
+        </div>
+        <div className="crm-integration-actions">
+          <button className="crm-integration-btn" onClick={load} disabled={loading}>
+            <RefreshCw size={14} /> Refresh
+          </button>
+          <button className="crm-integration-btn primary" onClick={() => openCreate()}>
+            <Plus size={14} /> Add integration
+          </button>
+        </div>
       </div>
       {error && <div className="crm-integration-alert">{error}</div>}
       <div className="crm-integration-grid">
@@ -136,30 +148,106 @@ function Integrations() {
           const comingSoon = Boolean(meta.comingSoon);
           return (
             <div className="crm-integration-card" key={meta.type}>
-              <div className="crm-integration-card-top"><div className="crm-integration-icon"><Icon size={19}/></div><span className={`crm-integration-status ${connected?.status === "ACTIVE" ? "active" : ""}`}>{comingSoon ? "COMING SOON" : connected?.status || "NOT CONNECTED"}</span></div>
-              <h3 className="crm-integration-name">{meta.label}</h3><p className="crm-integration-desc">{meta.description}</p>
-              <div className="crm-integration-meta"><span className="crm-integration-provider">{meta.provider}</span><div className="crm-integration-card-actions">
-                {comingSoon ? <span className="crm-integration-mini" style={{cursor:"default",opacity:.65}}>Future</span> : connected ? <><button className="crm-integration-mini" onClick={() => toggle(connected)}>{connected.status === "ACTIVE" ? "Disable" : "Enable"}</button><button className="crm-integration-mini" onClick={() => remove(connected)} title="Remove"><Trash2 size={13}/></button></> : <button className="crm-integration-mini" onClick={() => openCreate(meta.type, meta.provider)}><Link2 size={13}/> Connect</button>}
-              </div></div>
+              <div className="crm-integration-card-top">
+                <div className="crm-integration-icon">
+                  <Icon size={19} />
+                </div>
+                <span className={`crm-integration-status ${connected?.status === "ACTIVE" ? "active" : ""}`}>{comingSoon ? "COMING SOON" : connected?.status || "NOT CONNECTED"}</span>
+              </div>
+              <h3 className="crm-integration-name">{meta.label}</h3>
+              <p className="crm-integration-desc">{meta.description}</p>
+              <div className="crm-integration-meta">
+                <span className="crm-integration-provider">{meta.provider}</span>
+                <div className="crm-integration-card-actions">
+                  {comingSoon ? (
+                    <span className="crm-integration-mini" style={{ cursor: "default", opacity: 0.65 }}>
+                      Future
+                    </span>
+                  ) : connected ? (
+                    <>
+                      <button className="crm-integration-mini" onClick={() => toggle(connected)}>
+                        {connected.status === "ACTIVE" ? "Disable" : "Enable"}
+                      </button>
+                      <button className="crm-integration-mini" onClick={() => remove(connected)} title="Remove">
+                        <Trash2 size={13} />
+                      </button>
+                    </>
+                  ) : (
+                    <button className="crm-integration-mini" onClick={() => openCreate(meta.type, meta.provider)}>
+                      <Link2 size={13} /> Connect
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           );
         })}
         {loading || businessLoading ? <div className="crm-integration-empty">Loading integrations…</div> : null}
       </div>
-      {modal && <div className="crm-integration-modal" onMouseDown={(e) => e.target === e.currentTarget && setModal(false)}>
-        <div className="crm-integration-dialog">
-          <div className="crm-integration-dialog-head"><h2>Connect {form.name || "integration"}</h2><button className="crm-integration-close" onClick={() => setModal(false)}><X size={17}/></button></div>
-          <div className="crm-integration-fields">
-            <div className="crm-integration-field full"><label>Integration name</label><input value={form.name} onChange={(e) => setForm({...form,name:e.target.value})} /></div>
-            <div className="crm-integration-field"><label>Channel</label><select value={form.type} onChange={(e) => setForm({...form,type:e.target.value})}>{PROVIDERS.filter((p) => !p.comingSoon).map((p)=><option key={p.type} value={p.type}>{p.label}</option>)}</select></div>
-            <div className="crm-integration-field"><label>Provider</label><input value={form.provider} readOnly /></div>
-            {(form.type === "SMS") && <div className="crm-integration-field"><label>SMS sender</label><input value={form.sender} onChange={(e)=>setForm({...form,sender:e.target.value})} placeholder="Approved Brevo sender" /></div>}
-            {(form.type === "WHATSAPP") && <><div className="crm-integration-field"><label>Sender number</label><input value={form.senderNumber} onChange={(e)=>setForm({...form,senderNumber:e.target.value})} placeholder="Connected WhatsApp sender" /></div><div className="crm-integration-field"><label>Phone number</label><input value={form.phoneNumber} onChange={(e)=>setForm({...form,phoneNumber:e.target.value})} /></div></>}
-            {(form.type === "CONVERSATION" || form.type === "SOCIAL" || form.type === "PHONE") && <div className="crm-integration-field full"><label>Webhook secret (optional)</label><input value={form.webhookSecret} onChange={(e)=>setForm({...form,webhookSecret:e.target.value})} placeholder="Used to validate provider events" /></div>}
+      {modal && (
+        <div className="crm-integration-modal" onMouseDown={(e) => e.target === e.currentTarget && setModal(false)}>
+          <div className="crm-integration-dialog">
+            <div className="crm-integration-dialog-head">
+              <h2>Connect {form.name || "integration"}</h2>
+              <button className="crm-integration-close" onClick={() => setModal(false)}>
+                <X size={17} />
+              </button>
+            </div>
+            <div className="crm-integration-fields">
+              <div className="crm-integration-field full">
+                <label>Integration name</label>
+                <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+              </div>
+              <div className="crm-integration-field">
+                <label>Channel</label>
+                <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
+                  {PROVIDERS.filter((p) => !p.comingSoon).map((p) => (
+                    <option key={p.type} value={p.type}>
+                      {p.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="crm-integration-field">
+                <label>Provider</label>
+                <input value={form.provider} readOnly />
+              </div>
+              {form.type === "SMS" && (
+                <div className="crm-integration-field">
+                  <label>SMS sender</label>
+                  <input value={form.sender} onChange={(e) => setForm({ ...form, sender: e.target.value })} placeholder="Approved Brevo sender" />
+                </div>
+              )}
+              {form.type === "WHATSAPP" && (
+                <>
+                  <div className="crm-integration-field">
+                    <label>Sender number</label>
+                    <input value={form.senderNumber} onChange={(e) => setForm({ ...form, senderNumber: e.target.value })} placeholder="Connected WhatsApp sender" />
+                  </div>
+                  <div className="crm-integration-field">
+                    <label>Phone number</label>
+                    <input value={form.phoneNumber} onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })} />
+                  </div>
+                </>
+              )}
+              {(form.type === "CONVERSATION" || form.type === "SOCIAL" || form.type === "PHONE") && (
+                <div className="crm-integration-field full">
+                  <label>Webhook secret (optional)</label>
+                  <input value={form.webhookSecret} onChange={(e) => setForm({ ...form, webhookSecret: e.target.value })} placeholder="Used to validate provider events" />
+                </div>
+              )}
+            </div>
+            <div className="crm-integration-foot">
+              <button className="crm-integration-btn" onClick={() => setModal(false)}>
+                Cancel
+              </button>
+              <button className="crm-integration-btn primary" disabled={saving} onClick={save}>
+                {saving ? "Connecting…" : "Connect"}
+              </button>
+            </div>
           </div>
-          <div className="crm-integration-foot"><button className="crm-integration-btn" onClick={()=>setModal(false)}>Cancel</button><button className="crm-integration-btn primary" disabled={saving} onClick={save}>{saving ? "Connecting…" : "Connect"}</button></div>
         </div>
-      </div>}
+      )}
     </div>
   );
 }

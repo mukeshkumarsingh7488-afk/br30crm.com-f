@@ -405,7 +405,7 @@ export default function Companies() {
   const navigate = useNavigate();
   const { businessId, loading: businessLoading, error: businessError, role, isBusinessOwner } = useBusiness();
   const canManage = isManagementRole({ role, isBusinessOwner });
-    const [assigneeDetail, setAssigneeDetail] = useState(null);
+  const [assigneeDetail, setAssigneeDetail] = useState(null);
   const [companies, setCompanies] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0, totalPages: 1 });
   const [search, setSearch] = useState("");
@@ -903,7 +903,7 @@ export default function Companies() {
           </div>
         </div>
       )}
-    {assigneeDetail ? <AssigneeDetailsPopup detail={assigneeDetail} onClose={() => setAssigneeDetail(null)} /> : null}
+      {assigneeDetail ? <AssigneeDetailsPopup detail={assigneeDetail} onClose={() => setAssigneeDetail(null)} /> : null}
     </div>
   );
 }

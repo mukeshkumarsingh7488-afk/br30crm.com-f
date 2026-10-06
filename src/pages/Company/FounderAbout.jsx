@@ -129,7 +129,9 @@ function FounderAbout() {
               <strong>Mukesh Raj</strong>
               <span>Founder of BR30 CRM — focused on building a practical, connected workspace for modern business operations.</span>
 
-              <a href={SUPPORT_FORM_URL} className="br30-support-ticket-link" target="_blank" rel="noopener noreferrer"><Ticket size={13} /> Create Support Ticket</a>
+              <a href={SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
+                <Ticket size={13} /> Create Support Ticket
+              </a>
             </div>
           </div>
         </div>
@@ -438,7 +440,10 @@ function FounderAbout() {
                 <strong>Mukesh Raj — Founder, BR30 CRM</strong>
 
                 <p>
-                  Email: <a href={SUPPORT_FORM_URL} className="br30-support-ticket-link" target="_blank" rel="noopener noreferrer"><Ticket size={13} /> Create Support Ticket</a>
+                  Email:{" "}
+                  <a href={SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
+                    <Ticket size={13} /> Create Support Ticket
+                  </a>
                 </p>
               </div>
             </div>

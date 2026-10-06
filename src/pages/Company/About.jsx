@@ -534,7 +534,7 @@ function About() {
                 <p>Explore the platform or speak with the BR30 CRM team about your business requirements.</p>
               </div>
 
-              <a href={COMPANY_ABOUT_SUPPORT_FORM_URL} target="_blank" rel="noopener noreferrer" className="br30-about-button">
+              <a href={COMPANY_ABOUT_SUPPORT_FORM_URL} rel="noopener noreferrer" className="br30-about-button">
                 Create Support Ticket
                 <ArrowRight size={14} />
               </a>
@@ -559,7 +559,7 @@ function About() {
               <div>
                 <strong>BR30 CRM Support & Business Inquiries</strong>
 
-                <a href={COMPANY_ABOUT_SUPPORT_FORM_URL} className="br30-support-ticket-link" target="_blank" rel="noopener noreferrer">
+                <a href={COMPANY_ABOUT_SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
                   Create Support Ticket
                 </a>
               </div>

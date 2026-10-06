@@ -397,7 +397,7 @@ function CookiePolicy() {
               <div>
                 <strong>Privacy & Support</strong>
 
-                <a href={LEGAL_COOKIE_POLICY_SUPPORT_FORM_URL} className="br30-support-ticket-link" target="_blank" rel="noopener noreferrer">
+                <a href={LEGAL_COOKIE_POLICY_SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
                   Create Support Ticket
                 </a>
               </div>

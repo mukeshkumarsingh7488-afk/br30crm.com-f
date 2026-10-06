@@ -778,7 +778,7 @@ function AssignLeadContent({ lead, assignForm, setAssignForm, members, teams, lo
 export default function Leads() {
   const { businessId, loading: businessLoading, error: businessError, permissions, isBusinessOwner, role } = useBusiness();
   const access = { permissions, isBusinessOwner, role };
-    const [assigneeDetail, setAssigneeDetail] = useState(null);
+  const [assigneeDetail, setAssigneeDetail] = useState(null);
   const canCreate = hasPermission(access, PERMISSIONS.LEADS_CREATE);
   const canUpdate = hasPermission(access, PERMISSIONS.LEADS_UPDATE);
   const canDelete = isManagementRole(access) && hasPermission(access, PERMISSIONS.LEADS_DELETE);
@@ -1754,9 +1754,13 @@ export default function Leads() {
 
                         <td>
                           <div style={{ display: "grid", gap: 2 }}>
-                              <span className="lead-source">{formatSource(lead.source)}</span>
-                              {lead?.customFields?._leadGeneration?.isSupportTicket && <span className="lead-source" style={{ fontSize: 11 }}>Ticket</span>}
-                            </div>
+                            <span className="lead-source">{formatSource(lead.source)}</span>
+                            {lead?.customFields?._leadGeneration?.isSupportTicket && (
+                              <span className="lead-source" style={{ fontSize: 11 }}>
+                                Ticket
+                              </span>
+                            )}
+                          </div>
                         </td>
 
                         <td>
@@ -1772,7 +1776,9 @@ export default function Leads() {
                             {assignedName ? (
                               <div className="lead-assignee">
                                 <UserCheck size={12} />
-                                <button type="button" className="crm-assignee-name" onClick={() => lead?.assignedTo && setAssigneeDetail({ type: "user", name: assignedName, email: lead?.assignedTo?.email || "" })}>User: {assignedName}</button>
+                                <button type="button" className="crm-assignee-name" onClick={() => lead?.assignedTo && setAssigneeDetail({ type: "user", name: assignedName, email: lead?.assignedTo?.email || "" })}>
+                                  User: {assignedName}
+                                </button>
                               </div>
                             ) : (
                               <div className="lead-assignee muted">
@@ -2112,7 +2118,7 @@ export default function Leads() {
           </div>
         </div>
       )}
-    {assigneeDetail ? <AssigneeDetailsPopup detail={assigneeDetail} onClose={() => setAssigneeDetail(null)} /> : null}
+      {assigneeDetail ? <AssigneeDetailsPopup detail={assigneeDetail} onClose={() => setAssigneeDetail(null)} /> : null}
     </>
   );
 }

@@ -103,7 +103,12 @@ function AppRoutes() {
       <Routes>
         {/* Public */}
         <Route path="/" element={<Landing />} />
+        {/* Public Forms */}
         <Route path="/public/forms/:businessId/:slug" element={<PublicForm />} />
+        {/* What's New */}
+        <Route path="/whats-new" element={<WhatsNew />} />
+        {/* Announcements */}
+        <Route path="/announcements" element={<Announcements />} />
         {/* Legal */}
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsOfService />} />
@@ -125,7 +130,6 @@ function AppRoutes() {
         <Route path="/reporting-analytics" element={<ReportingAnalytics />} />
         <Route path="/sales-management" element={<SalesManagement />} />
         <Route path="/team-management" element={<TeamManagement />} />
-
         {/* Company */}
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
@@ -142,11 +146,6 @@ function AppRoutes() {
         <Route path="/verify-reset-otp" element={<VerifyResetOtp />} />
         <Route path="/reset-password" element={<ResetPassword />} />
 
-        {/* What's New */}
-        <Route path="/whats-new" element={<WhatsNew />} />
-
-        {/* Announcements */}
-        <Route path="/announcements" element={<Announcements />} />
         {/* Protected CRM */}
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>

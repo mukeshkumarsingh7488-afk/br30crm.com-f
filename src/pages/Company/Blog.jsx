@@ -506,7 +506,7 @@ function Blog() {
               <div>
                 <strong>BR30 CRM Content & Support</strong>
 
-                <a href={COMPANY_BLOG_SUPPORT_FORM_URL} className="br30-support-ticket-link" target="_blank" rel="noopener noreferrer">
+                <a href={COMPANY_BLOG_SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
                   Create Support Ticket
                 </a>
               </div>
@@ -597,7 +597,7 @@ function Blog() {
               <p>Send us your question or business challenge and tell us what you'd like to learn more about.</p>
             </div>
 
-            <a href={COMPANY_BLOG_SUPPORT_FORM_URL} className="br30-blog-button" target="_blank" rel="noopener noreferrer">
+            <a href={COMPANY_BLOG_SUPPORT_FORM_URL} className="br30-blog-button" rel="noopener noreferrer">
               <Ticket size={13} />
               Create Support Ticket
             </a>
