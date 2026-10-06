@@ -41,7 +41,7 @@ function Topbar({ theme, setTheme, onMenu }) {
         const r = await getUnreadNotificationCount(businessId);
 
         if (mounted) {
-          setUnreadCount(Number(r?.count ?? r?.data?.count ?? 0));
+          setUnreadCount(Number(r?.count ?? r?.data?.count ?? r?.data?.data?.count ?? 0));
         }
       } catch {
         if (mounted) {
@@ -52,11 +52,14 @@ function Topbar({ theme, setTheme, onMenu }) {
 
     loadUnread();
 
-    const timer = window.setInterval(loadUnread, 30000);
+    const timer = window.setInterval(loadUnread, 5000);
+    const refreshNotifications = () => loadUnread();
+    window.addEventListener("br30:notifications-changed", refreshNotifications);
 
     return () => {
       mounted = false;
       window.clearInterval(timer);
+      window.removeEventListener("br30:notifications-changed", refreshNotifications);
     };
   }, [businessId]);
 

@@ -46,6 +46,23 @@ function ActionConfig({ action, onChange, members = [], teams = [], tags = [] })
       </select>
     );
   };
+  const selectMany = (key, items, placeholder) => {
+    const val = Array.isArray(c[key]) ? c[key].map(String) : c[key] ? [String(c[key])] : [];
+    return (
+      <select
+        style={{ ...inputStyle, minHeight: 82, height: 82, padding: "8px 10px" }}
+        multiple
+        value={val}
+        onChange={(e) => set(key, Array.from(e.target.selectedOptions).map((option) => option.value))}>
+        {items.length === 0 ? <option disabled value="">{placeholder}</option> : null}
+        {items.map((x) => (
+          <option key={idOf(x)} value={idOf(x)}>
+            {optionName(x)}
+          </option>
+        ))}
+      </select>
+    );
+  };
   if (action.type === "assign_user" || action.type === "send_notification")
     return (
       <div className="auto-config-grid">
@@ -94,6 +111,8 @@ function ActionConfig({ action, onChange, members = [], teams = [], tags = [] })
           <input style={inputStyle} type="datetime-local" value={c.dueDate ? String(c.dueDate).slice(0, 16) : ""} onChange={(e) => set("dueDate", e.target.value ? new Date(e.target.value).toISOString() : "")} />
         </label>
         <label>Assigned user{select("assignedTo", members, "Optional assignee")}</label>
+        <label>Tags{selectMany("tagIds", tags, "No tags available")}</label>
+        <span className="auto-help auto-span">Optional: select one or more tags to apply to the task created by this automation.</span>
       </div>
     );
   if (action.type === "create_note")

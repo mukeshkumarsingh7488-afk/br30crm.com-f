@@ -527,7 +527,7 @@ textarea::placeholder {
 /* CRM table finishing: consistent 5-row viewport, professional column sizing, centered headers. */
 .crm-main div:has(> table){max-height:348px;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;}
 .crm-main div:has(> table) > table{width:max-content;min-width:100%;table-layout:auto;border-collapse:separate;border-spacing:0;}
-.crm-main div:has(> table) > table th{position:sticky;top:0;z-index:4;text-align:center !important;vertical-align:middle;white-space:nowrap;min-width:110px;padding:13px 16px;}
+.crm-main div:has(> table) > table th{position:sticky;top:0;z-index:4;text-align:left !important;vertical-align:middle;white-space:nowrap;min-width:110px;padding:13px 16px;background:var(--crm-surface-2);color:var(--crm-muted) !important;font-weight:400;text-transform:uppercase;letter-spacing:.05em;}
 .crm-main div:has(> table) > table td{white-space:nowrap;min-width:110px;padding:13px 16px;}
 .crm-main div:has(> table) > table th:first-child,.crm-main div:has(> table) > table td:first-child{min-width:150px;}
 .crm-main div:has(> table) > table th:last-child,.crm-main div:has(> table) > table td:last-child{min-width:150px;}
@@ -548,3 +548,6 @@ textarea::placeholder {
 .crm-main div:has(> table)::-webkit-scrollbar{width:9px;height:9px;}
 .crm-main div:has(> table)::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--crm-muted) 45%,transparent);border-radius:999px;}
 .crm-main div:has(> table)::-webkit-scrollbar-track{background:transparent;}
+
+/* BR30 CRM table headers: left aligned and use the same muted header treatment as Tags. */
+.crm-main table th{background:var(--crm-surface-2) !important;color:var(--crm-muted) !important;font-weight:400 !important;text-align:left !important;text-transform:uppercase;letter-spacing:.05em;}

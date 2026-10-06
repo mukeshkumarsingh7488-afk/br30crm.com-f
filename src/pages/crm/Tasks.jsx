@@ -826,7 +826,7 @@ function Tasks() {
 
   const toggleTag = (tagId) => {
     setForm((current) => {
-      const currentTags = Array.isArray(current.tags) ? current.tags : [];
+      const currentTags = Array.isArray(current.tags) ? current.tags.map(getTagId).filter(Boolean).map(String) : [];
 
       const exists = currentTags.includes(tagId);
 

@@ -29,7 +29,7 @@ const plans = [
     name: "Professional",
     eyebrow: "For growing teams",
     description: "Everything your growing sales team needs to manage work, pipelines and operations.",
-    price: "₹499",
+    price: "₹999",
     label: "User/month",
     cta: "Start Professional",
     popular: true,

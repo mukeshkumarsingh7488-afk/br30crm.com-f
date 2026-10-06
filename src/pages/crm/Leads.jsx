@@ -102,13 +102,16 @@ const showErrorAlert = (title, text) =>
     confirmButtonText: "OK",
   });
 
-function normaliseTags(value) {
-  if (Array.isArray(value))
-    return value
-      .map((item) => (typeof item === "string" ? item : item?._id || item?.id || ""))
-      .filter(Boolean)
-      .join(", ");
-  return String(value || "");
+function normaliseTags(value, options = []) {
+  if (!Array.isArray(value)) return String(value || "");
+  return value
+    .map((item) => {
+      if (typeof item !== "string") return getTagName(item);
+      const matched = options.find((tag) => String(getTagId(tag)) === String(item));
+      return matched ? getTagName(matched) : "";
+    })
+    .filter(Boolean)
+    .join(", ");
 }
 
 function normaliseCustomFields(value) {
@@ -1992,7 +1995,7 @@ export default function Leads() {
 
                       <div className="leads-view-item">
                         <div className="leads-view-label">Tags</div>
-                        <div className="leads-view-value">{normaliseTags(modal.lead?.tags) || "—"}</div>
+                        <div className="leads-view-value">{normaliseTags(modal.lead?.tags, tags) || "—"}</div>
                       </div>
 
                       <div className="leads-view-item">
