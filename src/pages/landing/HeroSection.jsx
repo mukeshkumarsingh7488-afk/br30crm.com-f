@@ -80,7 +80,7 @@ function HeroSection() {
           </p>
 
           <div className="lp-hero-actions">
-            <a href="/login" className="lp-primary-btn">
+            <a href="/register" className="lp-primary-btn">
               Get Started
               <ArrowRight size={16} />
             </a>
