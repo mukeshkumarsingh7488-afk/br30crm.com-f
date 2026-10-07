@@ -1,7 +1,5 @@
 import { ArrowRight, Check, Minus } from "lucide-react";
 
-import { CUSTOM_PLAN_SUPPORT_FORM_URL } from "../../constants/supportForm";
-
 const plans = [
   {
     name: "Starter",
@@ -110,9 +108,14 @@ function PricingSection() {
 
                 {plan.trial && <div className="lp-price-trial">{plan.trial}</div>}
 
-                <a href={plan.name === "Business" ? CUSTOM_PLAN_SUPPORT_FORM_URL : "/register"} className="lp-price-btn">
+                <a
+                  href={
+                    plan.name === "Business"
+                      ? "https://br30crm-com-f.vercel.app/public/forms/6ac4a4ce8ab8658ebe3748f7/br30-crm-custom-plan-request?utm_source=br30-crm-custom-plan&utm_medium=website&lead_source=br30-crm-custom-plan&form_id=6ac3e39fcf2cad28844a5a4d&source_id=6ac3e400cf2cad28844a5a4e"
+                      : "/register"
+                  }
+                  className="lp-price-btn">
                   {plan.cta}
-
                   <ArrowRight size={14} />
                 </a>
 

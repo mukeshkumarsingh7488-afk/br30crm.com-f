@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { ArrowUp, CheckCircle2, ChevronRight, Clock3, FileText, Mail, MessageSquare, Phone, Send, ShieldCheck, Ticket } from "lucide-react";
 import LandingNavbar from "../../components/landing/LandingNavbar";
 import LandingFooter from "../../components/landing/LandingFooter";
-import { SUPPORT_FORM_URL } from "../../constants/supportForm";
 
 function Contact() {
   const [activeSection, setActiveSection] = useState("contact-support");
@@ -196,7 +195,10 @@ function Contact() {
               <div>
                 <strong>BR30 Support Ticket</strong>
                 <p>Create a ticket for account, technical, billing, product, security, or general support requests.</p>
-                <a href={SUPPORT_FORM_URL} className="br30-contact-submit" rel="noopener noreferrer">
+                <a
+                  href="https://br30crm-com-f.vercel.app/public/forms/6ac4a4ce8ab8658ebe3748f7/br30-crm-support-ticket?utm_source=br30-crm-support&utm_medium=support&lead_source=br30-crm-support&form_id=6ac236c9961d1033e0b7bbb5&source_id=6ac237ad961d1033e0b7bbb7"
+                  className="br30-contact-submit"
+                  rel="noopener noreferrer">
                   <Ticket size={14} />
                   Create Support Ticket
                 </a>
@@ -222,7 +224,10 @@ function Contact() {
               <div>
                 <strong>Create Support Ticket</strong>
                 <p>Please submit your request through the official BR30 CRM support form.</p>
-                <a href={SUPPORT_FORM_URL} className="br30-contact-submit" rel="noopener noreferrer">
+                <a
+                  href="https://br30crm-com-f.vercel.app/public/forms/6ac4a4ce8ab8658ebe3748f7/br30-crm-support-ticket?utm_source=br30-crm-support&utm_medium=support&lead_source=br30-crm-support&form_id=6ac236c9961d1033e0b7bbb5&source_id=6ac237ad961d1033e0b7bbb7"
+                  className="br30-contact-submit"
+                  rel="noopener noreferrer">
                   <Ticket size={14} />
                   Open Support Form
                 </a>
