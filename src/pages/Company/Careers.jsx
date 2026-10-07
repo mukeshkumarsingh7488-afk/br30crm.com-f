@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { ArrowRight, BriefcaseBusiness, CheckCircle2, ChevronRight, Code2, Mail, Rocket, Target, UserCheck, Users, Ticket } from "lucide-react";
 import LandingNavbar from "../../components/landing/LandingNavbar";
 import LandingFooter from "../../components/landing/LandingFooter";
-import { COMPANY_CAREERS_SUPPORT_FORM_URL } from "../../constants/supportForm";
 
 function Careers() {
   const [activeSection, setActiveSection] = useState("working-at-br30");
@@ -320,13 +319,19 @@ function Careers() {
 
                 <p>Share your name, experience, role of interest, relevant skills, and any additional information that may help us understand your profile.</p>
 
-                <a href={COMPANY_CAREERS_SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
+                <a
+                  href="https://br30crm-com-f.vercel.app/public/forms/6ac4a4ce8ab8658ebe3748f7/br30-crm-company-support-ticket?utm_source=br30crm-company-careers&utm_medium=website&lead_source=br30crm-company-careers&form_id=6ac2f5a745d94386aa073fc8&source_id=6ac2f77045d94386aa073fcc"
+                  className="br30-support-ticket-link"
+                  rel="noopener noreferrer">
                   Create Support Ticket <ArrowRight size={12} />
                 </a>
 
                 <br />
 
-                <a href={COMPANY_CAREERS_SUPPORT_FORM_URL} className="br30-careers-button" rel="noopener noreferrer">
+                <a
+                  href="https://br30crm-com-f.vercel.app/public/forms/6ac4a4ce8ab8658ebe3748f7/br30-crm-company-support-ticket?utm_source=br30crm-company-careers&utm_medium=website&lead_source=br30crm-company-careers&form_id=6ac2f5a745d94386aa073fc8&source_id=6ac2f77045d94386aa073fcc"
+                  className="br30-careers-button"
+                  rel="noopener noreferrer">
                   <Ticket size={13} />
                   Create Support Ticket
                 </a>
@@ -352,7 +357,10 @@ function Careers() {
               <div>
                 <strong>Career & Support</strong>
 
-                <a href={COMPANY_CAREERS_SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
+                <a
+                  href="https://br30crm-com-f.vercel.app/public/forms/6ac4a4ce8ab8658ebe3748f7/br30-crm-company-support-ticket?utm_source=br30crm-company-careers&utm_medium=website&lead_source=br30crm-company-careers&form_id=6ac2f5a745d94386aa073fc8&source_id=6ac2f77045d94386aa073fcc"
+                  className="br30-support-ticket-link"
+                  rel="noopener noreferrer">
                   Create Support Ticket
                 </a>
               </div>

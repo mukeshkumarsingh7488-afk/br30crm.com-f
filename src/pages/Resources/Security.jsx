@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { ArrowUp, CheckCircle2, ChevronRight, Database, FileCheck2, LockKeyhole, Mail, Server, Shield, ShieldCheck, UserCheck } from "lucide-react";
 import LandingNavbar from "../../components/landing/LandingNavbar";
 import LandingFooter from "../../components/landing/LandingFooter";
-import { RESOURCES_SECURITY_SUPPORT_FORM_URL } from "../../constants/supportForm";
 
 function Security() {
   const [activeSection, setActiveSection] = useState("overview");
@@ -435,7 +434,10 @@ function Security() {
               <div>
                 <strong>Security & Support</strong>
 
-                <a href={RESOURCES_SECURITY_SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
+                <a
+                  href="https://br30crm-com-f.vercel.app/public/forms/6ac4a4ce8ab8658ebe3748f7/br30-crm-resources-support-ticket?utm_source=br30crm-resources-security&utm_medium=website&lead_source=br30crm-resources-security&form_id=6ac2e97c45d94386aa073fb7&source_id=6ac2ec0445d94386aa073fbb"
+                  className="br30-support-ticket-link"
+                  rel="noopener noreferrer">
                   Create Support Ticket
                 </a>
               </div>

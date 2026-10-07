@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { ArrowUp, ChevronRight, Globe2, Layers3, Network, ShieldCheck, Users } from "lucide-react";
 import LandingNavbar from "../../components/landing/LandingNavbar";
 import LandingFooter from "../../components/landing/LandingFooter";
-import { COMPANY_ECOSYSTEM_SUPPORT_FORM_URL } from "../../constants/supportForm";
 
 function Ecosystem() {
   const [activeSection, setActiveSection] = useState("overview");
@@ -410,7 +409,10 @@ function Ecosystem() {
               <div>
                 <strong>BR30 CRM Support</strong>
 
-                <a href={COMPANY_ECOSYSTEM_SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
+                <a
+                  href="https://br30crm-com-f.vercel.app/public/forms/6ac4a4ce8ab8658ebe3748f7/br30-crm-company-support-ticket?utm_source=br30-crm-company-ecosystem&utm_medium=website&lead_source=br30-crm-company-ecosystem&form_id=6ac2f5a745d94386aa073fc8&source_id=6ac2f7a245d94386aa073fce"
+                  className="br30-support-ticket-link"
+                  rel="noopener noreferrer">
                   Create Support Ticket
                 </a>
               </div>

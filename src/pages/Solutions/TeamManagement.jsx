@@ -1,4 +1,3 @@
-import { SOLUTIONS_TEAM_MANAGEMENT_SUPPORT_FORM_URL } from "../../constants/supportForm";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUp, BriefcaseBusiness, Building2, CheckCircle2, ChevronRight, FileText, Mail, ShieldCheck, UserCheck, UsersRound } from "lucide-react";
@@ -537,7 +536,10 @@ function TeamManagement() {
               <div>
                 <strong>BR30 CRM Support</strong>
 
-                <a href={SOLUTIONS_TEAM_MANAGEMENT_SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
+                <a
+                  href="https://br30crm-com-f.vercel.app/public/forms/6ac4a4ce8ab8658ebe3748f7/br30-crm-solutions-support-ticket?utm_source=br30crm-solutions-team-management&utm_medium=website&lead_source=br30crm-solutions-team-management&form_id=6ac2f06f45d94386aa073fc0&source_id=6ac2f1d845d94386aa073fc6"
+                  className="br30-support-ticket-link"
+                  rel="noopener noreferrer">
                   Create Support Ticket
                 </a>
               </div>

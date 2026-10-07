@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { ChevronDown, ChevronRight, HelpCircle, Mail, Search, ShieldCheck, ArrowUp } from "lucide-react";
 import LandingNavbar from "../../components/landing/LandingNavbar";
 import LandingFooter from "../../components/landing/LandingFooter";
-import { RESOURCES_FAQ_SUPPORT_FORM_URL } from "../../constants/supportForm";
 
 function FAQ() {
   const [search, setSearch] = useState("");
@@ -296,7 +295,10 @@ function FAQ() {
               </div>
             </div>
 
-            <a href={RESOURCES_FAQ_SUPPORT_FORM_URL} rel="noopener noreferrer" className="br30-faq-contact-link">
+            <a
+              href="https://br30crm-com-f.vercel.app/public/forms/6ac4a4ce8ab8658ebe3748f7/br30-crm-resources-support-ticket?utm_source=br30crm-resources-faq&utm_medium=website&lead_source=br30crm-resources-faq&form_id=6ac2e97c45d94386aa073fb7&source_id=6ac2ebcb45d94386aa073fb9"
+              rel="noopener noreferrer"
+              className="br30-faq-contact-link">
               Create Support Ticket
               <ChevronRight size={13} />
             </a>

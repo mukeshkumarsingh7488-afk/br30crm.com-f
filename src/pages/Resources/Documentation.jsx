@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { ArrowUp, BookOpen, CheckCircle2, ChevronRight, Code2, FileText, Mail, Search, ShieldCheck, Sparkles } from "lucide-react";
 import LandingNavbar from "../../components/landing/LandingNavbar";
 import LandingFooter from "../../components/landing/LandingFooter";
-import { RESOURCES_DOCUMENTATION_SUPPORT_FORM_URL } from "../../constants/supportForm";
 
 function Documentation() {
   const [activeSection, setActiveSection] = useState("getting-started");
@@ -337,7 +336,10 @@ function Documentation() {
               </div>
               <div>
                 <strong>BR30 CRM Support</strong>
-                <a href={RESOURCES_DOCUMENTATION_SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
+                <a
+                  href="https://br30crm-com-f.vercel.app/public/forms/6ac4a4ce8ab8658ebe3748f7/br30-crm-resources-support-ticket?utm_source=br30crm-resources-documentation&utm_medium=website&lead_source=br30crm-resources-documentation&form_id=6ac2e97c45d94386aa073fb7&source_id=6ac2ea8445d94386aa073fb8"
+                  className="br30-support-ticket-link"
+                  rel="noopener noreferrer">
                   Create Support Ticket
                 </a>
               </div>

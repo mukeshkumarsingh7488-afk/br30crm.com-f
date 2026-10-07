@@ -1,4 +1,3 @@
-import { SOLUTIONS_REPORTING_ANALYTICS_SUPPORT_FORM_URL } from "../../constants/supportForm";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUp, BarChart3, CheckCircle2, ChevronRight, Database, FileText, Mail, PieChart, ShieldCheck, TrendingUp, UserCheck } from "lucide-react";
@@ -560,7 +559,10 @@ function ReportingAnalytics() {
               <div>
                 <strong>BR30 CRM Support</strong>
 
-                <a href={SOLUTIONS_REPORTING_ANALYTICS_SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
+                <a
+                  href="https://br30crm-com-f.vercel.app/public/forms/6ac4a4ce8ab8658ebe3748f7/br30-crm-solutions-support-ticket?utm_source=br30crm-solutions-reporting-analytics&utm_medium=website&lead_source=br30crm-solutions-reporting-analytics&form_id=6ac2f06f45d94386aa073fc0&source_id=6ac2f19b45d94386aa073fc4"
+                  className="br30-support-ticket-link"
+                  rel="noopener noreferrer">
                   Create Support Ticket
                 </a>
               </div>

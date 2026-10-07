@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { ArrowUp, ChevronRight, FileText, Gavel, Mail, ShieldCheck, UserCheck } from "lucide-react";
 import LandingNavbar from "../../components/landing/LandingNavbar";
 import LandingFooter from "../../components/landing/LandingFooter";
-import { LEGAL_TERMS_OF_SERVICE_SUPPORT_FORM_URL } from "../../constants/supportForm";
 
 function TermsOfService() {
   const [activeSection, setActiveSection] = useState("agreement");
@@ -437,7 +436,10 @@ function TermsOfService() {
               <div>
                 <strong>BR30 CRM Support</strong>
 
-                <a href={LEGAL_TERMS_OF_SERVICE_SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
+                <a
+                  href="https://br30crm-com-f.vercel.app/public/forms/6ac4a4ce8ab8658ebe3748f7/br30-crm-legal-support-ticket?utm_source=br30crm-legal-terms-of-service&utm_medium=website&lead_source=br30crm-legal-terms-of-service&form_id=6ac2de8b45d94386aa073fad&source_id=6ac2e1f745d94386aa073fb4"
+                  className="br30-support-ticket-link"
+                  rel="noopener noreferrer">
                   Create Support Ticket
                 </a>
               </div>

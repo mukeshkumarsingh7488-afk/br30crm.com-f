@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { RESOURCES_SYSTEM_STATUS_SUPPORT_FORM_URL } from "../../constants/supportForm";
 import { ArrowUp, CheckCircle2, ChevronRight, Clock3, FileText, Mail, Server, ShieldCheck, Wrench, AlertTriangle, Activity } from "lucide-react";
 import LandingNavbar from "../../components/landing/LandingNavbar";
 import LandingFooter from "../../components/landing/LandingFooter";
@@ -381,7 +380,10 @@ function SystemStatus() {
               <div>
                 <strong>BR30 CRM Support</strong>
 
-                <a href={RESOURCES_SYSTEM_STATUS_SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
+                <a
+                  href="https://br30crm-com-f.vercel.app/public/forms/6ac4a4ce8ab8658ebe3748f7/br30-crm-resources-support-ticket?utm_source=br30crm-resources-system-status&utm_medium=website&lead_source=br30crm-resources-system-status&form_id=6ac2e97c45d94386aa073fb7&source_id=6ac2ec2045d94386aa073fbc"
+                  className="br30-support-ticket-link"
+                  rel="noopener noreferrer">
                   Create Support Ticket
                 </a>
               </div>

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { ArrowUp, BriefcaseBusiness, ChevronRight, Code2, Compass, Database, FileText, Mail, Rocket, ShieldCheck, Target, User, Users, Ticket } from "lucide-react";
 import LandingNavbar from "../../components/landing/LandingNavbar";
 import LandingFooter from "../../components/landing/LandingFooter";
-import { SUPPORT_FORM_URL } from "../../constants/supportForm";
 
 function FounderAbout() {
   const [activeSection, setActiveSection] = useState("introduction");
@@ -129,7 +128,10 @@ function FounderAbout() {
               <strong>Mukesh Raj</strong>
               <span>Founder of BR30 CRM — focused on building a practical, connected workspace for modern business operations.</span>
 
-              <a href={SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
+              <a
+                href="https://br30crm-com-f.vercel.app/public/forms/6ac4a4ce8ab8658ebe3748f7/br30-crm-support-ticket?utm_source=br30-crm-support&utm_medium=support&lead_source=br30-crm-support&form_id=6ac236c9961d1033e0b7bbb5&source_id=6ac237ad961d1033e0b7bbb7"
+                className="br30-support-ticket-link"
+                rel="noopener noreferrer">
                 <Ticket size={13} /> Create Support Ticket
               </a>
             </div>
@@ -441,7 +443,10 @@ function FounderAbout() {
 
                 <p>
                   Email:{" "}
-                  <a href={SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
+                  <a
+                    href="https://br30crm-com-f.vercel.app/public/forms/6ac4a4ce8ab8658ebe3748f7/br30-crm-support-ticket?utm_source=br30-crm-support&utm_medium=support&lead_source=br30-crm-support&form_id=6ac236c9961d1033e0b7bbb5&source_id=6ac237ad961d1033e0b7bbb7"
+                    className="br30-support-ticket-link"
+                    rel="noopener noreferrer">
                     <Ticket size={13} /> Create Support Ticket
                   </a>
                 </p>

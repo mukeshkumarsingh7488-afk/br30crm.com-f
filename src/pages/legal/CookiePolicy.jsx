@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { ArrowUp, ChevronRight, Cookie, FileText, Mail, ShieldCheck, UserCheck } from "lucide-react";
 import LandingNavbar from "../../components/landing/LandingNavbar";
 import LandingFooter from "../../components/landing/LandingFooter";
-import { LEGAL_COOKIE_POLICY_SUPPORT_FORM_URL } from "../../constants/supportForm";
 
 function CookiePolicy() {
   const [activeSection, setActiveSection] = useState("introduction");
@@ -397,7 +396,10 @@ function CookiePolicy() {
               <div>
                 <strong>Privacy & Support</strong>
 
-                <a href={LEGAL_COOKIE_POLICY_SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
+                <a
+                  href="https://br30crm-com-f.vercel.app/public/forms/6ac4a4ce8ab8658ebe3748f7/br30-crm-legal-support-ticket?utm_source=br30crm-legal-cookie-policy&utm_medium=website&lead_source=br30crm-legal-cookie-policy&form_id=6ac2de8b45d94386aa073fad&source_id=6ac2e16045d94386aa073fae"
+                  className="br30-support-ticket-link"
+                  rel="noopener noreferrer">
                   Create Support Ticket
                 </a>
               </div>

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { ArrowUp, ChevronRight, Database, FileText, LockKeyhole, Mail, ShieldCheck, UserCheck } from "lucide-react";
 import LandingNavbar from "../../components/landing/LandingNavbar";
 import LandingFooter from "../../components/landing/LandingFooter";
-import { LEGAL_PRIVACY_POLICY_SUPPORT_FORM_URL } from "../../constants/supportForm";
 
 function PrivacyPolicy() {
   const [activeSection, setActiveSection] = useState("introduction");
@@ -445,7 +444,10 @@ function PrivacyPolicy() {
               <div>
                 <strong>Privacy & Support</strong>
 
-                <a href={LEGAL_PRIVACY_POLICY_SUPPORT_FORM_URL} className="br30-support-ticket-link" rel="noopener noreferrer">
+                <a
+                  href="https://br30crm-com-f.vercel.app/public/forms/6ac4a4ce8ab8658ebe3748f7/br30-crm-legal-support-ticket?utm_source=br30-crm-legal-privacy-policy&utm_medium=website&lead_source=br30-crm-legal-privacy-policy&form_id=6ac2de8b45d94386aa073fad&source_id=6ac2e1ba45d94386aa073fb2"
+                  className="br30-support-ticket-link"
+                  rel="noopener noreferrer">
                   Create Support Ticket
                 </a>
               </div>
