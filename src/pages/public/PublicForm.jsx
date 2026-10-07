@@ -2,6 +2,29 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import api from "../../api/api";
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const getPublicFormWithRetry = async ({ businessId, slug, query }) => {
+  let lastError;
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      return await api.get(`/public-forms/public/${businessId}/${encodeURIComponent(slug)}`, {
+        params: query,
+        timeout: 90000,
+      });
+    } catch (error) {
+      lastError = error;
+
+      if (attempt === 0) {
+        await sleep(1000);
+      }
+    }
+  }
+
+  throw lastError;
+};
+
 const unwrap = (response) => response?.data?.data ?? response?.data ?? response ?? {};
 
 const getErrorMessage = (error) => error?.response?.data?.message || error?.response?.data?.error || error?.message || "Unable to load the form.";
@@ -77,8 +100,10 @@ export default function PublicForm() {
       setError("");
 
       try {
-        const response = await api.get(`/public-forms/public/${businessId}/${encodeURIComponent(slug)}`, {
-          params: query,
+        const response = await getPublicFormWithRetry({
+          businessId,
+          slug,
+          query,
         });
 
         const data = unwrap(response);
