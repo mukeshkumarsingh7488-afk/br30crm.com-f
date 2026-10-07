@@ -5,12 +5,6 @@ import * as XLSX from "xlsx";
 import { getLeadsReport } from "../../api/report.api";
 import useBusiness from "../../hooks/useBusiness";
 
-/*
- * ============================================================
- * HELPERS
- * ============================================================
- */
-
 const formatNumber = (value) => {
   const number = Number(value);
 
@@ -87,11 +81,6 @@ const ratingLabel = (value) => {
 };
 
 const normalizeResponse = (response) => {
-  /*
-   * Supports the normal ApiResponse structure as well as
-   * direct response.data structures.
-   */
-
   const root = response?.data ?? response ?? {};
 
   if (root?.data && typeof root.data === "object") {
@@ -106,12 +95,6 @@ const escapeCsvValue = (value) => {
 
   return `"${stringValue.replace(/"/g, '""')}"`;
 };
-
-/*
- * ============================================================
- * COMPONENT
- * ============================================================
- */
 
 const LeadsReport = () => {
   const { businessId, loading: businessLoading, error: businessError } = useBusiness();
@@ -137,23 +120,11 @@ const LeadsReport = () => {
   const [sortField, setSortField] = useState("createdAt");
   const [sortDirection, setSortDirection] = useState("desc");
 
-  /*
-   * ----------------------------------------------------------
-   * Business context
-   * ----------------------------------------------------------
-   */
-
   useEffect(() => {
     if (businessError && !businessId && !businessLoading) {
       setError(businessError || "Unable to load your business workspace.");
     }
   }, [businessError, businessId, businessLoading]);
-
-  /*
-   * ----------------------------------------------------------
-   * SweetAlert theme helper
-   * ----------------------------------------------------------
-   */
 
   const showErrorAlert = useCallback((message) => {
     Swal.fire({
@@ -169,12 +140,6 @@ const LeadsReport = () => {
       },
     });
   }, []);
-
-  /*
-   * ----------------------------------------------------------
-   * Fetch report
-   * ----------------------------------------------------------
-   */
 
   const loadReport = useCallback(
     async (options = {}) => {
@@ -257,12 +222,6 @@ const LeadsReport = () => {
     loadReport();
   }, [loadReport]);
 
-  /*
-   * ----------------------------------------------------------
-   * Data
-   * ----------------------------------------------------------
-   */
-
   const summary = report?.summary || {};
 
   const rows = report?.rows || [];
@@ -274,24 +233,12 @@ const LeadsReport = () => {
   const byAssignedTeam = report?.byAssignedTeam || [];
   const monthly = report?.monthly || [];
 
-  /*
-   * ----------------------------------------------------------
-   * Sources
-   * ----------------------------------------------------------
-   */
-
   const sourceOptions = useMemo(() => {
     return bySource
       .map((item) => item?.source)
       .filter(Boolean)
       .sort((a, b) => String(a).localeCompare(String(b)));
   }, [bySource]);
-
-  /*
-   * ----------------------------------------------------------
-   * Assigned users
-   * ----------------------------------------------------------
-   */
 
   const assignedUserOptions = useMemo(() => {
     return byAssignedUser
@@ -302,12 +249,6 @@ const LeadsReport = () => {
       }))
       .sort((a, b) => String(a.name).localeCompare(String(b.name)));
   }, [byAssignedUser]);
-
-  /*
-   * ----------------------------------------------------------
-   * Filtered table rows
-   * ----------------------------------------------------------
-   */
 
   const filteredRows = useMemo(() => {
     const query = String(search || "")
@@ -367,19 +308,7 @@ const LeadsReport = () => {
     return result;
   }, [rows, search, sortField, sortDirection]);
 
-  /*
-   * ----------------------------------------------------------
-   * Active filters
-   * ----------------------------------------------------------
-   */
-
   const activeFilterCount = [dateFrom, dateTo, status, source, assignedTo].filter(Boolean).length;
-
-  /*
-   * ----------------------------------------------------------
-   * Clear filters
-   * ----------------------------------------------------------
-   */
 
   const clearFilters = () => {
     setDateFrom("");
@@ -390,12 +319,6 @@ const LeadsReport = () => {
     setSearch("");
   };
 
-  /*
-   * ----------------------------------------------------------
-   * Sorting
-   * ----------------------------------------------------------
-   */
-
   const handleSort = (field) => {
     if (sortField === field) {
       setSortDirection((current) => (current === "asc" ? "desc" : "asc"));
@@ -405,12 +328,6 @@ const LeadsReport = () => {
     setSortField(field);
     setSortDirection("asc");
   };
-
-  /*
-   * ----------------------------------------------------------
-   * Export CSV
-   * ----------------------------------------------------------
-   */
 
   const exportCsv = () => {
     if (!filteredRows.length) {
@@ -460,12 +377,6 @@ const LeadsReport = () => {
     URL.revokeObjectURL(url);
   };
 
-  /*
-   * ----------------------------------------------------------
-   * Export Excel
-   * ----------------------------------------------------------
-   */
-
   const exportExcel = () => {
     if (!filteredRows.length) {
       Swal.fire({
@@ -501,12 +412,6 @@ const LeadsReport = () => {
 
     XLSX.writeFile(workbook, `leads-report-${new Date().toISOString().slice(0, 10)}.xlsx`);
   };
-
-  /*
-   * ----------------------------------------------------------
-   * Status classes
-   * ----------------------------------------------------------
-   */
 
   const getStatusClass = (value) => {
     switch (String(value || "").toUpperCase()) {
@@ -549,12 +454,6 @@ const LeadsReport = () => {
     }
   };
 
-  /*
-   * ----------------------------------------------------------
-   * Sort icon
-   * ----------------------------------------------------------
-   */
-
   const SortIcon = ({ field }) => {
     if (sortField !== field) {
       return <ChevronDown size={13} className="leads-report-sort-muted" />;
@@ -562,12 +461,6 @@ const LeadsReport = () => {
 
     return sortDirection === "asc" ? <ChevronUp size={13} /> : <ChevronDown size={13} />;
   };
-
-  /*
-   * ============================================================
-   * LOADING
-   * ============================================================
-   */
 
   if (loading || businessLoading) {
     return (
@@ -590,20 +483,14 @@ const LeadsReport = () => {
     );
   }
 
-  /*
-   * ============================================================
-   * PAGE
-   * ============================================================
-   */
-
   return (
     <>
       <style>{styles}</style>
 
       <div className="leads-report-page">
-        {/* ================================================== */}
-        {/* HEADER */}
-        {/* ================================================== */}
+        {}
+        {}
+        {}
 
         <div className="leads-report-header">
           <div className="leads-report-header-left">
@@ -633,9 +520,9 @@ const LeadsReport = () => {
           </div>
         </div>
 
-        {/* ================================================== */}
-        {/* FILTER BAR */}
-        {/* ================================================== */}
+        {}
+        {}
+        {}
 
         <div className="leads-report-filter-card">
           <div className="leads-report-filter-top">
@@ -748,9 +635,9 @@ const LeadsReport = () => {
           )}
         </div>
 
-        {/* ================================================== */}
-        {/* ERROR */}
-        {/* ================================================== */}
+        {}
+        {}
+        {}
 
         {error && (
           <div className="leads-report-error">
@@ -767,9 +654,9 @@ const LeadsReport = () => {
           </div>
         )}
 
-        {/* ================================================== */}
-        {/* SUMMARY CARDS */}
-        {/* ================================================== */}
+        {}
+        {}
+        {}
 
         <div className="leads-report-summary-grid">
           <div className="leads-report-summary-card">
@@ -838,9 +725,9 @@ const LeadsReport = () => {
           </div>
         </div>
 
-        {/* ================================================== */}
-        {/* SECONDARY METRICS */}
-        {/* ================================================== */}
+        {}
+        {}
+        {}
 
         <div className="leads-report-mini-grid">
           <div className="leads-report-mini-card">
@@ -888,9 +775,9 @@ const LeadsReport = () => {
           </div>
         </div>
 
-        {/* ================================================== */}
-        {/* SECTION TABS */}
-        {/* ================================================== */}
+        {}
+        {}
+        {}
 
         <div className="leads-report-tabs">
           <button type="button" className={activeSection === "overview" ? "leads-report-tab leads-report-tab-active" : "leads-report-tab"} onClick={() => setActiveSection("overview")}>
@@ -909,13 +796,13 @@ const LeadsReport = () => {
           </button>
         </div>
 
-        {/* ================================================== */}
-        {/* OVERVIEW */}
-        {/* ================================================== */}
+        {}
+        {}
+        {}
 
         {activeSection === "overview" && (
           <div className="leads-report-content-grid">
-            {/* STATUS */}
+            {}
             <div className="leads-report-panel">
               <div className="leads-report-panel-header">
                 <div>
@@ -957,7 +844,7 @@ const LeadsReport = () => {
               </div>
             </div>
 
-            {/* SOURCE */}
+            {}
             <div className="leads-report-panel">
               <div className="leads-report-panel-header">
                 <div>
@@ -999,7 +886,7 @@ const LeadsReport = () => {
               </div>
             </div>
 
-            {/* RATING */}
+            {}
             <div className="leads-report-panel">
               <div className="leads-report-panel-header">
                 <div>
@@ -1049,7 +936,7 @@ const LeadsReport = () => {
               </div>
             </div>
 
-            {/* MONTHLY */}
+            {}
             <div className="leads-report-panel leads-report-panel-wide">
               <div className="leads-report-panel-header">
                 <div>
@@ -1112,9 +999,9 @@ const LeadsReport = () => {
           </div>
         )}
 
-        {/* ================================================== */}
-        {/* ASSIGNMENT */}
-        {/* ================================================== */}
+        {}
+        {}
+        {}
 
         {activeSection === "people" && (
           <div className="leads-report-content-grid">
@@ -1240,9 +1127,9 @@ const LeadsReport = () => {
           </div>
         )}
 
-        {/* ================================================== */}
-        {/* LEAD DETAILS */}
-        {/* ================================================== */}
+        {}
+        {}
+        {}
 
         {activeSection === "leads" && (
           <div className="leads-report-panel leads-report-details-panel">
@@ -1391,9 +1278,9 @@ const LeadsReport = () => {
           </div>
         )}
 
-        {/* ================================================== */}
-        {/* FOOTER */}
-        {/* ================================================== */}
+        {}
+        {}
+        {}
 
         <div className="leads-report-footer">
           <span>
@@ -1412,12 +1299,6 @@ const LeadsReport = () => {
     </>
   );
 };
-
-/*
- * ============================================================
- * STYLES
- * ============================================================
- */
 
 const styles = `.leads-report-input-wrap select{color:var(--crm-text,#111827);background:var(--crm-surface,#fff);color-scheme:light}.leads-report-input-wrap select option{color:var(--crm-text,#111827);background:var(--crm-surface,#fff)}.leads-report-input-wrap input[type="date"]{color-scheme:light;-webkit-appearance:auto;appearance:auto;accent-color:var(--crm-primary,#2563eb);cursor:pointer}.leads-report-input-wrap input[type="date"]::-webkit-calendar-picker-indicator{display:block;opacity:1!important;visibility:visible!important;cursor:pointer;width:16px;height:16px}.dark .leads-report-input-wrap input[type="date"],[data-theme="dark"] .leads-report-input-wrap input[type="date"],html.dark .leads-report-input-wrap input[type="date"],body.dark .leads-report-input-wrap input[type="date"],body.dark-mode .leads-report-input-wrap input[type="date"],html.dark-mode .leads-report-input-wrap input[type="date"],.dark-theme .leads-report-input-wrap input[type="date"]{color-scheme:dark;background:transparent;color:var(--crm-text,#f8fafc)}.dark .leads-report-input-wrap select{color:var(--crm-text,#f3f4f6);background:var(--crm-surface,#111827);color-scheme:dark}.dark .leads-report-input-wrap select option{color:var(--crm-text,#f3f4f6);background:var(--crm-surface,#111827)}[data-theme="dark"] .leads-report-input-wrap select{color:var(--crm-text,#f3f4f6);background:var(--crm-surface,#111827);color-scheme:dark}[data-theme="dark"] .leads-report-input-wrap select option{color:var(--crm-text,#f3f4f6);background:var(--crm-surface,#111827)}.leads-report-page{width:100%; min-width:0; padding:22px; color:var(--crm-text,#1f2937);}.leads-report-header{display:flex; align-items:center; justify-content:space-between; gap:18px; margin-bottom:18px;}.leads-report-header-left{display:flex; align-items:center; gap:13px; min-width:0;}.leads-report-title-icon{width:44px; height:44px; min-width:44px; display:flex; align-items:center; justify-content:center; border-radius:12px; background:var(--crm-primary,#2563eb); color:#fff; box-shadow:0 8px 20px rgba(37,99,235,.18);}.leads-report-title{margin:0; font-size:24px; line-height:1.25; font-weight:400; color:var(--crm-text,#1f2937);}.leads-report-subtitle{margin:5px 0 0; font-size:13px; line-height:1.5; color:var(--crm-muted,#6b7280);}.leads-report-header-actions{display:flex; align-items:center; justify-content:flex-end; gap:8px; flex-wrap:wrap;}.leads-report-btn{min-height:38px; border:1px solid var(--crm-border,#e5e7eb); border-radius:9px; padding:0 13px; display:inline-flex; align-items:center; justify-content:center; gap:7px; font-size:13px; font-weight:400; cursor:pointer; transition:.18s ease; white-space:nowrap;}.leads-report-btn:disabled{opacity:.6; cursor:not-allowed;}.leads-report-btn-secondary{background:var(--crm-surface,#fff); color:var(--crm-text,#374151);}.leads-report-btn-secondary:hover:not(:disabled){background:var(--crm-bg,#f8fafc); border-color:var(--crm-primary,#2563eb);}.leads-report-btn-primary{background:var(--crm-primary,#2563eb); border-color:var(--crm-primary,#2563eb); color:#fff;}.leads-report-btn-primary:hover:not(:disabled){filter:brightness(.95);}.leads-report-filter-card{border:1px solid var(--crm-border,#e5e7eb); background:var(--crm-surface,#fff); border-radius:12px; margin-bottom:18px; overflow:hidden;}.leads-report-filter-top{min-height:54px; padding:0 15px; display:flex; align-items:center; justify-content:space-between; gap:12px;}.leads-report-filter-title{display:flex; align-items:center; gap:8px; font-size:13px; font-weight:400; color:var(--crm-text,#374151);}.leads-report-filter-count{min-width:20px; height:20px; padding:0 6px; display:inline-flex; align-items:center; justify-content:center; border-radius:20px; background:var(--crm-primary,#2563eb); color:#fff; font-size:13px; font-weight:400;}.leads-report-filter-actions{display:flex; align-items:center; gap:8px;}.leads-report-clear-btn, .leads-report-filter-toggle{height:32px; padding:0 10px; display:inline-flex; align-items:center; gap:6px; border-radius:8px; border:1px solid var(--crm-border,#e5e7eb); background:transparent; color:var(--crm-muted,#6b7280); font-size:13px; font-weight:400; cursor:pointer;}.leads-report-clear-btn:hover, .leads-report-filter-toggle:hover{background:var(--crm-bg,#f8fafc); color:var(--crm-text,#374151);}.leads-report-filter-grid{border-top:1px solid var(--crm-border,#e5e7eb); padding:15px; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)) auto; gap:12px; align-items:end;}.leads-report-field{min-width:0;}.leads-report-field label{display:block; margin:0 0 6px; font-size:13px; line-height:1.2; font-weight:400; color:var(--crm-muted,#6b7280);}.leads-report-input-wrap{min-height:38px; display:flex; align-items:center; gap:8px; padding:0 10px; border:1px solid var(--crm-border,#e5e7eb); border-radius:8px; background:var(--crm-surface,#fff); color:var(--crm-muted,#6b7280);}.leads-report-input-wrap:focus-within{border-color:var(--crm-primary,#2563eb); box-shadow:0 0 0 3px rgba(37,99,235,.08);}.leads-report-input-wrap input, .leads-report-input-wrap select{width:100%; min-width:0; height:36px; border:0; outline:0; background:transparent; color:var(--crm-text,#374151); font-size:13px;}.leads-report-input-wrap select{cursor:pointer;}.leads-report-filter-apply{display:flex; justify-content:flex-end;}.leads-report-error{margin-bottom:18px; padding:12px 14px; border:1px solid rgba(239,68,68,.22); border-radius:10px; background:rgba(239,68,68,.06); display:flex; align-items:center; gap:10px; color:#dc2626;}.leads-report-error>div{flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;}.leads-report-error strong{font-size:13px;}.leads-report-error span{font-size:13px; color:var(--crm-muted,#6b7280);}.leads-report-error button{border:0; background:transparent; color:#dc2626; font-size:13px; font-weight:400; cursor:pointer;}.leads-report-summary-grid{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; margin-bottom:12px;}.leads-report-summary-card{min-width:0; padding:16px; border:1px solid var(--crm-border,#e5e7eb); border-radius:12px; background:var(--crm-surface,#fff); display:flex; align-items:flex-start; gap:12px;}.leads-report-summary-icon{width:38px; height:38px; min-width:38px; display:flex; align-items:center; justify-content:center; border-radius:10px; background:rgba(37,99,235,.1); color:var(--crm-primary,#2563eb);}.leads-report-summary-icon-green{background:rgba(16,185,129,.1); color:#059669;}.leads-report-summary-icon-blue{background:rgba(59,130,246,.1); color:#2563eb;}.leads-report-summary-icon-orange{background:rgba(245,158,11,.11); color:#d97706;}.leads-report-summary-icon-red{background:rgba(239,68,68,.1); color:#dc2626;}.leads-report-summary-content{min-width:0; display:flex; flex-direction:column;}.leads-report-summary-content>span{font-size:13px; color:var(--crm-muted,#6b7280); font-weight:400;}.leads-report-summary-content>strong{margin-top:4px; font-size:22px; line-height:1.15; font-weight:400; color:var(--crm-text,#1f2937);}.leads-report-summary-content>small{margin-top:4px; font-size:13px; color:var(--crm-muted,#6b7280); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}.leads-report-positive{color:#059669!important;}.leads-report-mini-grid{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:18px;}.leads-report-mini-card{min-width:0; min-height:66px; padding:12px 14px; border:1px solid var(--crm-border,#e5e7eb); border-radius:11px; background:var(--crm-surface,#fff); display:flex; align-items:center; justify-content:space-between; gap:12px;}.leads-report-mini-card>div:first-child{min-width:0; display:flex; flex-direction:column;}.leads-report-mini-card span{font-size:13px; color:var(--crm-muted,#6b7280);}.leads-report-mini-card strong{margin-top:3px; font-size:17px; color:var(--crm-text,#1f2937);}.leads-report-mini-icon{width:32px; height:32px; min-width:32px; display:flex; align-items:center; justify-content:center; border-radius:9px; background:var(--crm-bg,#f8fafc); color:var(--crm-primary,#2563eb);}.leads-report-tabs{display:flex; align-items:center; gap:3px; margin-bottom:14px; padding:4px; border:1px solid var(--crm-border,#e5e7eb); border-radius:10px; background:var(--crm-bg,#f8fafc); width:max-content; max-width:100%;}.leads-report-tab{height:34px; padding:0 12px; display:inline-flex; align-items:center; gap:7px; border:0; border-radius:7px; background:transparent; color:var(--crm-muted,#6b7280); font-size:13px; font-weight:400; cursor:pointer;}.leads-report-tab:hover{color:var(--crm-text,#374151);}.leads-report-tab-active{background:var(--crm-surface,#fff); color:var(--crm-primary,#2563eb); box-shadow:0 1px 3px rgba(15,23,42,.08);}.leads-report-content-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px;}.leads-report-panel{min-width:0; border:1px solid var(--crm-border,#e5e7eb); border-radius:12px; background:var(--crm-surface,#fff); overflow:hidden;}.leads-report-panel-wide{grid-column:1 / -1;}.leads-report-panel-header{min-height:64px; padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; border-bottom:1px solid var(--crm-border,#e5e7eb);}.leads-report-panel-header>div{min-width:0;}.leads-report-panel-header h3{margin:0; font-size:14px; line-height:1.3; font-weight:400; color:var(--crm-text,#1f2937);}.leads-report-panel-header p{margin:4px 0 0; font-size:13px; color:var(--crm-muted,#6b7280);}.leads-report-panel-header>svg{color:var(--crm-muted,#6b7280);}.leads-report-breakdown{padding:14px 16px 16px;}.leads-report-breakdown-item{margin-bottom:14px;}.leads-report-breakdown-item:last-child{margin-bottom:0;}.leads-report-breakdown-top{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:6px;}.leads-report-breakdown-top span{font-size:13px; color:var(--crm-text,#374151);}.leads-report-breakdown-top strong{font-size:13px; color:var(--crm-text,#1f2937);}.leads-report-progress{width:100%; height:6px; border-radius:20px; overflow:hidden; background:var(--crm-bg,#f1f5f9);}.leads-report-progress>div{height:100%; border-radius:20px; background:var(--crm-primary,#2563eb); transition:width .3s ease;}.leads-report-breakdown-item small{display:block; margin-top:4px; font-size:13px; color:var(--crm-muted,#6b7280);}.leads-report-rating-grid{padding:14px 16px 8px; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px;}.leads-report-rating-box{min-width:0; padding:12px 10px; border:1px solid var(--crm-border,#e5e7eb); border-radius:9px; display:flex; flex-direction:column; gap:4px;}.leads-report-rating-box span{font-size:13px; font-weight:400;}.leads-report-rating-box strong{font-size:18px;}.leads-report-rating-box-hot{background:rgba(239,68,68,.05); border-color:rgba(239,68,68,.15); color:#dc2626;}.leads-report-rating-box-warm{background:rgba(245,158,11,.05); border-color:rgba(245,158,11,.15); color:#d97706;}.leads-report-rating-box-cold{background:rgba(59,130,246,.05); border-color:rgba(59,130,246,.15); color:#2563eb;}.leads-report-rating-list{padding:8px 16px 16px;}.leads-report-rating-list-row{min-height:34px; display:flex; align-items:center; justify-content:space-between; gap:10px; border-bottom:1px solid var(--crm-border,#e5e7eb);}.leads-report-rating-list-row:last-child{border-bottom:0;}.leads-report-rating{display:inline-flex; align-items:center; min-height:23px; padding:0 8px; border-radius:20px; font-size:13px; font-weight:400; text-transform:capitalize; background:var(--crm-bg,#f8fafc); color:var(--crm-muted,#6b7280);}.leads-report-rating-hot{background:rgba(239,68,68,.1); color:#dc2626;}.leads-report-rating-warm{background:rgba(245,158,11,.1); color:#d97706;}.leads-report-rating-cold{background:rgba(59,130,246,.1); color:#2563eb;}.leads-report-monthly-table-wrap{overflow:auto; max-height:300px;}.leads-report-simple-table{width:100%; border-collapse:collapse;}.leads-report-simple-table th{position:sticky; top:0; z-index:1; padding:10px 14px; text-align:left; background:var(--crm-bg,#f8fafc); border-bottom:1px solid var(--crm-border,#e5e7eb); color:var(--crm-muted,#6b7280); font-size:13px; font-weight:400; text-transform:uppercase; letter-spacing:.02em; white-space:nowrap;}.leads-report-simple-table td{padding:11px 14px; border-bottom:1px solid var(--crm-border,#e5e7eb); color:var(--crm-text,#374151); font-size:13px; white-space:nowrap;}.leads-report-simple-table tbody tr:last-child td{border-bottom:0;}.leads-report-simple-table tbody tr:hover{background:var(--crm-bg,#f8fafc);}.leads-report-table-positive{color:#059669!important; font-weight:400;}.leads-report-table-negative{color:#dc2626!important; font-weight:400;}.leads-report-percentage-pill{display:inline-flex; align-items:center; min-height:23px; padding:0 8px; border-radius:20px; background:rgba(37,99,235,.09); color:var(--crm-primary,#2563eb); font-size:13px; font-weight:400;}.leads-report-empty{min-height:180px; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:6px; color:var(--crm-muted,#6b7280);}.leads-report-empty strong{font-size:13px; color:var(--crm-text,#374151);}.leads-report-empty span{font-size:13px;}.leads-report-empty-small{padding:28px 10px; text-align:center; color:var(--crm-muted,#6b7280); font-size:13px;}.leads-report-scroll-table{max-height:350px; overflow:auto;}.leads-report-person{display:flex; align-items:center; gap:9px; min-width:170px;}.leads-report-person>div:last-child{min-width:0; display:flex; flex-direction:column;}.leads-report-person strong{max-width:220px; overflow:hidden; text-overflow:ellipsis; font-size:13px; color:var(--crm-text,#374151);}.leads-report-person span{max-width:220px; margin-top:2px; overflow:hidden; text-overflow:ellipsis; font-size:13px; color:var(--crm-muted,#6b7280);}.leads-report-avatar, .leads-report-small-avatar{display:flex; align-items:center; justify-content:center; border-radius:50%; flex-shrink:0; background:rgba(37,99,235,.1); color:var(--crm-primary,#2563eb); font-weight:400;}.leads-report-avatar{width:32px; height:32px; font-size:13px;}.leads-report-small-avatar{width:27px; height:27px; font-size:13px;}.leads-report-team-icon{width:32px; height:32px; min-width:32px; display:flex; align-items:center; justify-content:center; border-radius:9px; background:rgba(37,99,235,.1); color:var(--crm-primary,#2563eb);}.leads-report-table-empty{height:100px; text-align:center!important; color:var(--crm-muted,#6b7280)!important;}.leads-report-details-panel{overflow:hidden;}.leads-report-details-header{align-items:center;}.leads-report-detail-actions{display:flex!important; align-items:center; justify-content:flex-end; gap:10px;}.leads-report-search{width:260px; height:34px; display:flex; align-items:center; gap:7px; padding:0 9px; border:1px solid var(--crm-border,#e5e7eb); border-radius:8px; background:var(--crm-surface,#fff); color:var(--crm-muted,#6b7280);}.leads-report-search:focus-within{border-color:var(--crm-primary,#2563eb); box-shadow:0 0 0 3px rgba(37,99,235,.08);}.leads-report-search input{width:100%; min-width:0; border:0; outline:0; background:transparent; color:var(--crm-text,#374151); font-size:13px;}.leads-report-search input::placeholder{color:var(--crm-muted,#9ca3af);}.leads-report-search button{width:22px; height:22px; padding:0; display:flex; align-items:center; justify-content:center; border:0; border-radius:5px; background:var(--crm-bg,#f1f5f9); color:var(--crm-muted,#6b7280); cursor:pointer;}.leads-report-search button:hover{color:var(--crm-text,#374151);}.leads-report-record-count{font-size:13px; color:var(--crm-muted,#6b7280); white-space:nowrap;}.leads-report-details-table{width:100%; overflow:auto; max-height:560px;}.leads-report-details-table table{width:100%; min-width:1120px; border-collapse:collapse;}.leads-report-details-table th{position:sticky; top:0; z-index:2; height:43px; padding:0 13px; text-align:left; background:var(--crm-bg,#f8fafc); border-bottom:1px solid var(--crm-border,#e5e7eb); color:var(--crm-muted,#6b7280); font-size:13px; font-weight:400; text-transform:uppercase; white-space:nowrap;}.leads-report-details-table th button{display:inline-flex; align-items:center; gap:4px; padding:0; border:0; background:transparent; color:inherit; font:inherit; cursor:pointer;}.leads-report-details-table th button:hover{color:var(--crm-text,#374151);}.leads-report-sort-muted{opacity:.45;}.leads-report-details-table td{height:58px; padding:8px 13px; border-bottom:1px solid var(--crm-border,#e5e7eb); color:var(--crm-text,#374151); font-size:13px; white-space:nowrap;}.leads-report-details-table tbody tr:hover{background:var(--crm-bg,#f8fafc);}.leads-report-lead-cell{min-width:190px; display:flex; align-items:center; gap:9px;}.leads-report-lead-cell>div:last-child{min-width:0; display:flex; flex-direction:column;}.leads-report-lead-cell strong{max-width:220px; overflow:hidden; text-overflow:ellipsis; color:var(--crm-text,#374151); font-size:13px;}.leads-report-lead-cell span{max-width:220px; margin-top:2px; overflow:hidden; text-overflow:ellipsis; color:var(--crm-muted,#6b7280); font-size:13px;}.leads-report-lead-avatar{width:31px; height:31px; min-width:31px; display:flex; align-items:center; justify-content:center; border-radius:9px; background:rgba(37,99,235,.1); color:var(--crm-primary,#2563eb); font-size:13px; font-weight:400;}.leads-report-contact-cell{display:flex; flex-direction:column; min-width:170px; max-width:210px;}.leads-report-contact-cell span{overflow:hidden; text-overflow:ellipsis; font-size:13px;}.leads-report-contact-cell small{margin-top:2px; color:var(--crm-muted,#6b7280); font-size:13px;}.leads-report-source-pill{display:inline-flex; align-items:center; max-width:120px; min-height:24px; padding:0 8px; overflow:hidden; text-overflow:ellipsis; border-radius:6px; background:var(--crm-bg,#f1f5f9); color:var(--crm-text,#475569); font-size:13px; font-weight:400; text-transform:capitalize;}.leads-report-status{display:inline-flex; align-items:center; min-height:24px; padding:0 8px; border-radius:20px; background:var(--crm-bg,#f1f5f9); color:var(--crm-muted,#64748b); font-size:13px; font-weight:400;}.leads-report-status-new{background:rgba(59,130,246,.1); color:#2563eb;}.leads-report-status-contacted{background:rgba(139,92,246,.1); color:#7c3aed;}.leads-report-status-qualified{background:rgba(16,185,129,.1); color:#059669;}.leads-report-status-unqualified{background:rgba(100,116,139,.1); color:#64748b;}.leads-report-status-converted{background:rgba(16,185,129,.12); color:#047857;}.leads-report-status-lost{background:rgba(239,68,68,.1); color:#dc2626;}.leads-report-assignee{display:flex; align-items:center; gap:7px; min-width:130px;}.leads-report-assignee>span{max-width:150px; overflow:hidden; text-overflow:ellipsis;}.leads-report-date{color:var(--crm-muted,#6b7280); font-size:13px;}.leads-report-muted{color:var(--crm-muted,#9ca3af)!important;}.leads-report-no-data{height:260px!important; text-align:center!important;}.leads-report-no-data>div{display:flex; align-items:center; justify-content:center; flex-direction:column; gap:7px; color:var(--crm-muted,#6b7280);}.leads-report-no-data strong{color:var(--crm-text,#374151); font-size:13px;}.leads-report-no-data span{font-size:13px;}.leads-report-footer{margin-top:14px; padding:0 2px; display:flex; align-items:center; justify-content:space-between; gap:12px; color:var(--crm-muted,#6b7280); font-size:13px;}.leads-report-loading{min-height:420px; display:flex; align-items:center; justify-content:center; gap:13px; color:var(--crm-muted,#6b7280);}.leads-report-loading-icon{width:54px; height:54px; display:flex; align-items:center; justify-content:center; border-radius:14px; background:rgba(37,99,235,.09); color:var(--crm-primary,#2563eb);}.leads-report-loading h3{margin:0; color:var(--crm-text,#374151); font-size:15px;}.leads-report-loading p{margin:5px 0 0; font-size:13px;}.leads-report-spin{animation:leadsReportSpin 1s linear infinite;}
 @keyframes leadsReportSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)} }

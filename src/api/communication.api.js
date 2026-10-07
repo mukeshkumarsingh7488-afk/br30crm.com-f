@@ -17,12 +17,6 @@ const normalizePagination = (pagination = {}) => ({
   totalPages: Number(pagination?.totalPages) || 0,
 });
 
-/*
- * ============================================================
- * GET COMMUNICATIONS
- * ============================================================
- */
-
 export const getCommunications = async (businessId, params = {}) => {
   if (!businessId) {
     throw new Error("Business ID is required.");
@@ -53,21 +47,9 @@ export const getCommunications = async (businessId, params = {}) => {
   };
 };
 
-/*
- * ============================================================
- * COMMUNICATION HISTORY
- * ============================================================
- */
-
 export const getCommunicationHistory = async (businessId, params = {}) => {
   return getCommunications(businessId, params);
 };
-
-/*
- * ============================================================
- * SEND COMMUNICATION
- * ============================================================
- */
 
 export const sendCommunication = async (businessId, data = {}) => {
   if (!businessId) {
@@ -96,24 +78,12 @@ export const sendCommunication = async (businessId, data = {}) => {
   return unwrap(response);
 };
 
-/*
- * ============================================================
- * EMAIL
- * ============================================================
- */
-
 export const sendEmailCommunication = async (businessId, data = {}) => {
   return sendCommunication(businessId, {
     ...data,
     channel: "EMAIL",
   });
 };
-
-/*
- * ============================================================
- * WHATSAPP
- * ============================================================
- */
 
 export const sendWhatsAppCommunication = async (businessId, data = {}) => {
   return sendCommunication(businessId, {
@@ -122,12 +92,6 @@ export const sendWhatsAppCommunication = async (businessId, data = {}) => {
   });
 };
 
-/*
- * ============================================================
- * SMS
- * ============================================================
- */
-
 export const sendSmsCommunication = async (businessId, data = {}) => {
   return sendCommunication(businessId, {
     ...data,
@@ -135,23 +99,15 @@ export const sendSmsCommunication = async (businessId, data = {}) => {
   });
 };
 
-/*
- * ============================================================
- * NORMALIZER
- * ============================================================
- */
-
 export const getCommunicationSenders = async (businessId) => {
   if (!businessId) throw new Error("Business ID is required.");
   const response = await api.get(`/communications/business/${businessId}/senders`);
   return unwrap(response);
 };
 
-export const sendConversationCommunication = async (businessId, data = {}) =>
-  sendCommunication(businessId, { ...data, channel: "CONVERSATION" });
+export const sendConversationCommunication = async (businessId, data = {}) => sendCommunication(businessId, { ...data, channel: "CONVERSATION" });
 
-export const sendCallCommunication = async (businessId, data = {}) =>
-  sendCommunication(businessId, { ...data, channel: "CALL" });
+export const sendCallCommunication = async (businessId, data = {}) => sendCommunication(businessId, { ...data, channel: "CALL" });
 
 export const extractCommunicationRows = (response) => {
   if (Array.isArray(response)) {
@@ -168,12 +124,6 @@ export const extractCommunicationRows = (response) => {
 
   return [];
 };
-
-/*
- * ============================================================
- * DEFAULT EXPORT
- * ============================================================
- */
 
 export default {
   getCommunications,

@@ -347,11 +347,6 @@ export default function Roles() {
     const activePermissionIds = new Set(permissions.map((permission) => String(permission?._id || "")).filter(Boolean));
     const assignedPermissionIds = getPermissionIds(role?.permissions);
 
-    /*
-     * Only active permissions are assignable to a role.
-     * If an older role contains a permission that has since been
-     * deactivated, do not keep that stale ID in the edit payload.
-     */
     const editablePermissionIds = assignedPermissionIds.filter((permissionId) => activePermissionIds.has(permissionId));
 
     setForm({

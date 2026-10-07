@@ -5,12 +5,6 @@ import { getDealsReport } from "../../api/report.api";
 import useBusiness from "../../hooks/useBusiness";
 import { showAuthAlert } from "../../components/auth/authAlert";
 
-/*
- * ============================================================
- * HELPERS
- * ============================================================
- */
-
 const formatNumber = (value) => {
   const number = Number(value);
 
@@ -172,12 +166,6 @@ const escapeCsvValue = (value) => {
   return `"${stringValue.replace(/"/g, '""')}"`;
 };
 
-/*
- * ============================================================
- * COMPONENT
- * ============================================================
- */
-
 const DealsReport = () => {
   const { businessId, loading: businessLoading, error: businessError } = useBusiness();
 
@@ -205,23 +193,11 @@ const DealsReport = () => {
 
   const [visibleRows, setVisibleRows] = useState(50);
 
-  /*
-   * ============================================================
-   * BUSINESS ERROR
-   * ============================================================
-   */
-
   useEffect(() => {
     if (businessError && !businessId && !businessLoading) {
       setError(businessError || "Unable to load your business workspace.");
     }
   }, [businessError, businessId, businessLoading]);
-
-  /*
-   * ============================================================
-   * SWEETALERT
-   * ============================================================
-   */
 
   const showErrorAlert = useCallback(async (message) => {
     await showAuthAlert({
@@ -231,12 +207,6 @@ const DealsReport = () => {
       confirmButtonText: "OK",
     });
   }, []);
-
-  /*
-   * ============================================================
-   * LOAD REPORT
-   * ============================================================
-   */
 
   const loadReport = useCallback(
     async (options = {}) => {
@@ -314,12 +284,6 @@ const DealsReport = () => {
     }
   }, [businessId, businessLoading]);
 
-  /*
-   * ============================================================
-   * REPORT DATA
-   * ============================================================
-   */
-
   const summary = report?.summary || {};
 
   const rows = Array.isArray(report?.rows) ? report.rows : [];
@@ -332,21 +296,9 @@ const DealsReport = () => {
 
   const currencies = Array.isArray(report?.currencies) ? report.currencies : [];
 
-  /*
-   * ============================================================
-   * SOURCE OPTIONS
-   * ============================================================
-   */
-
   const sourceOptions = useMemo(() => {
     return Array.from(new Set(bySource.map((item) => String(item?.source || "").trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b));
   }, [bySource]);
-
-  /*
-   * ============================================================
-   * ASSIGNED USERS
-   * ============================================================
-   */
 
   const assignedUserOptions = useMemo(() => {
     const map = new Map();
@@ -375,12 +327,6 @@ const DealsReport = () => {
 
     return Array.from(map.values()).sort((a, b) => String(a.name).localeCompare(String(b.name)));
   }, [rows]);
-
-  /*
-   * ============================================================
-   * FILTERED ROWS
-   * ============================================================
-   */
 
   const filteredRows = useMemo(() => {
     const query = String(search || "")
@@ -438,12 +384,6 @@ const DealsReport = () => {
     return filteredRows.slice(0, visibleRows);
   }, [filteredRows, visibleRows]);
 
-  /*
-   * ============================================================
-   * MAX VALUES
-   * ============================================================
-   */
-
   const maxMonthlyValue = useMemo(() => {
     return Math.max(1, ...monthly.map((item) => Number(item?.wonRevenue || item?.value || 0)));
   }, [monthly]);
@@ -452,29 +392,11 @@ const DealsReport = () => {
     return Math.max(1, ...bySource.map((item) => Number(item?.value || 0)));
   }, [bySource]);
 
-  /*
-   * ============================================================
-   * PRIMARY CURRENCY
-   * ============================================================
-   */
-
   const primaryCurrency = currencies?.[0]?.currency || report?.rows?.[0]?.currency || "INR";
-
-  /*
-   * ============================================================
-   * ACTIVE FILTERS
-   * ============================================================
-   */
 
   const activeFilterCount = [dateFrom, dateTo, statusFilter, sourceFilter, assignedTo].filter(Boolean).length;
 
   const hasActiveFilters = activeFilterCount > 0;
-
-  /*
-   * ============================================================
-   * FILTER ACTIONS
-   * ============================================================
-   */
 
   const clearFilters = async () => {
     setDateFrom("");
@@ -529,12 +451,6 @@ const DealsReport = () => {
     });
   };
 
-  /*
-   * ============================================================
-   * SORT
-   * ============================================================
-   */
-
   const handleSort = (field) => {
     if (sortField === field) {
       setSortDirection((current) => (current === "asc" ? "desc" : "asc"));
@@ -554,12 +470,6 @@ const DealsReport = () => {
     return sortDirection === "asc" ? <ChevronUp size={13} /> : <ChevronDown size={13} />;
   };
 
-  /*
-   * ============================================================
-   * STATUS CLASS
-   * ============================================================
-   */
-
   const getStatusClass = (value) => {
     switch (String(value || "").toUpperCase()) {
       case "WON":
@@ -575,12 +485,6 @@ const DealsReport = () => {
         return "deals-report-status";
     }
   };
-
-  /*
-   * ============================================================
-   * CSV EXPORT
-   * ============================================================
-   */
 
   const exportCsv = async () => {
     if (!filteredRows.length) {
@@ -639,12 +543,6 @@ const DealsReport = () => {
     URL.revokeObjectURL(url);
   };
 
-  /*
-   * ============================================================
-   * EXCEL EXPORT
-   * ============================================================
-   */
-
   const exportExcel = async () => {
     if (!filteredRows.length) {
       await showAuthAlert({
@@ -680,12 +578,6 @@ const DealsReport = () => {
     XLSX.writeFile(workbook, `deals-report-${new Date().toISOString().slice(0, 10)}.xlsx`);
   };
 
-  /*
-   * ============================================================
-   * LOADING
-   * ============================================================
-   */
-
   if (loading || businessLoading) {
     return (
       <>
@@ -708,20 +600,14 @@ const DealsReport = () => {
     );
   }
 
-  /*
-   * ============================================================
-   * PAGE
-   * ============================================================
-   */
-
   return (
     <>
       <style>{styles}</style>
 
       <div className="deals-report-page">
-        {/* ================================================== */}
-        {/* HEADER */}
-        {/* ================================================== */}
+        {}
+        {}
+        {}
 
         <div className="deals-report-header">
           <div className="deals-report-heading">
@@ -749,9 +635,9 @@ const DealsReport = () => {
           </div>
         </div>
 
-        {/* ================================================== */}
-        {/* FILTER BAR */}
-        {/* ================================================== */}
+        {}
+        {}
+        {}
 
         <div className="deals-report-filter-card">
           <div className="deals-report-filter-top">
@@ -865,9 +751,9 @@ const DealsReport = () => {
           )}
         </div>
 
-        {/* ================================================== */}
-        {/* ERROR */}
-        {/* ================================================== */}
+        {}
+        {}
+        {}
 
         {error && (
           <div className="deals-report-error">
@@ -891,9 +777,9 @@ const DealsReport = () => {
           </div>
         )}
 
-        {/* ================================================== */}
-        {/* SUMMARY CARDS */}
-        {/* ================================================== */}
+        {}
+        {}
+        {}
 
         <div className="deals-report-summary-grid">
           <div className="deals-report-summary-card">
@@ -981,9 +867,9 @@ const DealsReport = () => {
           </div>
         </div>
 
-        {/* ================================================== */}
-        {/* QUICK METRICS */}
-        {/* ================================================== */}
+        {}
+        {}
+        {}
 
         <div className="deals-report-mini-grid">
           <div className="deals-report-mini-card">
@@ -1011,9 +897,9 @@ const DealsReport = () => {
           </div>
         </div>
 
-        {/* ================================================== */}
-        {/* TABS */}
-        {/* ================================================== */}
+        {}
+        {}
+        {}
 
         <div className="deals-report-tabs">
           <button type="button" className={`deals-report-tab ${activeSection === "overview" ? "active" : ""}`} onClick={() => setActiveSection("overview")}>
@@ -1027,9 +913,9 @@ const DealsReport = () => {
           </button>
         </div>
 
-        {/* ================================================== */}
-        {/* OVERVIEW */}
-        {/* ================================================== */}
+        {}
+        {}
+        {}
 
         {activeSection === "overview" && (
           <div className="deals-report-content-grid">
@@ -1237,9 +1123,9 @@ const DealsReport = () => {
           </div>
         )}
 
-        {/* ================================================== */}
-        {/* DEAL DETAILS */}
-        {/* ================================================== */}
+        {}
+        {}
+        {}
 
         {activeSection === "deals" && (
           <div className="deals-report-panel deals-report-details-panel">
@@ -1406,9 +1292,9 @@ const DealsReport = () => {
           </div>
         )}
 
-        {/* ================================================== */}
-        {/* FOOTER */}
-        {/* ================================================== */}
+        {}
+        {}
+        {}
 
         <div className="deals-report-footer">
           <span>
@@ -1427,12 +1313,6 @@ const DealsReport = () => {
     </>
   );
 };
-
-/*
- * ============================================================
- * STYLES
- * ============================================================
- */
 
 const styles = `
 .deals-report-page{width:100%;min-width:0;padding:22px;color:var(--crm-text,#1f2937);}

@@ -151,7 +151,7 @@ function LandingFooter() {
           <div className="lp-footer-bottom">
             <div className="lp-copyright">© {new Date().getFullYear()} BR30 CRM. All rights reserved.</div>
 
-            <div className="lp-footer-version">V 1.1.0</div>
+            <div className="lp-footer-version">V 1.2.0</div>
 
             <div className="lp-footer-built">
               Built with <span className="lp-built-heart">❤️</span> by <strong>BR30 Group</strong>

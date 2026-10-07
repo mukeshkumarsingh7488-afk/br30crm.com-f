@@ -27,8 +27,6 @@ function AdminPanel() {
 
       setOverview(data);
     } catch (err) {
-      console.error("Admin overview error:", err);
-
       const status = err?.response?.status;
 
       if (status === 401) {

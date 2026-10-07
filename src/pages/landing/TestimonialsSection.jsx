@@ -62,7 +62,7 @@ const testimonials = [
     role: "Business Owner",
     text: "A clean CRM that keeps our leads, contacts, deals and activities connected in one place.",
   },
-,
+  ,
   {
     name: "Aarav Sharma",
     role: "Sales Manager — Andhra Pradesh",
@@ -2502,7 +2502,7 @@ const testimonials = [
     name: "Rahul Bansal",
     role: "Sales Executive — Punjab",
     text: "Managing sales activity is more structured now because our team can see the next action clearly.",
-  }
+  },
 ];
 
 function TestimonialsSection() {

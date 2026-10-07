@@ -126,10 +126,6 @@ export default function PublicForm() {
       const payload = {
         ...values,
 
-        /*
-         * Backend spam protection supports this honeypot field.
-         * Keep it empty for real users.
-         */
         _website: "",
       };
 
@@ -143,7 +139,9 @@ export default function PublicForm() {
         return;
       }
 
-      setSuccess(result?.supportTicket?.ticketNumber ? `${result?.successMessage || form?.successMessage || "Your support request has been submitted successfully."} Ticket ID: ${result.supportTicket.ticketNumber}` : result?.successMessage || form?.successMessage || "Thank you. We will contact you shortly.");
+      setSuccess(
+        result?.supportTicket?.ticketNumber ? `${result?.successMessage || form?.successMessage || "Your support request has been submitted successfully."} Ticket ID: ${result.supportTicket.ticketNumber}` : result?.successMessage || form?.successMessage || "Thank you. We will contact you shortly."
+      );
 
       setValues(getInitialValues(form.fields));
     } catch (err) {

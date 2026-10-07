@@ -385,9 +385,7 @@ export default function Team() {
           for (const memberId of teamForm.memberIds) {
             try {
               await addTeamMember(businessId, savedTeamId, memberId);
-            } catch (memberError) {
-              console.error("Unable to add team member:", memberError);
-            }
+            } catch (memberError) {}
           }
         }
 
@@ -420,17 +418,13 @@ export default function Team() {
         for (const memberId of toAdd) {
           try {
             await addTeamMember(businessId, teamId, memberId);
-          } catch (memberError) {
-            console.error("Unable to add team member:", memberError);
-          }
+          } catch (memberError) {}
         }
 
         for (const memberId of toRemove) {
           try {
             await removeTeamMember(businessId, teamId, memberId);
-          } catch (memberError) {
-            console.error("Unable to remove team member:", memberError);
-          }
+          } catch (memberError) {}
         }
 
         await showAuthAlert({

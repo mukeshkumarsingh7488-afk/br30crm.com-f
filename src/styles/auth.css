@@ -414,7 +414,7 @@
     flex-basis: 40px;
   }
 }
-/* aditional btn */
+
 .auth-field-hint {
   margin-top: -2px;
   color: var(--crm-muted);
@@ -467,8 +467,7 @@
   opacity: 0.55;
   cursor: not-allowed;
 }
-/* END EDITIONAL BTN */
-/*Sweet Alart */
+
 .br30-auth-swal-popup {
   width: min(430px, calc(100vw - 30px)) !important;
   border: 1px solid var(--crm-border) !important;

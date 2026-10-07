@@ -11,9 +11,7 @@ function getInitialTheme() {
     if (savedTheme === "light" || savedTheme === "dark" || savedTheme === "device") {
       return savedTheme;
     }
-  } catch (error) {
-    console.warn("Unable to read admin theme preference:", error);
-  }
+  } catch (error) {}
 
   return "device";
 }
@@ -42,9 +40,7 @@ function AdminLayout({ children }) {
 
     try {
       localStorage.setItem(ADMIN_THEME_KEY, validTheme);
-    } catch (error) {
-      console.warn("Unable to save admin theme preference:", error);
-    }
+    } catch (error) {}
   }, []);
 
   const toggleSidebarCollapse = useCallback(() => {

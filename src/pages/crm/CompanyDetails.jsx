@@ -7,6 +7,7 @@ import { deleteCompany, getCompanyById, updateCompany } from "../../api/company.
 import { getBusinessMembers } from "../../api/crm.api";
 import { getTeams } from "../../api/operations.api";
 import { showAuthAlert } from "../../components/auth/authAlert";
+import ActivityTimeline from "../../components/crm/ActivityTimeline";
 
 const SIZES = ["SOLO", "SMALL", "MEDIUM", "LARGE", "ENTERPRISE"];
 
@@ -546,6 +547,8 @@ export default function CompanyDetails() {
             )}
           </div>
         </div>
+
+        <ActivityTimeline businessId={businessId} companyId={company?._id} title="Activity timeline" subtitle="Complete activity history for this company." />
       </div>
 
       {editOpen && form && (

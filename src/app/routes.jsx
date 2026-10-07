@@ -35,6 +35,8 @@ import Team from "../pages/crm/Team";
 import Notifications from "../pages/crm/Notifications";
 import Templates from "../pages/crm/Templates";
 import AuditLog from "../pages/crm/AuditLog";
+import CRMTools from "../pages/crm/CRMTools";
+import Analytics from "../pages/crm/Analytics";
 import Meetings from "../pages/crm/Meetings";
 import Email from "../pages/crm/Email";
 import WhatsApp from "../pages/crm/WhatsApp";
@@ -103,36 +105,36 @@ function AppRoutes() {
       <ScrollToTop />
 
       <Routes>
-        {/* Public */}
+        {}
         <Route path="/" element={<Landing />} />
-        {/* Public Forms */}
+        {}
         <Route path="/public/forms/:businessId/:slug" element={<PublicForm />} />
-        {/* What's New */}
+        {}
         <Route path="/whats-new" element={<WhatsNew />} />
-        {/* Announcements */}
+        {}
         <Route path="/announcements" element={<Announcements />} />
-        {/* Legal */}
+        {}
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/cookies" element={<CookiePolicy />} />
         <Route path="/refund" element={<RefundPolicy />} />
         <Route path="/data-processing" element={<DataProcessing />} />
         <Route path="/gdpr" element={<GDPRCompliance />} />
-        {/* Resources */}
+        {}
         <Route path="/help" element={<HelpCenter />} />
         <Route path="/documentation" element={<Documentation />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/security" element={<Security />} />
         <Route path="/system-status" element={<SystemStatus />} />
         <Route path="/trust-center" element={<TrustCenter />} />
-        {/* Solutions */}
+        {}
         <Route path="/business-operations" element={<BusinessOperations />} />
         <Route path="/customer-management" element={<CustomerManagement />} />
         <Route path="/lead-management" element={<LeadManagement />} />
         <Route path="/reporting-analytics" element={<ReportingAnalytics />} />
         <Route path="/sales-management" element={<SalesManagement />} />
         <Route path="/team-management" element={<TeamManagement />} />
-        {/* Company */}
+        {}
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/careers" element={<Careers />} />
@@ -140,7 +142,7 @@ function AppRoutes() {
         <Route path="/ecosystem" element={<Ecosystem />} />
         <Route path="/consultants" element={<Cunsultalts />} />
         <Route path="/founder-about" element={<FounderAbout />} />
-        {/* Authentication */}
+        {}
         <Route path="/register" element={<Register />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/login" element={<Login />} />
@@ -148,7 +150,7 @@ function AppRoutes() {
         <Route path="/verify-reset-otp" element={<VerifyResetOtp />} />
         <Route path="/reset-password" element={<ResetPassword />} />
 
-        {/* Protected CRM */}
+        {}
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
@@ -172,6 +174,8 @@ function AppRoutes() {
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/templates" element={<Templates />} />
             <Route path="/audit-log" element={<AuditLog />} />
+            <Route path="/crm-tools" element={<CRMTools />} />
+            <Route path="/analytics" element={<Analytics />} />
             <Route path="/profile" element={<MyProfile />} />
             <Route path="/meetings" element={<Meetings />} />
 
@@ -203,7 +207,7 @@ function AppRoutes() {
             <Route path="/subscription" element={<Subscription />} />
           </Route>
 
-          {/* Admin */}
+          {}
           <Route path="/admin" element={<AdminPanel />}>
             <Route index element={<AdminOverview />} />
             <Route path="whats-new" element={<AdminWhatsNew />} />
@@ -212,7 +216,7 @@ function AppRoutes() {
           </Route>
         </Route>
 
-        {/* Fallback */}
+        {}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <CookieConsent />

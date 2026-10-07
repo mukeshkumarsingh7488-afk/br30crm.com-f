@@ -145,9 +145,7 @@ function MyProfile() {
           });
 
           membershipId = currentMember?._id || currentMember?.membershipId || null;
-        } catch (membershipError) {
-          console.error("Membership load failed:", membershipError);
-        }
+        } catch (membershipError) {}
       }
 
       const profileData = {
@@ -171,8 +169,6 @@ function MyProfile() {
 
       setImagePreview(profileData.profileImage || "");
     } catch (error) {
-      console.error("My Profile load failed:", error);
-
       setMessage({
         type: "error",
         text: error?.response?.data?.message || error.message || "Failed to load profile.",
@@ -522,16 +518,6 @@ function MyProfile() {
 
       setUploadProgress(85);
 
-      /*
-
-       * IMPORTANT:
-
-       * Image is saved to database immediately.
-
-       * User does NOT need to press Save changes.
-
-       */
-
       const profileResponse = await updateProfile({
         profileImage: secureUrl,
 
@@ -588,9 +574,7 @@ function MyProfile() {
             profileImagePublicId: nextPublicId,
           })
         );
-      } catch {
-        // Ignore localStorage errors.
-      }
+      } catch {}
 
       setUploadProgress(100);
 
@@ -650,22 +634,6 @@ function MyProfile() {
         text: "",
       });
 
-      /*
-
-       * Backend removes:
-
-       * 1. Cloudinary image
-
-       * 2. profileImage
-
-       * 3. profileImagePublicId
-
-       *
-
-       * No Save button required.
-
-       */
-
       const response = await removeProfileImage();
 
       const responseUser = response?.data?.user || response?.user || response?.data || null;
@@ -714,9 +682,7 @@ function MyProfile() {
             profileImagePublicId: "",
           })
         );
-      } catch {
-        // Ignore localStorage errors.
-      }
+      } catch {}
 
       await showAuthSuccess("Profile Picture Removed", "Your profile picture has been removed successfully.", { timer: 1800, showConfirmButton: false });
     } catch (error) {
@@ -830,9 +796,7 @@ function MyProfile() {
             ...(updatedUser || {}),
           })
         );
-      } catch {
-        // Ignore localStorage errors.
-      }
+      } catch {}
 
       await showAuthSuccess("Profile Updated", "Your profile has been updated successfully.", {
         timer: 1800,

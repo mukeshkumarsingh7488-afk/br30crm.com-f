@@ -138,8 +138,6 @@ function Register() {
         email,
         phone,
         password,
-
-        // Legal consent information
         legalConsent: {
           accepted: true,
           acceptedAt: new Date().toISOString(),
@@ -163,8 +161,6 @@ function Register() {
         },
       });
     } catch (err) {
-      console.error("Register error:", err);
-
       const status = err?.response?.status;
       const data = err?.response?.data;
 
@@ -192,7 +188,7 @@ function Register() {
   return (
     <AuthLayout>
       <div className="auth-login-layout auth-register-layout">
-        {/* LEFT CONTENT */}
+        {}
         <div className="auth-login-intro" style={{ transform: "translateY(-1.5in)" }}>
           <div className="auth-intro-badge">
             <UserPlus size={14} />
@@ -236,7 +232,7 @@ function Register() {
           </div>
         </div>
 
-        {/* REGISTER CARD */}
+        {}
         <div className="auth-card">
           <div className="auth-card-header">
             <div className="auth-icon">
@@ -250,7 +246,7 @@ function Register() {
           </div>
 
           <form className="auth-form" onSubmit={handleSubmit}>
-            {/* NAME */}
+            {}
             <div className="auth-field">
               <label htmlFor="name">Full name</label>
 
@@ -261,7 +257,7 @@ function Register() {
               </div>
             </div>
 
-            {/* EMAIL */}
+            {}
             <div className="auth-field">
               <label htmlFor="email">Email address</label>
 
@@ -272,7 +268,7 @@ function Register() {
               </div>
             </div>
 
-            {/* PHONE */}
+            {}
             <div className="auth-field">
               <label htmlFor="phone">Phone number</label>
 
@@ -283,7 +279,7 @@ function Register() {
               </div>
             </div>
 
-            {/* PASSWORD */}
+            {}
             <div className="auth-field">
               <label htmlFor="password">Password</label>
 
@@ -298,7 +294,7 @@ function Register() {
               </div>
             </div>
 
-            {/* CONFIRM PASSWORD */}
+            {}
             <div className="auth-field">
               <label htmlFor="confirmPassword">Confirm password</label>
 
@@ -313,7 +309,7 @@ function Register() {
               </div>
             </div>
 
-            {/* LEGAL CONSENT */}
+            {}
             <div
               style={{
                 display: "flex",
@@ -388,7 +384,7 @@ function Register() {
               </label>
             </div>
 
-            {/* SUBMIT */}
+            {}
             <button type="submit" className="auth-submit-btn" disabled={loading}>
               {loading ? (
                 <>
@@ -404,7 +400,7 @@ function Register() {
             </button>
           </form>
 
-          {/* LOGIN */}
+          {}
           <div className="auth-divider">
             <span>Already have an account?</span>
           </div>
@@ -413,7 +409,7 @@ function Register() {
             Sign in to your account
           </Link>
 
-          {/* SECURITY */}
+          {}
           <p className="auth-card-security">
             <ShieldCheck size={15} />
             You'll need to verify your email before signing in.

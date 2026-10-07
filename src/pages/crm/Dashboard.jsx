@@ -116,8 +116,6 @@ function Dashboard() {
           setCurrentUser(userData);
         }
       } catch (error) {
-        console.error("Failed to load current user:", error);
-
         if (mounted) {
           setCurrentUser(null);
         }
@@ -154,7 +152,9 @@ function Dashboard() {
         if (ts.length) setLiveTasks(ts);
         if (as.length) setLiveActivities(as);
       })
-      .catch((error) => console.error("Dashboard live data failed", error));
+      .catch((error) => {
+        console.error("Dashboard overview fetch failed:", error);
+      });
   }, [businessId]);
 
   const userName = currentUser?.name?.trim()?.split(/\s+/)[0] || "there";

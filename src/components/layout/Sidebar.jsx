@@ -39,6 +39,7 @@ import {
   Workflow,
   X,
   Tag,
+  Wrench,
 } from "lucide-react";
 
 import { showAuthAlert } from "../auth/authAlert";
@@ -97,6 +98,8 @@ const teamMenu = [
 const systemMenu = [
   { label: "Notifications", path: "/notifications", icon: BellRing },
   { label: "Audit Logs", path: "/audit-log", icon: ShieldCheck },
+  { label: "CRM Tools", path: "/crm-tools", icon: Wrench },
+  { label: "Analytics", path: "/analytics", icon: BarChart3 },
   { label: "Integrations", path: "/integrations", icon: Network },
   { label: "Subscription", path: "/subscription", icon: CreditCard },
 ];
@@ -264,6 +267,8 @@ function Sidebar({ collapsed, mobileOpen, sidebarMode = "rail", onToggle, onMobi
     if (["/team", "/team/members"].includes(path)) return PERMISSIONS.USERS_VIEW;
     if (path === "/notifications") return PERMISSIONS.NOTIFICATIONS_VIEW;
     if (path === "/audit-log") return PERMISSIONS.AUDIT_VIEW;
+    if (path === "/analytics") return PERMISSIONS.ANALYTICS_VIEW;
+    if (path === "/crm-tools") return PERMISSIONS.SETTINGS_VIEW;
     if (path === "/integrations") return PERMISSIONS.INTEGRATIONS_VIEW;
     if (["/settings", "/subscription"].includes(path)) return PERMISSIONS.SETTINGS_VIEW;
     return null;

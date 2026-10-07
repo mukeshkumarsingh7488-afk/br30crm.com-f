@@ -1,11 +1,5 @@
 import api from "./api";
 
-/*
- * ============================================================
- * PUBLIC
- * ============================================================
- */
-
 export const getPublicWhatsNew = async (params = {}) => {
   const response = await api.get("/whatsnew", {
     params,
@@ -24,12 +18,6 @@ export const getPublicWhatsNewBySlug = async (slug) => {
   return response.data;
 };
 
-/*
- * ============================================================
- * ADMIN
- * ============================================================
- */
-
 export const getAllWhatsNew = async (params = {}) => {
   const response = await api.get("/whatsnew/admin", {
     params,
@@ -47,29 +35,6 @@ export const getWhatsNewById = async (whatsNewId) => {
 
   return response.data;
 };
-
-/*
- * ============================================================
- * JSON PAYLOAD BUILDER
- * ============================================================
- *
- * Backend now expects normal JSON.
- *
- * IMAGE:
- *   mediaType -> "IMAGE"
- *   imageUrl  -> Cloudinary public URL
- *
- * VIDEO:
- *   mediaType -> "VIDEO"
- *   videoUrl  -> YouTube URL
- *
- * NONE:
- *   mediaType -> "NONE"
- *
- * No Multer.
- * No FormData.
- * No image file upload.
- */
 
 const buildPayload = (data = {}) => {
   const mediaType = data.mediaType || "NONE";
@@ -115,12 +80,6 @@ const buildPayload = (data = {}) => {
   return payload;
 };
 
-/*
- * ============================================================
- * CREATE
- * ============================================================
- */
-
 export const createWhatsNew = async (data = {}) => {
   const payload = buildPayload(data);
 
@@ -128,12 +87,6 @@ export const createWhatsNew = async (data = {}) => {
 
   return response.data;
 };
-
-/*
- * ============================================================
- * UPDATE
- * ============================================================
- */
 
 export const updateWhatsNew = async (whatsNewId, data = {}) => {
   if (!whatsNewId) {
@@ -146,12 +99,6 @@ export const updateWhatsNew = async (whatsNewId, data = {}) => {
 
   return response.data;
 };
-
-/*
- * ============================================================
- * STATUS
- * ============================================================
- */
 
 export const updateWhatsNewStatus = async (whatsNewId, status) => {
   if (!whatsNewId) {
@@ -168,12 +115,6 @@ export const updateWhatsNewStatus = async (whatsNewId, status) => {
 
   return response.data;
 };
-
-/*
- * ============================================================
- * DELETE / ARCHIVE
- * ============================================================
- */
 
 export const deleteWhatsNew = async (whatsNewId) => {
   if (!whatsNewId) {

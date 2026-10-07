@@ -4,10 +4,6 @@ import Swal from "sweetalert2";
 
 import { getAdminOverview, getAdminUser, updateAdminUser, updateAdminUserStatus, deleteAdminUser } from "../../api/admin.api";
 
-/* ============================================================
- * DATE HELPERS
- * ============================================================ */
-
 function formatDate(value) {
   if (!value) return "Never";
 
@@ -37,10 +33,6 @@ function formatDateTime(value) {
     minute: "2-digit",
   });
 }
-
-/* ============================================================
- * USER HELPERS
- * ============================================================ */
 
 function getInitials(name = "") {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -78,10 +70,6 @@ function getStatusClass(status) {
   return "admin-user-status inactive";
 }
 
-/* ============================================================
- * ADMIN USERS
- * ============================================================ */
-
 function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -117,10 +105,6 @@ function AdminUsers() {
 
   const [savingEdit, setSavingEdit] = useState(false);
 
-  /* ==========================================================
-   * THEME
-   * ========================================================== */
-
   const [adminTheme, setAdminTheme] = useState(() => {
     if (typeof document === "undefined") {
       return "light";
@@ -149,10 +133,6 @@ function AdminUsers() {
       observer.disconnect();
     };
   }, []);
-
-  /* ==========================================================
-   * SWEET ALERT THEME
-   * ========================================================== */
 
   const getSweetAlertTheme = () => {
     const currentTheme = document.documentElement.getAttribute("data-admin-theme");
@@ -199,10 +179,6 @@ function AdminUsers() {
     });
   };
 
-  /* ==========================================================
-   * LOAD USERS
-   * ========================================================== */
-
   const loadUsers = async (showLoader = true) => {
     try {
       if (showLoader) {
@@ -236,8 +212,6 @@ function AdminUsers() {
         totalPages: Number(userData.pagination?.totalPages || 1),
       });
     } catch (error) {
-      console.error("Admin users load failed:", error);
-
       await fireAlert({
         icon: "error",
         title: "Unable to load users",
@@ -253,10 +227,6 @@ function AdminUsers() {
   useEffect(() => {
     loadUsers(true);
   }, [page, limit]);
-
-  /* ==========================================================
-   * FILTERED USERS
-   * ========================================================== */
 
   const filteredUsers = useMemo(() => {
     const searchValue = search.trim().toLowerCase();
@@ -290,10 +260,6 @@ function AdminUsers() {
     return users.filter((user) => user?.status === "SUSPENDED" || user?.status === "INACTIVE").length;
   }, [users]);
 
-  /* ==========================================================
-   * ACTIONS
-   * ========================================================== */
-
   const handleRefresh = async () => {
     await loadUsers(false);
   };
@@ -317,8 +283,6 @@ function AdminUsers() {
         membershipId: detailedUser?.membershipId || user?.membershipId || null,
       });
     } catch (error) {
-      console.error("Admin user details load failed:", error);
-
       setSelectedUser(user);
 
       await fireAlert({
@@ -348,10 +312,6 @@ function AdminUsers() {
       [name]: value,
     }));
   };
-
-  /* ==========================================================
-   * EDIT USER
-   * ========================================================== */
 
   const handleEditSubmit = async (event) => {
     event.preventDefault();
@@ -411,8 +371,6 @@ function AdminUsers() {
 
       await loadUsers(false);
     } catch (error) {
-      console.error("User update failed:", error);
-
       await fireAlert({
         icon: "error",
         title: "Update failed",
@@ -423,10 +381,6 @@ function AdminUsers() {
       setSavingEdit(false);
     }
   };
-
-  /* ==========================================================
-   * BLOCK / ACTIVATE
-   * ========================================================== */
 
   const handleToggleStatus = async (user) => {
     const userId = getUserId(user);
@@ -476,8 +430,6 @@ function AdminUsers() {
 
       await loadUsers(false);
     } catch (error) {
-      console.error("User status update failed:", error);
-
       await fireAlert({
         icon: "error",
         title: "Action failed",
@@ -485,10 +437,6 @@ function AdminUsers() {
       });
     }
   };
-
-  /* ==========================================================
-   * DELETE USER
-   * ========================================================== */
 
   const handleDelete = async (user) => {
     const userId = getUserId(user);
@@ -546,8 +494,6 @@ function AdminUsers() {
         await loadUsers(false);
       }
     } catch (error) {
-      console.error("User delete failed:", error);
-
       await fireAlert({
         icon: "error",
         title: "Delete failed",
@@ -556,20 +502,12 @@ function AdminUsers() {
     }
   };
 
-  /* ==========================================================
-   * CLEAR FILTERS
-   * ========================================================== */
-
   const clearFilters = () => {
     setSearch("");
     setStatusFilter("ALL");
     setVerificationFilter("ALL");
     setPage(1);
   };
-
-  /* ==========================================================
-   * RENDER
-   * ========================================================== */
 
   return (
     <>
@@ -801,9 +739,7 @@ function AdminUsers() {
 `}</style>
 
       <section className="admin-users-page">
-        {/* ======================================================
-         * HEADER
-         * ====================================================== */}
+        {}
 
         <div className="admin-users-head">
           <div>
@@ -819,9 +755,7 @@ function AdminUsers() {
           </div>
         </div>
 
-        {/* ======================================================
-         * STATS
-         * ====================================================== */}
+        {}
 
         <div className="admin-users-stats">
           <div className="admin-users-stat">
@@ -873,9 +807,7 @@ function AdminUsers() {
           </div>
         </div>
 
-        {/* ======================================================
-         * FILTERS
-         * ====================================================== */}
+        {}
 
         <div className="admin-users-toolbar">
           <div className="admin-users-search">
@@ -928,9 +860,7 @@ function AdminUsers() {
           )}
         </div>
 
-        {/* ======================================================
-         * TABLE
-         * ====================================================== */}
+        {}
 
         <div className="admin-users-table-card">
           <div className="admin-users-table-wrap">
@@ -1159,9 +1089,7 @@ function AdminUsers() {
         </div>
       </section>
 
-      {/* ========================================================
-       * VIEW USER MODAL
-       * ======================================================== */}
+      {}
 
       {selectedUser && (
         <div
@@ -1269,9 +1197,7 @@ function AdminUsers() {
         </div>
       )}
 
-      {/* ========================================================
-       * EDIT USER MODAL
-       * ======================================================== */}
+      {}
 
       {editingUser && (
         <div

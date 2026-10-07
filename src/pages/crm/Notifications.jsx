@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Check, Eye, RefreshCw, Trash2, X } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Eye, RefreshCw, Trash2, X } from "lucide-react";
 import useBusiness from "../../hooks/useBusiness";
 import { showAuthAlert } from "../../components/auth/authAlert";
 import { deleteNotification, getNotification, getNotifications, markAllNotificationsRead, markNotificationRead } from "../../api/notification.api";
@@ -48,23 +48,34 @@ export default function Notifications() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [modal, setModal] = useState(null);
+  const [pagination, setPagination] = useState({ page: 1, limit: 50, total: 0, totalPages: 1 });
 
-  const load = useCallback(async () => {
-    if (!businessId) return;
-    setLoading(true);
-    setError("");
-    try {
-      const response = await getNotifications(businessId, { page: 1, limit: 100 });
-      const data = unwrap(response);
-      const rows = Array.isArray(data?.notifications) ? data.notifications : Array.isArray(data?.items) ? data.items : Array.isArray(data) ? data : [];
-      setItems(rows);
-      window.dispatchEvent(new CustomEvent("br30:notifications-changed"));
-    } catch (err) {
-      setError(err?.response?.data?.message || err?.message || "Unable to load notifications.");
-    } finally {
-      setLoading(false);
-    }
-  }, [businessId]);
+  const load = useCallback(
+    async (targetPage = 1) => {
+      if (!businessId) return;
+      setLoading(true);
+      setError("");
+      try {
+        const response = await getNotifications(businessId, { page: targetPage, limit: 50 });
+        const data = unwrap(response);
+        const rows = Array.isArray(data?.notifications) ? data.notifications : Array.isArray(data?.items) ? data.items : Array.isArray(data) ? data : [];
+        const nextPagination = data?.pagination || { page: targetPage, limit: 50, total: rows.length, totalPages: rows.length ? targetPage : 1 };
+        setItems(rows);
+        setPagination({
+          page: Number(nextPagination.page) || targetPage,
+          limit: Number(nextPagination.limit) || 50,
+          total: Number(nextPagination.total) || 0,
+          totalPages: Math.max(Number(nextPagination.totalPages) || 1, 1),
+        });
+        window.dispatchEvent(new CustomEvent("br30:notifications-changed"));
+      } catch (err) {
+        setError(err?.response?.data?.message || err?.message || "Unable to load notifications.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [businessId]
+  );
 
   useEffect(() => {
     let active = true;
@@ -115,8 +126,9 @@ export default function Notifications() {
     if (!result?.isConfirmed) return;
     try {
       await deleteNotification(businessId, notification._id);
-      setItems((current) => current.filter((item) => item._id !== notification._id));
       if (modal?._id === notification._id) setModal(null);
+      const nextPage = items.length === 1 && pagination.page > 1 ? pagination.page - 1 : pagination.page;
+      await load(nextPage);
       window.dispatchEvent(new CustomEvent("br30:notifications-changed"));
     } catch (err) {
       await showAuthAlert({ icon: "error", title: "Unable to delete notification", text: err?.response?.data?.message || err?.message || "Unable to delete notification.", confirmButtonText: "OK" });
@@ -125,7 +137,7 @@ export default function Notifications() {
 
   return (
     <div className="crm-notifications-page">
-      <style>{`.crm-notifications-page{padding:24px 26px 40px;color:var(--crm-text)}.crm-notifications-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px}.crm-notifications-title{margin:0;font-size:26px;line-height:1.15;font-weight:400;letter-spacing:-.35px}.crm-notifications-sub{margin:6px 0 0;color:var(--crm-muted);font-size:13px}.crm-notifications-head-actions{display:flex;align-items:center;gap:8px}.crm-notifications-btn{height:38px;border:1px solid var(--crm-border);background:var(--crm-surface);color:var(--crm-text);border-radius:9px;padding:0 12px;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-size:13px;font-weight:400;cursor:pointer}.crm-notifications-btn:hover{background:var(--crm-surface-2);border-color:var(--crm-primary)}.crm-notifications-error{margin-bottom:12px;padding:10px 12px;border-radius:9px;background:color-mix(in srgb,var(--crm-danger) 9%,transparent);color:var(--crm-danger);font-size:13px}.crm-notifications-card{background:var(--crm-surface);border:1px solid var(--crm-border);border-radius:14px;overflow:auto;box-shadow:var(--crm-shadow)}.crm-notifications-table{width:100%;min-width:1050px;border-collapse:collapse}.crm-notifications-table th,.crm-notifications-table td{padding:13px 16px;border-bottom:1px solid var(--crm-border);text-align:left;font-size:13px;vertical-align:middle}.crm-notifications-table th{background:var(--crm-surface-2);color:var(--crm-muted);font-size:13px;text-transform:uppercase;letter-spacing:.06em;font-weight:400;white-space:nowrap}.crm-notifications-table td{color:var(--crm-text)}.crm-notifications-table tbody tr:last-child td{border-bottom:0}.crm-notification-title{font-weight:400}.crm-notification-message{margin-top:3px;color:var(--crm-muted);font-size:12px;max-width:420px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.crm-notification-source{display:grid;gap:2px}.crm-notification-source-name{color:var(--crm-text)}.crm-notification-source-meta{font-size:12px;color:var(--crm-muted)}.crm-notification-status{display:inline-flex;align-items:center;padding:4px 8px;border-radius:7px;font-size:12px;font-weight:400}.crm-notification-status.unread{background:color-mix(in srgb,var(--crm-primary) 10%,transparent);color:var(--crm-primary)}.crm-notification-status.read{background:color-mix(in srgb,var(--crm-muted) 10%,transparent);color:var(--crm-muted)}.crm-notification-priority{color:var(--crm-muted)}.crm-notification-actions{display:flex;align-items:center;gap:5px}.crm-notification-icon{width:30px;height:30px;border:1px solid var(--crm-border);background:var(--crm-surface);color:var(--crm-muted);border-radius:8px;display:grid;place-items:center;cursor:pointer;padding:0}.crm-notification-icon:hover{color:var(--crm-primary);border-color:var(--crm-primary);background:var(--crm-surface-2)}.crm-notification-icon.danger:hover{color:var(--crm-danger);border-color:var(--crm-danger)}.crm-notifications-empty{padding:50px 20px;text-align:center;color:var(--crm-muted);font-size:13px}.crm-notifications-modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.48);display:grid;place-items:center;padding:20px;z-index:700}.crm-notifications-modal{width:min(680px,100%);max-height:88vh;overflow:auto;background:var(--crm-surface);border:1px solid var(--crm-border);border-radius:15px;box-shadow:0 25px 70px rgba(0,0,0,.24)}.crm-notifications-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:18px 20px;border-bottom:1px solid var(--crm-border)}.crm-notifications-modal-head h2{margin:0;font-size:18px;font-weight:400;color:var(--crm-text)}.crm-notifications-modal-close{width:32px;height:32px;border:1px solid var(--crm-border);background:var(--crm-surface);color:var(--crm-muted);border-radius:8px;display:grid;place-items:center;cursor:pointer}.crm-notifications-modal-body{padding:20px}.crm-notification-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.crm-notification-detail{border:1px solid var(--crm-border);border-radius:10px;padding:12px;background:var(--crm-surface-2)}.crm-notification-detail.full{grid-column:1/-1}.crm-notification-detail-label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--crm-muted);margin-bottom:5px}.crm-notification-detail-value{font-size:13px;color:var(--crm-text);line-height:1.5;word-break:break-word}.crm-notification-detail-value.message{white-space:pre-wrap}.crm-notifications-modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--crm-border)}@media(max-width:700px){.crm-notification-detail-grid{grid-template-columns:1fr}.crm-notification-detail.full{grid-column:auto}.crm-notifications-page{padding:18px 14px 30px}}`}</style>
+      <style>{`.crm-notifications-page{padding:24px 26px 40px;color:var(--crm-text)}.crm-notifications-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px}.crm-notifications-title{margin:0;font-size:26px;line-height:1.15;font-weight:400;letter-spacing:-.35px}.crm-notifications-sub{margin:6px 0 0;color:var(--crm-muted);font-size:13px}.crm-notifications-head-actions{display:flex;align-items:center;gap:8px}.crm-notifications-btn{height:38px;border:1px solid var(--crm-border);background:var(--crm-surface);color:var(--crm-text);border-radius:9px;padding:0 12px;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-size:13px;font-weight:400;cursor:pointer}.crm-notifications-btn:hover{background:var(--crm-surface-2);border-color:var(--crm-primary)}.crm-notifications-error{margin-bottom:12px;padding:10px 12px;border-radius:9px;background:color-mix(in srgb,var(--crm-danger) 9%,transparent);color:var(--crm-danger);font-size:13px}.crm-notifications-card{background:var(--crm-surface);border:1px solid var(--crm-border);border-radius:14px;overflow:hidden;box-shadow:var(--crm-shadow)}.crm-notifications-table{width:100%;min-width:1050px;border-collapse:collapse}.crm-notifications-card{overflow-x:auto}.crm-notifications-footer{min-width:1050px;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;border-top:1px solid var(--crm-border);background:var(--crm-surface)}.crm-notifications-footer-count{font-size:12px;color:var(--crm-muted);white-space:nowrap}.crm-notifications-footer-actions{display:flex;align-items:center;gap:7px}.crm-notifications-page-btn{width:35px;height:35px;border:1px solid var(--crm-border);background:var(--crm-surface);color:var(--crm-text);border-radius:9px;display:grid;place-items:center;cursor:pointer}.crm-notifications-page-btn:hover:not(:disabled){border-color:var(--crm-primary);color:var(--crm-primary)}.crm-notifications-page-btn:disabled{opacity:.45;cursor:not-allowed}.crm-notifications-table th,.crm-notifications-table td{padding:13px 16px;border-bottom:1px solid var(--crm-border);text-align:left;font-size:13px;vertical-align:middle}.crm-notifications-table th{background:var(--crm-surface-2);color:var(--crm-muted);font-size:13px;text-transform:uppercase;letter-spacing:.06em;font-weight:400;white-space:nowrap}.crm-notifications-table td{color:var(--crm-text)}.crm-notifications-table tbody tr:last-child td{border-bottom:0}.crm-notification-title{font-weight:400}.crm-notification-message{margin-top:3px;color:var(--crm-muted);font-size:12px;max-width:420px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.crm-notification-source{display:grid;gap:2px}.crm-notification-source-name{color:var(--crm-text)}.crm-notification-source-meta{font-size:12px;color:var(--crm-muted)}.crm-notification-status{display:inline-flex;align-items:center;padding:4px 8px;border-radius:7px;font-size:12px;font-weight:400}.crm-notification-status.unread{background:color-mix(in srgb,var(--crm-primary) 10%,transparent);color:var(--crm-primary)}.crm-notification-status.read{background:color-mix(in srgb,var(--crm-muted) 10%,transparent);color:var(--crm-muted)}.crm-notification-priority{color:var(--crm-muted)}.crm-notification-actions{display:flex;align-items:center;gap:5px}.crm-notification-icon{width:30px;height:30px;border:1px solid var(--crm-border);background:var(--crm-surface);color:var(--crm-muted);border-radius:8px;display:grid;place-items:center;cursor:pointer;padding:0}.crm-notification-icon:hover{color:var(--crm-primary);border-color:var(--crm-primary);background:var(--crm-surface-2)}.crm-notification-icon.danger:hover{color:var(--crm-danger);border-color:var(--crm-danger)}.crm-notifications-empty{padding:50px 20px;text-align:center;color:var(--crm-muted);font-size:13px}.crm-notifications-modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.48);display:grid;place-items:center;padding:20px;z-index:700}.crm-notifications-modal{width:min(680px,100%);max-height:88vh;overflow:auto;background:var(--crm-surface);border:1px solid var(--crm-border);border-radius:15px;box-shadow:0 25px 70px rgba(0,0,0,.24)}.crm-notifications-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:18px 20px;border-bottom:1px solid var(--crm-border)}.crm-notifications-modal-head h2{margin:0;font-size:18px;font-weight:400;color:var(--crm-text)}.crm-notifications-modal-close{width:32px;height:32px;border:1px solid var(--crm-border);background:var(--crm-surface);color:var(--crm-muted);border-radius:8px;display:grid;place-items:center;cursor:pointer}.crm-notifications-modal-body{padding:20px}.crm-notification-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.crm-notification-detail{border:1px solid var(--crm-border);border-radius:10px;padding:12px;background:var(--crm-surface-2)}.crm-notification-detail.full{grid-column:1/-1}.crm-notification-detail-label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--crm-muted);margin-bottom:5px}.crm-notification-detail-value{font-size:13px;color:var(--crm-text);line-height:1.5;word-break:break-word}.crm-notification-detail-value.message{white-space:pre-wrap}.crm-notifications-modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--crm-border)}@media(max-width:700px){.crm-notification-detail-grid{grid-template-columns:1fr}.crm-notification-detail.full{grid-column:auto}.crm-notifications-page{padding:18px 14px 30px}}`}</style>
 
       <div className="crm-notifications-head">
         <div>
@@ -133,7 +145,7 @@ export default function Notifications() {
           <p className="crm-notifications-sub">{unreadCount ? `${unreadCount} unread notification${unreadCount === 1 ? "" : "s"}` : "All notifications are read."}</p>
         </div>
         <div className="crm-notifications-head-actions">
-          <button type="button" className="crm-notifications-btn" onClick={load} disabled={loading}>
+          <button type="button" className="crm-notifications-btn" onClick={() => load(pagination.page || 1)} disabled={loading}>
             <RefreshCw size={15} /> Refresh
           </button>
         </div>
@@ -217,6 +229,19 @@ export default function Notifications() {
             )}
           </tbody>
         </table>
+        <div className="crm-notifications-footer">
+          <div className="crm-notifications-footer-count">
+            Showing page {pagination.page} of {pagination.totalPages} • {pagination.total} records
+          </div>
+          <div className="crm-notifications-footer-actions">
+            <button type="button" className="crm-notifications-page-btn" onClick={() => load(pagination.page - 1)} disabled={loading || pagination.page <= 1} title="Previous page" aria-label="Previous page">
+              <ChevronLeft size={15} />
+            </button>
+            <button type="button" className="crm-notifications-page-btn" onClick={() => load(pagination.page + 1)} disabled={loading || pagination.page >= pagination.totalPages} title="Next page" aria-label="Next page">
+              <ChevronRight size={15} />
+            </button>
+          </div>
+        </div>
       </div>
 
       {modal && (

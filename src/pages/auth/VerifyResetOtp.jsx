@@ -116,8 +116,6 @@ function VerifyResetOtp() {
         },
       });
     } catch (error) {
-      console.error("Verify reset OTP error:", error);
-
       const status = error?.response?.status;
       const data = error?.response?.data;
 
@@ -170,8 +168,6 @@ function VerifyResetOtp() {
         showConfirmButton: false,
       });
     } catch (error) {
-      console.error("Resend reset OTP error:", error);
-
       const status = error?.response?.status;
       const data = error?.response?.data;
 
@@ -190,7 +186,7 @@ function VerifyResetOtp() {
   return (
     <AuthLayout>
       <div className="auth-login-layout">
-        {/* LEFT SIDE */}
+        {}
         <section className="auth-login-intro">
           <div className="auth-intro-badge">
             <ShieldCheck size={15} />
@@ -234,7 +230,7 @@ function VerifyResetOtp() {
           </div>
         </section>
 
-        {/* RIGHT SIDE */}
+        {}
         <section className="auth-card">
           <div className="auth-card-header">
             <div className="auth-icon">
@@ -249,7 +245,7 @@ function VerifyResetOtp() {
           </div>
 
           <form className="auth-form" onSubmit={handleVerify}>
-            {/* EMAIL */}
+            {}
             <div className="auth-field">
               <label htmlFor="reset-otp-email">Email address</label>
 
@@ -260,7 +256,7 @@ function VerifyResetOtp() {
               </div>
             </div>
 
-            {/* OTP */}
+            {}
             <div className="auth-field">
               <label htmlFor="reset-otp">Verification code</label>
 
@@ -287,7 +283,7 @@ function VerifyResetOtp() {
               </div>
             </div>
 
-            {/* VERIFY */}
+            {}
             <button type="submit" className="auth-submit-btn" disabled={loading || resending}>
               {loading ? (
                 <>
@@ -303,7 +299,7 @@ function VerifyResetOtp() {
             </button>
           </form>
 
-          {/* RESEND */}
+          {}
           <div className="auth-divider">
             <span>Didn't receive the code?</span>
           </div>
@@ -327,7 +323,7 @@ function VerifyResetOtp() {
             )}
           </button>
 
-          {/* BACK */}
+          {}
           <div className="auth-back-link-wrap">
             <Link to="/forgot-password" className="auth-back-link">
               <ArrowLeft size={14} />

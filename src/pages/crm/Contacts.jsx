@@ -186,9 +186,6 @@ const parseCustomFields = (value) => {
     });
 
     if (hasPair) return objectFromPairs;
-
-    // A plain value such as "VIP" is still stored safely as a custom value
-    // instead of allowing a raw JSON.parse SyntaxError to escape to the UI.
     return { value: raw };
   }
 };

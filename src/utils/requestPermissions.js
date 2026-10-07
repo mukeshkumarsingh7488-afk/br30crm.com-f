@@ -57,8 +57,6 @@ export const resolveRequestPermissions = ({ method = "GET", url = "", data = nul
   if (!matched) return [];
 
   const module = matched[1];
-
-  // Special action endpoints must use their dedicated permission.
   if (/\/leads\/business\/[^/]+\/[^/]+\/convert$/.test(path)) return ["leads.convert"];
   if (/\/leads\/business\/[^/]+\/[^/]+\/assign$/.test(path)) return ["leads.assign"];
   if (/\/contacts\/business\/[^/]+\/[^/]+\/assign$/.test(path)) return ["contacts.assign"];
@@ -76,8 +74,6 @@ export const resolveRequestPermissions = ({ method = "GET", url = "", data = nul
   if (/\/reports\/business\/[^/]+\/deals$/.test(path)) return ["deals-report.view"];
   if (/\/reports\/business\/[^/]+\/activities$/.test(path)) return ["activities-report.view"];
   if (/\/reports\/business\/[^/]+\/[^/]+\/run$/.test(path)) return ["reports.view"];
-
-  // Permission management endpoint is special because it can operate on a SYSTEM permission.
   if (/\/permissions\/[^/]+$/.test(path) && upperMethod === "PATCH") return ["permissions.manage"];
   if (/\/permissions\/[^/]+$/.test(path) && upperMethod === "DELETE") return ["permissions.manage"];
 

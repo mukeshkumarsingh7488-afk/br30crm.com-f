@@ -1,10 +1,3 @@
-/*
- * BR30 CRM permission helpers.
- *
- * Frontend checks are UX protection only. The backend remains the
- * authoritative security boundary and must enforce every action.
- */
-
 export const ACCESS_STORAGE_KEY = "br30-crm-access";
 
 const normalizePermissionList = (permissions) => {
@@ -13,14 +6,18 @@ const normalizePermissionList = (permissions) => {
   return permissions
     .map((permission) => {
       if (typeof permission === "string") return permission.trim().toLowerCase();
-      return String(permission?.slug || "").trim().toLowerCase();
+      return String(permission?.slug || "")
+        .trim()
+        .toLowerCase();
     })
     .filter(Boolean);
 };
 
 export const normalizeAccess = (access = {}) => {
   const role = access?.role || access?.roleId || null;
-  const roleSlug = String(role?.slug || access?.roleSlug || "").trim().toLowerCase();
+  const roleSlug = String(role?.slug || access?.roleSlug || "")
+    .trim()
+    .toLowerCase();
   const permissions = normalizePermissionList(access?.permissions || role?.permissions || []);
 
   return {
@@ -36,8 +33,14 @@ export const normalizeAccess = (access = {}) => {
 export const isManagementRole = (access) => {
   const normalized = normalizeAccess(access);
   if (normalized.isBusinessOwner) return true;
-  const slug = String(normalized.roleSlug || "").trim().toLowerCase().replace(/[_\s]+/g, "-");
-  const name = String(normalized.role?.name || "").trim().toLowerCase().replace(/[_\s]+/g, "-");
+  const slug = String(normalized.roleSlug || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[_\s]+/g, "-");
+  const name = String(normalized.role?.name || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[_\s]+/g, "-");
   return slug === "manager" || slug === "team-manager" || slug.endsWith("-manager") || name === "manager" || name === "team-manager" || name.endsWith("-manager");
 };
 

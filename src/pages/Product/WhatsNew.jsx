@@ -51,8 +51,6 @@ function WhatsNew() {
 
       setPagination(normalized.pagination);
     } catch (err) {
-      console.error("Failed to fetch What's New:", err);
-
       setError(err?.response?.data?.message || err?.message || "Unable to load What's New.");
     } finally {
       setLoading(false);

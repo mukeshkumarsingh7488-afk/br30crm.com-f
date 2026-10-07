@@ -47,11 +47,6 @@ export const whatsNewStatusClass = (status) => {
   return `whats-new-status-${String(status || "DRAFT").toLowerCase()}`;
 };
 
-/* ============================================================
- * DATE HELPERS
- * ============================================================
- */
-
 export const formatWhatsNewDate = (date) => {
   if (!date) return "";
 
@@ -86,11 +81,6 @@ export const formatWhatsNewDateTime = (date) => {
   });
 };
 
-/* ============================================================
- * YOUTUBE HELPERS
- * ============================================================
- */
-
 export const getYouTubeVideoId = (url) => {
   if (!url) return "";
 
@@ -102,37 +92,22 @@ export const getYouTubeVideoId = (url) => {
 
     let videoId = "";
 
-    /*
-     * youtu.be/VIDEO_ID
-     */
     if (hostname === "youtu.be" || hostname.endsWith(".youtu.be")) {
       videoId = parsed.pathname.split("/").filter(Boolean)[0] || "";
     }
 
-    /*
-     * youtube.com/watch?v=VIDEO_ID
-     */
     if ((hostname === "youtube.com" || hostname === "www.youtube.com" || hostname.endsWith(".youtube.com")) && parsed.pathname === "/watch") {
       videoId = parsed.searchParams.get("v") || "";
     }
 
-    /*
-     * youtube.com/shorts/VIDEO_ID
-     */
     if ((hostname === "youtube.com" || hostname === "www.youtube.com" || hostname.endsWith(".youtube.com")) && parsed.pathname.startsWith("/shorts/")) {
       videoId = parsed.pathname.split("/")[2] || "";
     }
 
-    /*
-     * youtube.com/embed/VIDEO_ID
-     */
     if ((hostname === "youtube.com" || hostname === "www.youtube.com" || hostname.endsWith(".youtube.com")) && parsed.pathname.startsWith("/embed/")) {
       videoId = parsed.pathname.split("/")[2] || "";
     }
 
-    /*
-     * youtube.com/live/VIDEO_ID
-     */
     if ((hostname === "youtube.com" || hostname === "www.youtube.com" || hostname.endsWith(".youtube.com")) && parsed.pathname.startsWith("/live/")) {
       videoId = parsed.pathname.split("/")[2] || "";
     }
@@ -161,23 +136,6 @@ export const getYouTubeEmbedUrl = (url) => {
   return `https://www.youtube.com/embed/${videoId}`;
 };
 
-/* ============================================================
- * IMAGE URL
- * ============================================================
- *
- * WhatsNew IMAGE flow:
- *
- * Admin -> Cloudinary URL
- *       -> imageUrl
- *       -> MongoDB
- *       -> Public/Admin API
- *       -> <img src={imageUrl} />
- *
- * Cloudinary absolute URLs are returned directly.
- *
- * Relative URLs are still supported for backward compatibility.
- */
-
 export const getWhatsNewImageUrl = (imageUrl) => {
   if (!imageUrl) return null;
 
@@ -187,21 +145,10 @@ export const getWhatsNewImageUrl = (imageUrl) => {
     return null;
   }
 
-  /*
-   * Absolute URL
-   *
-   * Cloudinary:
-   * https://res.cloudinary.com/...
-   *
-   * Any other valid HTTP/HTTPS image URL is also supported.
-   */
   if (/^https?:\/\//i.test(value)) {
     return value;
   }
 
-  /*
-   * Backward compatibility for old relative image paths.
-   */
   const apiBaseUrl = String(import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
 
   if (!apiBaseUrl) {
@@ -213,11 +160,6 @@ export const getWhatsNewImageUrl = (imageUrl) => {
   return `${backendOrigin}${value.startsWith("/") ? value : `/${value}`}`;
 };
 
-/* ============================================================
- * MEDIA
- * ============================================================
- */
-
 export const getWhatsNewMedia = (item) => {
   if (!item) {
     return {
@@ -226,9 +168,6 @@ export const getWhatsNewMedia = (item) => {
     };
   }
 
-  /*
-   * IMAGE
-   */
   if (item.mediaType === "IMAGE" && item.imageUrl) {
     const imageUrl = getWhatsNewImageUrl(item.imageUrl);
 
@@ -240,9 +179,6 @@ export const getWhatsNewMedia = (item) => {
     }
   }
 
-  /*
-   * VIDEO
-   */
   if (item.mediaType === "VIDEO" && item.videoUrl) {
     const embedUrl = getYouTubeEmbedUrl(item.videoUrl);
 
@@ -254,32 +190,11 @@ export const getWhatsNewMedia = (item) => {
     }
   }
 
-  /*
-   * NONE / INVALID MEDIA
-   */
   return {
     type: "NONE",
     url: null,
   };
 };
-
-/* ============================================================
- * RESPONSE NORMALIZATION
- * ============================================================
- *
- * Supports:
- *
- * {
- *   success: true,
- *   data: {
- *     items: [],
- *     pagination: {}
- *   },
- *   message: "..."
- * }
- *
- * Axios API functions return response.data.
- */
 
 export const normalizeWhatsNewResponse = (response) => {
   const envelope = response?.data || response?.result || response || {};
@@ -310,11 +225,6 @@ export const normalizeWhatsNewResponse = (response) => {
   };
 };
 
-/* ============================================================
- * API ERROR
- * ============================================================
- */
-
 export const getApiErrorMessage = (error, fallback = "Something went wrong.") => {
   const responseData = error?.response?.data;
 
@@ -334,11 +244,6 @@ export const getApiErrorMessage = (error, fallback = "Something went wrong.") =>
 
   return responseData?.message || responseData?.data?.message || error?.message || fallback;
 };
-
-/* ============================================================
- * FEATURES
- * ============================================================
- */
 
 export const normalizeWhatsNewFeatures = (features) => {
   if (Array.isArray(features)) {

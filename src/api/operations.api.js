@@ -1,9 +1,5 @@
 import api from "./api";
 
-/* =========================================================
-   TEAM APIs
-   ========================================================= */
-
 export const getTeams = async (businessId, params = {}) => (await api.get(`/teams/business/${businessId}`, { params })).data;
 
 export const createTeam = async (businessId, data) => (await api.post(`/teams/business/${businessId}`, data)).data;
@@ -18,19 +14,6 @@ export const addTeamMember = async (businessId, teamId, userId) => (await api.po
 
 export const removeTeamMember = async (businessId, teamId, userId) => (await api.delete(`/teams/business/${businessId}/${teamId}/members/${userId}`)).data;
 
-/* =========================================================
-   BUSINESS MEMBERS APIs
-   =========================================================
-   
-   IMPORTANT:
-   Change only BUSINESS_MEMBER_BASE if your backend router
-   is mounted under a different prefix.
-   
-   Example:
-   app.use("/api/business-members", businessMemberRoutes)
-   => "/business-members"
-*/
-
 const BUSINESS_MEMBER_BASE = "/business-members";
 
 export const getBusinessMembers = async (businessId, params = {}) => (await api.get(`${BUSINESS_MEMBER_BASE}/${businessId}/members`, { params })).data;
@@ -43,10 +26,6 @@ export const updateBusinessMember = async (memberId, data) => (await api.patch(`
 
 export const removeBusinessMember = async (memberId) => (await api.delete(`${BUSINESS_MEMBER_BASE}/member/${memberId}`)).data;
 
-/* =========================================================
-   REPORT APIs
-   ========================================================= */
-
 export const getReports = async (businessId, params = {}) => (await api.get(`/reports/business/${businessId}`, { params })).data;
 
 export const createReport = async (businessId, data) => (await api.post(`/reports/business/${businessId}`, data)).data;
@@ -57,10 +36,6 @@ export const deleteReport = async (businessId, reportId) => (await api.delete(`/
 
 export const runReport = async (businessId, reportId) => (await api.post(`/reports/business/${businessId}/${reportId}/run`)).data;
 
-/* =========================================================
-   NOTIFICATION APIs
-   ========================================================= */
-
 export const getNotifications = async (businessId, params = {}) => (await api.get(`/notifications/business/${businessId}`, { params })).data;
 
 export const markNotificationRead = async (businessId, id) => (await api.patch(`/notifications/business/${businessId}/${id}/read`)).data;
@@ -68,9 +43,5 @@ export const markNotificationRead = async (businessId, id) => (await api.patch(`
 export const markAllNotificationsRead = async (businessId) => (await api.patch(`/notifications/business/${businessId}/read-all`)).data;
 
 export const deleteNotification = async (businessId, id) => (await api.delete(`/notifications/business/${businessId}/${id}`)).data;
-
-/* =========================================================
-   AUDIT LOG APIs
-   ========================================================= */
 
 export const getAuditLogs = async (businessId, params = {}) => (await api.get(`/audit/business/${businessId}`, { params })).data;

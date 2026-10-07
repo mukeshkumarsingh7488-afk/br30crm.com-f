@@ -53,12 +53,6 @@ function Login() {
     try {
       setLoading(true);
 
-      /*
-       * ---------------------------------------------------------
-       * LOGIN
-       * ---------------------------------------------------------
-       */
-
       const response = await login({
         email,
         password,
@@ -70,32 +64,11 @@ function Login() {
 
       let user = responseData?.user || response?.user || null;
 
-      /*
-       * ---------------------------------------------------------
-       * ACCESS TOKEN CHECK
-       * ---------------------------------------------------------
-       */
-
       if (!accessToken) {
         throw new Error("Login successful, but access token was not received.");
       }
 
-      /*
-       * ---------------------------------------------------------
-       * SAVE TOKEN IMMEDIATELY
-       * ---------------------------------------------------------
-       */
-
       localStorage.setItem("token", accessToken);
-
-      /*
-       * ---------------------------------------------------------
-       * USER DATA
-       *
-       * Usually login already returns user.
-       * If it doesn't, fetch the authenticated user from /auth/me.
-       * ---------------------------------------------------------
-       */
 
       if (!user) {
         try {
@@ -105,20 +78,12 @@ function Login() {
 
           user = meData?.user || meResponse?.user || null;
         } catch (meError) {
-          console.error("Failed to fetch current user after login:", meError);
-
           localStorage.removeItem("token");
           localStorage.removeItem("user");
 
           throw new Error("Login succeeded, but your account information could not be loaded. Please try again.");
         }
       }
-
-      /*
-       * ---------------------------------------------------------
-       * USER CHECK
-       * ---------------------------------------------------------
-       */
 
       if (!user) {
         localStorage.removeItem("token");
@@ -127,19 +92,7 @@ function Login() {
         throw new Error("Login succeeded, but user information was not received.");
       }
 
-      /*
-       * ---------------------------------------------------------
-       * SAVE USER
-       * ---------------------------------------------------------
-       */
-
       localStorage.setItem("user", JSON.stringify(user));
-
-      /*
-       * ---------------------------------------------------------
-       * SUCCESS
-       * ---------------------------------------------------------
-       */
 
       const firstName = user?.firstName?.trim() || user?.name?.trim()?.split(" ")[0] || "User";
 
@@ -151,40 +104,14 @@ function Login() {
         showConfirmButton: false,
       });
 
-      /*
-       * ---------------------------------------------------------
-       * GO TO DASHBOARD
-       * ---------------------------------------------------------
-       */
-
       navigate("/dashboard", {
         replace: true,
       });
     } catch (err) {
-      console.error("Login error:", err);
-
-      /*
-       * ---------------------------------------------------------
-       * NEVER KEEP INVALID LOGIN DATA
-       * ---------------------------------------------------------
-       */
-
       const status = err?.response?.status;
       const data = err?.response?.data;
 
-      /*
-       * ---------------------------------------------------------
-       * BACKEND ERROR MESSAGE
-       * ---------------------------------------------------------
-       */
-
       const message = data?.message || data?.error?.message || err?.message || "Unable to sign in. Please check your email and password.";
-
-      /*
-       * ---------------------------------------------------------
-       * EMAIL VERIFICATION REQUIRED
-       * ---------------------------------------------------------
-       */
 
       if (status === 403 && (data?.details?.emailVerificationRequired || data?.data?.emailVerificationRequired || message.toLowerCase().includes("verify your email"))) {
         await showAuthAlert({
@@ -202,12 +129,6 @@ function Login() {
 
         return;
       }
-
-      /*
-       * ---------------------------------------------------------
-       * NORMAL LOGIN ERROR
-       * ---------------------------------------------------------
-       */
 
       showAuthAlert({
         icon: "error",

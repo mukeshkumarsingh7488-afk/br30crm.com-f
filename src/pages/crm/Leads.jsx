@@ -133,17 +133,12 @@ function parseTags(value) {
 function parseCustomFields(value) {
   const raw = String(value || "").trim();
   if (!raw) return {};
-
-  // Keep the form simple for CRM users: plain text is stored safely
-  // inside the backend's object-based customFields structure.
   try {
     const parsed = JSON.parse(raw);
     if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
       return parsed;
     }
-  } catch {
-    // Plain text is intentionally supported.
-  }
+  } catch {}
 
   return { notes: raw };
 }

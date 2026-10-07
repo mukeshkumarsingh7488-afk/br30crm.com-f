@@ -26,12 +26,6 @@ const extractRows = (response, keys = []) => {
   return [];
 };
 
-/*
- * ============================================================
- * PARAMS NORMALIZER
- * ============================================================
- */
-
 const normalizeListParams = (params = {}) => {
   const rawPage = Number(params?.page);
   const rawLimit = Number(params?.limit);
@@ -42,12 +36,6 @@ const normalizeListParams = (params = {}) => {
     limit: Number.isFinite(rawLimit) && rawLimit >= 1 ? Math.min(Math.floor(rawLimit), 100) : 10,
   };
 };
-
-/*
- * ============================================================
- * MEETINGS
- * ============================================================
- */
 
 export const getCalendarMeetings = async (businessId, params = {}) => {
   const safeParams = normalizeListParams(params);
@@ -83,12 +71,6 @@ export const deleteCalendarMeeting = async (businessId, meetingId) => {
   return response.data;
 };
 
-/*
- * ============================================================
- * ACTIVITIES
- * ============================================================
- */
-
 export const getCalendarActivities = async (businessId, params = {}) => {
   const safeParams = normalizeListParams(params);
 
@@ -122,12 +104,6 @@ export const deleteCalendarActivity = async (businessId, activityId) => {
 
   return response.data;
 };
-
-/*
- * ============================================================
- * NORMALIZERS
- * ============================================================
- */
 
 export const extractMeetingRows = (response) => extractRows(response, ["meetings", "items", "results"]);
 

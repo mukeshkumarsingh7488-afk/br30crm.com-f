@@ -9,6 +9,7 @@ import { getTeams } from "../../api/operations.api";
 
 import { showAuthAlert } from "../../components/auth/authAlert";
 import useBusiness from "../../hooks/useBusiness";
+import ActivityTimeline from "../../components/crm/ActivityTimeline";
 
 const getErrorMessage = (error, fallback) => {
   const data = error?.response?.data;
@@ -1242,6 +1243,8 @@ export default function ContactDetails() {
                 </div>
               </div>
             </div>
+
+            <ActivityTimeline businessId={businessId} contactId={contact?._id} title="Activity timeline" subtitle="Complete activity history for this contact." />
           </>
         )}
       </div>

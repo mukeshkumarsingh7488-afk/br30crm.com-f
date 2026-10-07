@@ -5,12 +5,6 @@ import { getActivitiesReport } from "../../api/report.api";
 import useBusiness from "../../hooks/useBusiness";
 import { showAuthAlert } from "../../components/auth/authAlert";
 
-/*
- * ============================================================
- * HELPERS
- * ============================================================
- */
-
 const formatNumber = (value) => {
   const number = Number(value);
 
@@ -143,12 +137,6 @@ const escapeCsvValue = (value) => {
   return `"${stringValue.replace(/"/g, '""')}"`;
 };
 
-/*
- * ============================================================
- * COMPONENT
- * ============================================================
- */
-
 const ActivityReport = () => {
   const { businessId, loading: businessLoading, error: businessError } = useBusiness();
 
@@ -175,23 +163,11 @@ const ActivityReport = () => {
 
   const [visibleRows, setVisibleRows] = useState(50);
 
-  /*
-   * ============================================================
-   * BUSINESS ERROR
-   * ============================================================
-   */
-
   useEffect(() => {
     if (businessError && !businessId && !businessLoading) {
       setError(businessError || "Unable to load your business workspace.");
     }
   }, [businessError, businessId, businessLoading]);
-
-  /*
-   * ============================================================
-   * ERROR ALERT
-   * ============================================================
-   */
 
   const showErrorAlert = useCallback(async (message) => {
     await showAuthAlert({
@@ -201,12 +177,6 @@ const ActivityReport = () => {
       confirmButtonText: "OK",
     });
   }, []);
-
-  /*
-   * ============================================================
-   * LOAD REPORT
-   * ============================================================
-   */
 
   const loadReport = useCallback(
     async (options = {}) => {
@@ -288,12 +258,6 @@ const ActivityReport = () => {
     }
   }, [businessId, businessLoading]);
 
-  /*
-   * ============================================================
-   * REPORT DATA
-   * ============================================================
-   */
-
   const summary = report?.summary || {};
 
   const rows = Array.isArray(report?.rows) ? report.rows : [];
@@ -306,31 +270,13 @@ const ActivityReport = () => {
 
   const monthly = Array.isArray(report?.monthly) ? report.monthly : [];
 
-  /*
-   * ============================================================
-   * TYPE OPTIONS
-   * ============================================================
-   */
-
   const typeOptions = useMemo(() => {
     return Array.from(new Set(byType.map((item) => String(item?.type || "").trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b));
   }, [byType]);
 
-  /*
-   * ============================================================
-   * STATUS OPTIONS
-   * ============================================================
-   */
-
   const statusOptions = useMemo(() => {
     return Array.from(new Set(byStatus.map((item) => String(item?.status || "").trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b));
   }, [byStatus]);
-
-  /*
-   * ============================================================
-   * ASSIGNED USER OPTIONS
-   * ============================================================
-   */
 
   const assignedUserOptions = useMemo(() => {
     return byAssignedUser
@@ -342,12 +288,6 @@ const ActivityReport = () => {
       }))
       .sort((a, b) => String(a.name).localeCompare(String(b.name)));
   }, [byAssignedUser]);
-
-  /*
-   * ============================================================
-   * FILTERED ROWS
-   * ============================================================
-   */
 
   const filteredRows = useMemo(() => {
     const query = String(search || "")
@@ -441,12 +381,6 @@ const ActivityReport = () => {
     return filteredRows.slice(0, visibleRows);
   }, [filteredRows, visibleRows]);
 
-  /*
-   * ============================================================
-   * MAX VALUES
-   * ============================================================
-   */
-
   const maxTypeCount = useMemo(() => {
     return Math.max(1, ...byType.map((item) => Number(item?.count) || 0));
   }, [byType]);
@@ -459,21 +393,9 @@ const ActivityReport = () => {
     return Math.max(1, ...monthly.map((item) => Number(item?.count) || 0));
   }, [monthly]);
 
-  /*
-   * ============================================================
-   * ACTIVE FILTERS
-   * ============================================================
-   */
-
   const activeFilterCount = [dateFrom, dateTo, type, status, assignedTo].filter(Boolean).length;
 
   const hasActiveFilters = activeFilterCount > 0;
-
-  /*
-   * ============================================================
-   * FILTER ACTIONS
-   * ============================================================
-   */
 
   const clearFilters = async () => {
     setDateFrom("");
@@ -528,12 +450,6 @@ const ActivityReport = () => {
     });
   };
 
-  /*
-   * ============================================================
-   * SORT
-   * ============================================================
-   */
-
   const handleSort = (field) => {
     if (sortField === field) {
       setSortDirection((current) => (current === "asc" ? "desc" : "asc"));
@@ -552,12 +468,6 @@ const ActivityReport = () => {
 
     return sortDirection === "asc" ? <ChevronUp size={13} /> : <ChevronDown size={13} />;
   };
-
-  /*
-   * ============================================================
-   * STATUS CLASS
-   * ============================================================
-   */
 
   const getStatusClass = (value) => {
     switch (String(value || "").toUpperCase()) {
@@ -584,12 +494,6 @@ const ActivityReport = () => {
     }
   };
 
-  /*
-   * ============================================================
-   * ACTIVITY TYPE ICON LABEL
-   * ============================================================
-   */
-
   const getActivityIcon = (value) => {
     const normalized = String(value || "").toUpperCase();
 
@@ -615,12 +519,6 @@ const ActivityReport = () => {
 
     return "A";
   };
-
-  /*
-   * ============================================================
-   * EXPORT CSV
-   * ============================================================
-   */
 
   const exportCsv = async () => {
     if (!filteredRows.length) {
@@ -687,12 +585,6 @@ const ActivityReport = () => {
     URL.revokeObjectURL(url);
   };
 
-  /*
-   * ============================================================
-   * EXPORT EXCEL
-   * ============================================================
-   */
-
   const exportExcel = async () => {
     if (!filteredRows.length) {
       await showAuthAlert({
@@ -736,12 +628,6 @@ const ActivityReport = () => {
     XLSX.writeFile(workbook, `activity-report-${new Date().toISOString().slice(0, 10)}.xlsx`);
   };
 
-  /*
-   * ============================================================
-   * LOADING
-   * ============================================================
-   */
-
   if (loading || businessLoading) {
     return (
       <>
@@ -764,18 +650,12 @@ const ActivityReport = () => {
     );
   }
 
-  /*
-   * ============================================================
-   * PAGE
-   * ============================================================
-   */
-
   return (
     <>
       <style>{styles}</style>
 
       <div className="activity-report-page">
-        {/* HEADER */}
+        {}
 
         <div className="activity-report-header">
           <div className="activity-report-heading">
@@ -803,7 +683,7 @@ const ActivityReport = () => {
           </div>
         </div>
 
-        {/* FILTERS */}
+        {}
 
         <div className="activity-report-filter-card">
           <div className="activity-report-filter-top">
@@ -917,7 +797,7 @@ const ActivityReport = () => {
           )}
         </div>
 
-        {/* ERROR */}
+        {}
 
         {error && (
           <div className="activity-report-error">
@@ -941,7 +821,7 @@ const ActivityReport = () => {
           </div>
         )}
 
-        {/* SUMMARY */}
+        {}
 
         <div className="activity-report-summary-grid">
           <div className="activity-report-summary-card">
@@ -1015,7 +895,7 @@ const ActivityReport = () => {
           </div>
         </div>
 
-        {/* MINI METRICS */}
+        {}
 
         <div className="activity-report-mini-grid">
           <div className="activity-report-mini-card">
@@ -1067,7 +947,7 @@ const ActivityReport = () => {
           </div>
         </div>
 
-        {/* TABS */}
+        {}
 
         <div className="activity-report-tabs">
           <button type="button" className={activeSection === "overview" ? "activity-report-tab activity-report-tab-active" : "activity-report-tab"} onClick={() => setActiveSection("overview")}>
@@ -1086,7 +966,7 @@ const ActivityReport = () => {
           </button>
         </div>
 
-        {/* OVERVIEW */}
+        {}
 
         {activeSection === "overview" && (
           <div className="activity-report-content-grid">
@@ -1228,7 +1108,7 @@ const ActivityReport = () => {
           </div>
         )}
 
-        {/* ASSIGNMENT */}
+        {}
 
         {activeSection === "people" && (
           <div className="activity-report-panel activity-report-panel-wide">
@@ -1292,7 +1172,7 @@ const ActivityReport = () => {
           </div>
         )}
 
-        {/* DETAILS */}
+        {}
 
         {activeSection === "activities" && (
           <div className="activity-report-panel activity-report-details-panel">
@@ -1457,7 +1337,7 @@ const ActivityReport = () => {
           </div>
         )}
 
-        {/* FOOTER */}
+        {}
 
         <div className="activity-report-footer">
           <span>
@@ -1477,19 +1357,7 @@ const ActivityReport = () => {
   );
 };
 
-/*
- * ============================================================
- * SMALL TREND ICON
- * ============================================================
- */
-
 const TrendingIcon = () => <ArrowUp size={18} />;
-
-/*
- * ============================================================
- * STYLES
- * ============================================================
- */
 
 const styles = `
 .activity-report-page{width:100%;min-width:0;padding:22px;color:var(--crm-text,#1f2937);}

@@ -107,8 +107,6 @@ function VerifyEmail() {
 
       navigate("/login", { replace: true });
     } catch (error) {
-      console.error("Verify email error:", error);
-
       const status = error?.response?.status;
       const data = error?.response?.data;
 
@@ -165,8 +163,6 @@ function VerifyEmail() {
         showConfirmButton: false,
       });
     } catch (error) {
-      console.error("Resend OTP error:", error);
-
       const status = error?.response?.status;
       const data = error?.response?.data;
 
@@ -185,7 +181,7 @@ function VerifyEmail() {
   return (
     <AuthLayout>
       <div className="auth-login-layout">
-        {/* LEFT SIDE */}
+        {}
         <section className="auth-login-intro">
           <div className="auth-intro-badge">
             <Mail size={15} />
@@ -227,7 +223,7 @@ function VerifyEmail() {
           </div>
         </section>
 
-        {/* RIGHT SIDE */}
+        {}
         <section className="auth-card">
           <div className="auth-card-header">
             <div className="auth-icon">

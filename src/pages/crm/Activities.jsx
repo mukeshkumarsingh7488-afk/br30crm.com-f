@@ -24,6 +24,64 @@ const TYPE_OPTIONS = [
   { value: "OTHER", label: "Other" },
 ];
 
+const OUTCOME_OPTIONS = {
+  CALL: [
+    { value: "INTERESTED", label: "Interested" },
+    { value: "NOT_INTERESTED", label: "Not interested" },
+    { value: "FOLLOW_UP_REQUIRED", label: "Follow-up required" },
+    { value: "NO_RESPONSE", label: "No response" },
+    { value: "CONVERTED", label: "Converted" },
+  ],
+  EMAIL: [
+    { value: "SENT", label: "Sent" },
+    { value: "REPLIED", label: "Replied" },
+    { value: "NO_RESPONSE", label: "No response" },
+    { value: "FOLLOW_UP_REQUIRED", label: "Follow-up required" },
+  ],
+  MEETING: [
+    { value: "SUCCESSFUL", label: "Successful" },
+    { value: "FOLLOW_UP_REQUIRED", label: "Follow-up required" },
+    { value: "RESCHEDULED", label: "Rescheduled" },
+    { value: "CANCELLED", label: "Cancelled" },
+    { value: "NO_SHOW", label: "No show" },
+  ],
+  TASK: [
+    { value: "COMPLETED", label: "Completed" },
+    { value: "PENDING", label: "Pending" },
+    { value: "BLOCKED", label: "Blocked" },
+  ],
+  NOTE: [
+    { value: "INFORMATION_RECORDED", label: "Information recorded" },
+    { value: "IMPORTANT", label: "Important" },
+  ],
+  SMS: [
+    { value: "SENT", label: "Sent" },
+    { value: "DELIVERED", label: "Delivered" },
+    { value: "REPLIED", label: "Replied" },
+    { value: "NO_RESPONSE", label: "No response" },
+  ],
+  WHATSAPP: [
+    { value: "REPLIED", label: "Replied" },
+    { value: "INTERESTED", label: "Interested" },
+    { value: "NO_RESPONSE", label: "No response" },
+    { value: "FOLLOW_UP_REQUIRED", label: "Follow-up required" },
+  ],
+  FOLLOW_UP: [
+    { value: "CONNECTED", label: "Connected" },
+    { value: "INTERESTED", label: "Interested" },
+    { value: "NOT_INTERESTED", label: "Not interested" },
+    { value: "RESCHEDULED", label: "Rescheduled" },
+    { value: "NO_RESPONSE", label: "No response" },
+    { value: "CONVERTED", label: "Converted" },
+  ],
+  OTHER: [
+    { value: "COMPLETED", label: "Completed" },
+    { value: "FOLLOW_UP_REQUIRED", label: "Follow-up required" },
+    { value: "NO_RESPONSE", label: "No response" },
+    { value: "OTHER", label: "Other" },
+  ],
+};
+
 const STATUS_OPTIONS = [
   { value: "PLANNED", label: "Planned" },
   { value: "IN_PROGRESS", label: "In progress" },
@@ -346,7 +404,6 @@ function Activities() {
 
   const memberDropdownRef = useRef(null);
   const tagDropdownRef = useRef(null);
-
   const activeFilterCount = useMemo(() => {
     return [status, type, assignedTo].filter(Boolean).length;
   }, [status, type, assignedTo]);
@@ -506,10 +563,23 @@ function Activities() {
   }, []);
 
   const updateForm = (name, value) => {
-    setForm((current) => ({
-      ...current,
-      [name]: value,
-    }));
+    setForm((current) => {
+      if (name === "type") {
+        const nextOptions = OUTCOME_OPTIONS[value] || [];
+        const currentOutcome = nextOptions.some((option) => option.value === current.outcome) ? current.outcome : "";
+
+        return {
+          ...current,
+          type: value,
+          outcome: currentOutcome,
+        };
+      }
+
+      return {
+        ...current,
+        [name]: value,
+      };
+    });
   };
 
   const resetFilters = () => {
@@ -1903,7 +1973,15 @@ function Activities() {
                   <div className="activities-field full">
                     <label>Outcome</label>
 
-                    <textarea value={form.outcome} onChange={(event) => updateForm("outcome", event.target.value)} placeholder="Add activity outcome..." maxLength={2000} />
+                    <select value={form.outcome} onChange={(event) => updateForm("outcome", event.target.value)}>
+                      <option value="">Select outcome</option>
+
+                      {(OUTCOME_OPTIONS[form.type] || []).map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className="activities-field full">

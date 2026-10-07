@@ -141,8 +141,6 @@ a:focus-visible {
   outline-offset: 2px;
 }
 
-/* Whats New / Announcement Modal */
-
 .whats-new-modal-overlay,
 .announcement-modal-overlay {
   position: fixed;
@@ -328,12 +326,6 @@ a:focus-visible {
   }
 }
 
-/* ============================================================
-   BR30 GLOBAL TYPOGRAPHY / READABILITY
-   Consistent, normal-weight typography across Landing, CRM and
-   Admin without changing the existing component layout.
-   ============================================================ */
-
 html,
 body {
   font-size: 15px;
@@ -415,14 +407,6 @@ b {
   opacity: 1;
 }
 
-
-
-/* ============================================================
-   BR30 CRM SHARED LIST / REPORT POLISH
-   Uses the existing CRM variables and keeps page-specific
-   layouts intact while standardising the common controls.
-   ============================================================ */
-
 .leads-search-wrap,
 .deals-search-wrap,
 .member-search-wrap,
@@ -488,7 +472,6 @@ b {
   line-height: 0;
 }
 
-/* Consistent statistic-card height across CRM list/report pages. */
 [class*="-stats"] > [class*="-stat"],
 .leads-report-summary-card,
 .leads-report-mini-card,
@@ -500,19 +483,16 @@ b {
   min-height: 118px;
 }
 
-/* The larger five-card report row follows the Leads Report reference. */
 .leads-report-summary-card,
 .deals-report-summary-card {
   min-height: 158px;
 }
 
-/* Operations/system list search clear button stays vertically centred. */
 .crm-ops-clear {
   top: 50% !important;
   transform: translateY(-50%) !important;
 }
 
-/* User-friendly placeholder readability in both themes. */
 input::placeholder,
 textarea::placeholder {
   color: var(--crm-muted, #667085);
@@ -524,30 +504,96 @@ textarea::placeholder {
   color: var(--crm-muted, #9aa8bd);
 }
 
-/* CRM table finishing: consistent 5-row viewport, professional column sizing, centered headers. */
-.crm-main div:has(> table){max-height:348px;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;}
-.crm-main div:has(> table) > table{width:max-content;min-width:100%;table-layout:auto;border-collapse:separate;border-spacing:0;}
-.crm-main div:has(> table) > table th{position:sticky;top:0;z-index:4;text-align:left !important;vertical-align:middle;white-space:nowrap;min-width:110px;padding:13px 16px;background:var(--crm-surface-2);color:var(--crm-muted) !important;font-weight:400;text-transform:uppercase;letter-spacing:.05em;}
-.crm-main div:has(> table) > table td{white-space:nowrap;min-width:110px;padding:13px 16px;}
-.crm-main div:has(> table) > table th:first-child,.crm-main div:has(> table) > table td:first-child{min-width:150px;}
-.crm-main div:has(> table) > table th:last-child,.crm-main div:has(> table) > table td:last-child{min-width:150px;}
-.crm-main div:has(> table) > table th:nth-last-child(2),.crm-main div:has(> table) > table td:nth-last-child(2){min-width:130px;}
-.crm-main div:has(> table) > table tbody tr{min-height:54px;}
-.crm-main div:has(> table) > table tbody td{height:54px;box-sizing:border-box;}
-.crm-main div:has(> table) > table th:first-child{border-top-left-radius:0;}
-.crm-main div:has(> table) > table th:last-child{border-top-right-radius:0;}
+.crm-main div:has(> table) {
+  max-height: 348px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.crm-main div:has(> table) > table {
+  width: max-content;
+  min-width: 100%;
+  table-layout: auto;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.crm-main div:has(> table) > table th {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  text-align: left !important;
+  vertical-align: middle;
+  white-space: nowrap;
+  min-width: 110px;
+  padding: 13px 16px;
+  background: var(--crm-surface-2);
+  color: var(--crm-muted) !important;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.crm-main div:has(> table) > table td {
+  white-space: nowrap;
+  min-width: 110px;
+  padding: 13px 16px;
+}
+.crm-main div:has(> table) > table th:first-child,
+.crm-main div:has(> table) > table td:first-child {
+  min-width: 150px;
+}
+.crm-main div:has(> table) > table th:last-child,
+.crm-main div:has(> table) > table td:last-child {
+  min-width: 150px;
+}
+.crm-main div:has(> table) > table th:nth-last-child(2),
+.crm-main div:has(> table) > table td:nth-last-child(2) {
+  min-width: 130px;
+}
+.crm-main div:has(> table) > table tbody tr {
+  min-height: 54px;
+}
+.crm-main div:has(> table) > table tbody td {
+  height: 54px;
+  box-sizing: border-box;
+}
+.crm-main div:has(> table) > table th:first-child {
+  border-top-left-radius: 0;
+}
+.crm-main div:has(> table) > table th:last-child {
+  border-top-right-radius: 0;
+}
 
-/* Assignment columns stay readable without increasing row height. */
-.crm-main .leads-table th:nth-child(6),.crm-main .leads-table td:nth-child(6),
-.crm-main .contacts-table th:nth-child(8),.crm-main .contacts-table td:nth-child(8),
-.crm-main .companies-table th:nth-child(6),.crm-main .companies-table td:nth-child(6),
-.crm-main .deals-table th:nth-child(7),.crm-main .deals-table td:nth-child(7),
-.crm-main .activities-table th:nth-child(6),.crm-main .activities-table td:nth-child(6){min-width:230px;width:230px;}
+.crm-main .leads-table th:nth-child(6),
+.crm-main .leads-table td:nth-child(6),
+.crm-main .contacts-table th:nth-child(8),
+.crm-main .contacts-table td:nth-child(8),
+.crm-main .companies-table th:nth-child(6),
+.crm-main .companies-table td:nth-child(6),
+.crm-main .deals-table th:nth-child(7),
+.crm-main .deals-table td:nth-child(7),
+.crm-main .activities-table th:nth-child(6),
+.crm-main .activities-table td:nth-child(6) {
+  min-width: 230px;
+  width: 230px;
+}
 
-/* Keep table controls visually aligned while the table body scrolls. */
-.crm-main div:has(> table)::-webkit-scrollbar{width:9px;height:9px;}
-.crm-main div:has(> table)::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--crm-muted) 45%,transparent);border-radius:999px;}
-.crm-main div:has(> table)::-webkit-scrollbar-track{background:transparent;}
+.crm-main div:has(> table)::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+.crm-main div:has(> table)::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--crm-muted) 45%, transparent);
+  border-radius: 999px;
+}
+.crm-main div:has(> table)::-webkit-scrollbar-track {
+  background: transparent;
+}
 
-/* BR30 CRM table headers: left aligned and use the same muted header treatment as Tags. */
-.crm-main table th{background:var(--crm-surface-2) !important;color:var(--crm-muted) !important;font-weight:400 !important;text-align:left !important;text-transform:uppercase;letter-spacing:.05em;}
+.crm-main table th {
+  background: var(--crm-surface-2) !important;
+  color: var(--crm-muted) !important;
+  font-weight: 400 !important;
+  text-align: left !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

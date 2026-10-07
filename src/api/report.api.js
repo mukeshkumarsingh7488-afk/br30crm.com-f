@@ -39,10 +39,6 @@ export const deleteReport = async (businessId, reportId) => {
   return response.data;
 };
 
-/* ============================================================
- * SALES REPORT
- * ============================================================ */
-
 export const getSalesReport = async (businessId, params = {}) => {
   const response = await api.get(`/reports/business/${businessId}/sales`, {
     params,
@@ -50,10 +46,6 @@ export const getSalesReport = async (businessId, params = {}) => {
 
   return response.data;
 };
-
-/* ============================================================
- * LEADS REPORT
- * ============================================================ */
 
 export const getLeadsReport = async (businessId, params = {}) => {
   const response = await api.get(`/reports/business/${businessId}/leads`, {
@@ -63,10 +55,6 @@ export const getLeadsReport = async (businessId, params = {}) => {
   return response.data;
 };
 
-/* ============================================================
- * DEALS REPORT
- * ============================================================ */
-
 export const getDealsReport = async (businessId, params = {}) => {
   const response = await api.get(`/reports/business/${businessId}/deals`, {
     params,
@@ -74,10 +62,6 @@ export const getDealsReport = async (businessId, params = {}) => {
 
   return response.data;
 };
-
-/* ============================================================
- * ACTIVITY REPORT
- * ============================================================ */
 
 export const getActivitiesReport = async (businessId, params = {}) => {
   const response = await api.get(`/reports/business/${businessId}/activities`, {

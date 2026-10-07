@@ -551,9 +551,7 @@ export default function QR() {
         text: "Open this lead-generation form.",
         url,
       });
-    } catch {
-      // User cancelled native share.
-    }
+    } catch {}
   };
 
   return (

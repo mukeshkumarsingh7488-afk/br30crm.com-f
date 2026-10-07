@@ -132,8 +132,6 @@ function ResetPassword() {
         },
       });
     } catch (err) {
-      console.error("Reset password error:", err);
-
       const message = err?.response?.data?.message || err?.response?.data?.error?.message || err?.message || "Unable to reset your password. Please try again.";
 
       await showAuthAlert({
@@ -149,7 +147,7 @@ function ResetPassword() {
   return (
     <AuthLayout>
       <div className="auth-login-layout">
-        {/* LEFT SIDE */}
+        {}
         <section className="auth-login-intro">
           <div className="auth-intro-badge">
             <ShieldCheck size={14} />
@@ -193,7 +191,7 @@ function ResetPassword() {
           </div>
         </section>
 
-        {/* RIGHT SIDE */}
+        {}
         <section className="auth-card">
           <div className="auth-card-header">
             <div className="auth-icon">
@@ -207,7 +205,7 @@ function ResetPassword() {
           </div>
 
           <form className="auth-form" onSubmit={handleSubmit}>
-            {/* EMAIL */}
+            {}
             <div className="auth-field">
               <label htmlFor="reset-email">Email address</label>
 
@@ -218,7 +216,7 @@ function ResetPassword() {
               </div>
             </div>
 
-            {/* OTP */}
+            {}
             <div className="auth-field">
               <label htmlFor="reset-otp">Verification OTP</label>
 
@@ -231,7 +229,7 @@ function ResetPassword() {
               <small className="auth-field-hint">Enter the OTP sent to your email address.</small>
             </div>
 
-            {/* NEW PASSWORD */}
+            {}
             <div className="auth-field">
               <label htmlFor="reset-password">New password</label>
 
@@ -246,7 +244,7 @@ function ResetPassword() {
               </div>
             </div>
 
-            {/* CONFIRM PASSWORD */}
+            {}
             <div className="auth-field">
               <label htmlFor="reset-confirm-password">Confirm new password</label>
 
@@ -261,7 +259,7 @@ function ResetPassword() {
               </div>
             </div>
 
-            {/* SUBMIT */}
+            {}
             <button type="submit" className="auth-submit-btn" disabled={loading}>
               {loading ? (
                 <>

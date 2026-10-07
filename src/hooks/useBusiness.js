@@ -8,9 +8,7 @@ const BUSINESS_STORAGE_KEY = "br30-business-id";
 const getRolePermissions = (role) => {
   if (!Array.isArray(role?.permissions)) return [];
 
-  return role.permissions
-    .map((permission) => (typeof permission === "string" ? permission : permission?.slug || ""))
-    .filter(Boolean);
+  return role.permissions.map((permission) => (typeof permission === "string" ? permission : permission?.slug || "")).filter(Boolean);
 };
 
 export default function useBusiness() {

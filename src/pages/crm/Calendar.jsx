@@ -343,8 +343,6 @@ export default function Calendar() {
         setMeetings(extractMeetingRows(meetingResponse));
         setActivities(extractActivityRows(activityResponse));
       } catch (error) {
-        console.error("Failed to load calendar:", error);
-
         if (!silent) {
           await showAuthAlert({
             icon: "error",
@@ -579,8 +577,6 @@ export default function Calendar() {
         confirmButtonText: "Done",
       });
     } catch (error) {
-      console.error("Calendar save error:", error);
-
       await showAuthAlert({
         icon: "error",
         title: currentModal.mode === "edit" ? "Unable to update event" : "Unable to create event",

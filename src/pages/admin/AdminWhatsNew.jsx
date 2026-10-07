@@ -301,8 +301,6 @@ function AdminWhatsNew() {
         setItems(nextItems);
         setPagination(nextPagination);
       } catch (err) {
-        console.error("Admin What's New error:", err);
-
         setError(err?.response?.data?.message || err?.message || "Unable to load What's New.");
       } finally {
         setLoading(false);
@@ -421,8 +419,6 @@ function AdminWhatsNew() {
       closeForm();
       await fetchItems(pagination.page || 1, true);
     } catch (err) {
-      console.error("Save What's New error:", err);
-
       const message =
         err?.response?.data?.message ||
         err?.response?.data?.errors
@@ -482,8 +478,6 @@ function AdminWhatsNew() {
         showConfirmButton: false,
       });
     } catch (err) {
-      console.error("Delete What's New error:", err);
-
       const message = err?.response?.data?.message || err?.message || "Unable to archive What's New.";
       setError(message);
 

@@ -135,8 +135,6 @@ function CommunicationHistory() {
           totalPages: Number(response?.pagination?.totalPages) || 0,
         });
       } catch (err) {
-        console.error("Communication history error:", err);
-
         setItems([]);
 
         setError(err?.message || "Unable to load communication history.");

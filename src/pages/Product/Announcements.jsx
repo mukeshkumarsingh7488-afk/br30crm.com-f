@@ -51,8 +51,6 @@ function Announcements() {
         totalPages: Number(data.pagination?.totalPages) || 0,
       });
     } catch (err) {
-      console.error("Failed to fetch announcements:", err);
-
       setError(err?.response?.data?.message || err?.message || "Unable to load announcements.");
     } finally {
       setLoading(false);

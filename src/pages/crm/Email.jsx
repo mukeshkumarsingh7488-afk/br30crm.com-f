@@ -144,12 +144,6 @@ function Email() {
     body: "",
   });
 
-  /*
-   * ============================================================
-   * LOAD EMAILS
-   * ============================================================
-   */
-
   const loadEmails = useCallback(
     async (showRefreshLoader = false) => {
       if (!businessId) {
@@ -178,8 +172,6 @@ function Email() {
 
         setPagination(normalized.pagination);
       } catch (err) {
-        console.error("Unable to load emails:", err);
-
         setEmails([]);
 
         const message = getErrorMessage(err, "Unable to load email communication history.");
@@ -212,12 +204,6 @@ function Email() {
       });
   }, [businessId]);
 
-  /*
-   * ============================================================
-   * SEARCH
-   * ============================================================
-   */
-
   const filteredEmails = useMemo(() => {
     const query = search.trim().toLowerCase();
 
@@ -233,12 +219,6 @@ function Email() {
       );
     });
   }, [emails, search]);
-
-  /*
-   * ============================================================
-   * STATS
-   * ============================================================
-   */
 
   const stats = useMemo(() => {
     const sent = emails.filter((item) => ["SENT", "DELIVERED"].includes(String(item?.status || "").toUpperCase())).length;
@@ -257,12 +237,6 @@ function Email() {
       received,
     };
   }, [emails, pagination.total]);
-
-  /*
-   * ============================================================
-   * FORM
-   * ============================================================
-   */
 
   const resetCompose = () => {
     setForm({
@@ -287,12 +261,6 @@ function Email() {
       [name]: value,
     }));
   };
-
-  /*
-   * ============================================================
-   * VALIDATION
-   * ============================================================
-   */
 
   const validateForm = () => {
     const to = form.to.trim();
@@ -355,12 +323,6 @@ function Email() {
     return true;
   };
 
-  /*
-   * ============================================================
-   * SEND EMAIL
-   * ============================================================
-   */
-
   const handleSendEmail = async (event) => {
     event.preventDefault();
 
@@ -421,8 +383,6 @@ function Email() {
         await loadEmails();
       }
     } catch (err) {
-      console.error("Email sending failed:", err);
-
       await showAuthAlert({
         icon: "error",
         title: "Email not sent",
@@ -433,12 +393,6 @@ function Email() {
       setSending(false);
     }
   };
-
-  /*
-   * ============================================================
-   * PAGINATION
-   * ============================================================
-   */
 
   const handlePreviousPage = () => {
     if (page <= 1) return;
@@ -453,12 +407,6 @@ function Email() {
 
     setPage((previous) => previous + 1);
   };
-
-  /*
-   * ============================================================
-   * UI ACTIONS
-   * ============================================================
-   */
 
   const handleRefresh = async () => {
     await loadEmails(true);

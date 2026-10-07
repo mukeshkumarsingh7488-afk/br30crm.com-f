@@ -43,8 +43,6 @@ function AdminNavbar({ theme, setTheme, onMenuClick }) {
 
       navigate("/", { replace: true });
     } catch (error) {
-      console.error("Admin logout error:", error);
-
       await showAuthAlert({
         icon: "error",
         title: "Logout failed",

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Activity,
   ArrowDownRight,
@@ -12,6 +12,7 @@ import {
   CheckSquare,
   ChevronDown,
   CreditCard,
+  Eye,
   ChevronLeft,
   ChevronRight,
   CircleDollarSign,
@@ -19,18 +20,21 @@ import {
   Clock3,
   ContactRound,
   FileText,
+  FolderOpen,
   Filter,
   GitBranch,
   Globe,
   LayoutDashboard,
   Link2,
   LogOut,
+  Mail,
   Menu,
   Megaphone,
   MessageCircle,
   MoreHorizontal,
   Network,
   Workflow,
+  Wrench,
   Moon,
   Monitor,
   Plus,
@@ -122,8 +126,7 @@ const quickActions = [
   { label: "Add Contact", icon: UsersRound },
 ];
 
-const workspaceMenu = [
-  { label: "Dashboard", icon: LayoutDashboard },
+const crmMenu = [
   { label: "Leads", icon: Target },
   { label: "Contacts", icon: ContactRound },
   { label: "Companies", icon: Building2 },
@@ -132,40 +135,66 @@ const workspaceMenu = [
   { label: "Pipelines", icon: GitBranch },
   { label: "Tasks", icon: CheckSquare },
   { label: "Activities", icon: Activity },
+  { label: "Notes", icon: FileText },
+  { label: "Files", icon: FolderOpen },
   { label: "Meetings", icon: CalendarDays },
   { label: "Calendar", icon: CalendarDays },
 ];
 
-const insightMenu = [
-  { label: "Sales Report", icon: BarChart3 },
-  { label: "Leads Report", icon: Target },
-  { label: "Deals Report", icon: CircleDollarSign },
-  { label: "Activity Report", icon: Activity },
-];
-
-const utilityMenu = [
-  { label: "Email", icon: FileText },
+const communicationMenu = [
+  { label: "Email", icon: Mail },
   { label: "WhatsApp", icon: MessageCircle },
   { label: "SMS", icon: Smartphone },
   { label: "Communication History", icon: FileText },
+];
+
+const leadGenerationMenu = [
   { label: "Forms", icon: FileText },
   { label: "Public Links", icon: Link2 },
   { label: "QR", icon: QrCode },
   { label: "Sources / Campaigns", icon: Globe },
+];
+
+const automationMenu = [
   { label: "Automations", icon: Workflow },
   { label: "Workflows", icon: Network },
   { label: "Webhooks", icon: Link2 },
+];
+
+const reportsMenu = [
+  { label: "Sales", icon: BarChart3 },
+  { label: "Leads", icon: Target },
+  { label: "Deals", icon: CircleDollarSign },
+  { label: "Activity", icon: Activity },
+];
+
+const teamMenu = [
   { label: "Team", icon: UsersRound },
   { label: "Members", icon: UsersRound },
   { label: "Roles", icon: ShieldCheck },
   { label: "Permissions", icon: ShieldCheck },
+];
+
+const systemMenu = [
   { label: "Notifications", icon: BellRing },
   { label: "Audit Logs", icon: ShieldCheck },
+  { label: "CRM Tools", icon: Wrench },
+  { label: "Analytics", icon: BarChart3 },
   { label: "Integrations", icon: Network },
   { label: "Subscription", icon: CreditCard },
 ];
 
-const allPreviewPages = [...workspaceMenu, ...insightMenu, ...utilityMenu, { label: "Settings", icon: Settings }];
+const sections = [
+  { label: "CRM", items: crmMenu },
+  { label: "Communication", items: communicationMenu },
+  { label: "Lead Generation", items: leadGenerationMenu },
+  { label: "Automation", items: automationMenu },
+  { label: "Reports", items: reportsMenu },
+  { label: "Team", items: teamMenu },
+  { label: "System", items: systemMenu },
+];
+
+const allPreviewPages = sections.flatMap((section) => section.items).concat([{ label: "Settings", icon: Settings }]);
 
 function PhoneIcon(props) {
   return (
@@ -184,6 +213,18 @@ function DashboardPreview() {
   const [showActions, setShowActions] = useState(false);
   const [theme, setTheme] = useState("light");
   const [showNotifications, setShowNotifications] = useState(false);
+  const notificationRef = useRef(null);
+
+  useEffect(() => {
+    if (!showNotifications) return;
+    const handleOutsideClick = (event) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, [showNotifications]);
 
   const periodLabel = useMemo(() => {
     if (period === "30 days") return "Last 30 days";
@@ -249,7 +290,7 @@ function DashboardPreview() {
 .lp-crm-profile{width:40px;height:40px;padding:0;border:1px solid var(--preview-border);background:var(--preview-surface);border-radius:11px;display:grid;place-items:center;margin-left:2px;cursor:pointer}
 .lp-crm-profile:hover{border-color:var(--preview-primary);background:var(--preview-surface-2)}
 .lp-crm-avatar{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:var(--preview-primary);color:#fff;font-size:13px;font-weight:400}
-.lp-crm-notification-panel{position:absolute;right:26px;top:58px;width:280px;background:var(--preview-surface);border:1px solid var(--preview-border);border-radius:13px;box-shadow:var(--preview-shadow);padding:8px;z-index:100}
+.lp-crm-notification-wrap{position:relative}.lp-crm-notification-panel{position:absolute;right:0;top:48px;width:280px;background:var(--preview-surface);border:1px solid var(--preview-border);border-radius:13px;box-shadow:var(--preview-shadow);padding:8px;z-index:100}
 .lp-crm-notification-head{display:flex;align-items:center;justify-content:space-between;padding:10px;font-size:13px;font-weight:400;color:var(--preview-text)}
 .lp-crm-notification-item{padding:11px 10px;border-radius:9px}
 .lp-crm-notification-item:hover{background:var(--preview-surface-2)}
@@ -390,10 +431,8 @@ function DashboardPreview() {
 .lp-crm-page-actions{display:flex;gap:8px}
 .lp-crm-page-btn{height:38px;padding:0 13px;border-radius:9px;border:1px solid var(--preview-border);background:var(--preview-surface);color:var(--preview-text);display:flex;align-items:center;gap:7px;font-size:13px;font-weight:400;cursor:pointer}
 .lp-crm-page-btn.primary{background:var(--preview-primary);border-color:var(--preview-primary);color:#fff}
-.lp-crm-page-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
-.lp-crm-page-stat{padding:16px;border:1px solid var(--preview-border);background:var(--preview-surface);border-radius:13px;box-shadow:var(--preview-shadow)}
-.lp-crm-page-stat-label{font-size:13px;color:var(--preview-muted);font-weight:400}
-.lp-crm-page-stat-value{font-size:21px;color:var(--preview-text);font-weight:400;margin-top:6px}
+.lp-crm-page-grid{display:block;margin-bottom:14px}.lp-crm-page-table-card{width:100%}.lp-crm-page-side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}.lp-crm-page-side>.lp-crm-page-card:nth-child(3){grid-column:1/-1}
+.lp-crm-page-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}.lp-crm-page-stat{padding:12px 14px;border:1px solid var(--preview-border);background:var(--preview-surface);border-radius:11px;box-shadow:none;min-width:0}.lp-crm-page-stat-label{font-size:12px;color:var(--preview-muted);font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lp-crm-page-stat-value{font-size:18px;color:var(--preview-text);font-weight:400;margin-top:4px;line-height:1.2}.lp-crm-page-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-top:1px solid var(--preview-border);font-size:12px;color:var(--preview-muted)}.lp-crm-page-pagination{display:flex;align-items:center;gap:6px}.lp-crm-page-pagination .lp-crm-page-btn{width:34px;height:34px;padding:0;justify-content:center}.lp-crm-page-stat{padding:12px 14px;border:1px solid var(--preview-border);background:var(--preview-surface);border-radius:11px;box-shadow:none;min-width:0}
 .lp-crm-page-card{border:1px solid var(--preview-border);background:var(--preview-surface);border-radius:14px;box-shadow:var(--preview-shadow);overflow:hidden}
 .lp-crm-page-card-head{padding:16px 18px;border-bottom:1px solid var(--preview-border);display:flex;align-items:center;justify-content:space-between}
 .lp-crm-page-card-title{font-size:13px;font-weight:400;color:var(--preview-text)}
@@ -407,9 +446,9 @@ function DashboardPreview() {
 .lp-crm-badge.orange{background:color-mix(in srgb,var(--preview-warning) 12%,transparent);color:var(--preview-warning)}
 .lp-crm-empty-row{padding:35px;text-align:center;color:var(--preview-muted);font-size:13px}
 .lp-crm-mobile-overlay{display:none}
-@media(max-width:1050px){.lp-crm-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.lp-crm-insights{grid-template-columns:1fr}.lp-crm-quick-grid{grid-template-columns:repeat(2,1fr)}.lp-crm-page-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:1050px){.lp-crm-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.lp-crm-page-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.lp-crm-insights{grid-template-columns:1fr}.lp-crm-quick-grid{grid-template-columns:repeat(2,1fr)}.lp-crm-page-side{grid-template-columns:1fr}.lp-crm-page-side>.lp-crm-page-card:nth-child(3){grid-column:auto}}
 @media(max-width:900px){.lp-crm-preview{padding:58px 18px 70px}.lp-crm-shell{height:760px;min-height:560px}.lp-crm-sidebar{position:absolute;left:0;top:0;bottom:0;height:100%;transform:translateX(-102%);box-shadow:20px 0 50px rgba(15,23,42,.18);transition:transform .25s ease}.lp-crm-sidebar.mobile-open{transform:translateX(0)}.lp-crm-sidebar.collapsed{width:268px;min-width:268px}.lp-crm-sidebar.collapsed .lp-crm-brand-text,.lp-crm-sidebar.collapsed .lp-crm-nav-label,.lp-crm-sidebar.collapsed .lp-crm-nav-link span,.lp-crm-sidebar.collapsed .lp-crm-bottom-link span{display:block}.lp-crm-mobile-menu{display:grid}.lp-crm-search{width:42px;padding:0;justify-content:center}.lp-crm-search input,.lp-crm-search-clear{display:none}.lp-crm-mobile-overlay{position:absolute;inset:0;background:rgba(15,23,42,.42);z-index:25}}
-@media(max-width:700px){.lp-crm-dashboard{padding:20px 15px 30px}.lp-crm-dashboard-head{align-items:flex-start;flex-direction:column}.lp-crm-dashboard-actions{width:100%;flex-wrap:wrap}.lp-crm-action,.lp-crm-period{flex:1}.lp-crm-dashboard-title{font-size:23px}.lp-crm-stat-grid{grid-template-columns:1fr}.lp-crm-columns,.lp-crm-columns.equal{grid-template-columns:1fr}.lp-crm-quick-grid{grid-template-columns:1fr}.lp-crm-chart-wrap{height:250px}.lp-crm-conversion-main{align-items:flex-start}.lp-crm-ring{width:90px;height:90px}.lp-crm-page{padding:20px 15px 30px}.lp-crm-page-head{align-items:flex-start;flex-direction:column}.lp-crm-page-actions{width:100%}.lp-crm-page-btn{flex:1}.lp-crm-page-grid{grid-template-columns:1fr}.lp-crm-table-wrap{overflow:auto}.lp-crm-topbar{padding:0 14px}.lp-crm-notification-panel{right:12px;width:250px}}
+@media(max-width:700px){.lp-crm-page-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.lp-crm-page-footer{align-items:flex-start;flex-wrap:wrap}.lp-crm-dashboard{padding:20px 15px 30px}.lp-crm-dashboard-head{align-items:flex-start;flex-direction:column}.lp-crm-dashboard-actions{width:100%;flex-wrap:wrap}.lp-crm-action,.lp-crm-period{flex:1}.lp-crm-dashboard-title{font-size:23px}.lp-crm-stat-grid{grid-template-columns:1fr}.lp-crm-columns,.lp-crm-columns.equal{grid-template-columns:1fr}.lp-crm-quick-grid{grid-template-columns:1fr}.lp-crm-chart-wrap{height:250px}.lp-crm-conversion-main{align-items:flex-start}.lp-crm-ring{width:90px;height:90px}.lp-crm-page{padding:20px 15px 30px}.lp-crm-page-head{align-items:flex-start;flex-direction:column}.lp-crm-page-actions{width:100%}.lp-crm-page-btn{flex:1}.lp-crm-page-side{grid-template-columns:1fr}.lp-crm-page-side>.lp-crm-page-card:nth-child(3){grid-column:auto}.lp-crm-table-wrap{overflow:auto}.lp-crm-topbar{padding:0 14px}.lp-crm-notification-panel{right:0;width:250px}}
 @media(max-width:520px){.lp-crm-preview{padding:46px 12px 58px}.lp-crm-shell{border-radius:14px;height:700px}.lp-crm-topbar{padding:0 10px}.lp-crm-top-right{gap:3px}.lp-crm-icon-btn{width:37px;height:37px}.lp-crm-profile{width:37px;height:37px}.lp-crm-sidebar{width:280px}.lp-crm-dashboard-actions{gap:6px}.lp-crm-action,.lp-crm-period{height:38px}.lp-crm-panel-head{padding:15px}.lp-crm-chart-wrap{padding:15px 12px}.lp-crm-table{min-width:680px}}
       `}</style>
 
@@ -432,30 +471,23 @@ function DashboardPreview() {
           </div>
 
           <nav className="lp-crm-nav">
-            {!collapsed && <div className="lp-crm-nav-label">Workspace</div>}
-            {workspaceMenu.map(({ label, icon: Icon }) => (
-              <button type="button" key={label} className={`lp-crm-nav-link ${activePage === label ? "active" : ""}`} onClick={() => selectPage(label)} title={collapsed ? label : undefined}>
-                <Icon className="lp-crm-nav-icon" />
-                {!collapsed && <span>{label}</span>}
-              </button>
-            ))}
+            {!collapsed && <div className="lp-crm-nav-label">Dashboard</div>}
+            <button type="button" className={`lp-crm-nav-link ${activePage === "Dashboard" ? "active" : ""}`} onClick={() => selectPage("Dashboard")} title={collapsed ? "Dashboard" : undefined}>
+              <LayoutDashboard className="lp-crm-nav-icon" />
+              {!collapsed && <span>Dashboard</span>}
+            </button>
 
-            <div className="lp-crm-nav-divider" />
-            {!collapsed && <div className="lp-crm-nav-label">Insights</div>}
-            {insightMenu.map(({ label, icon: Icon }) => (
-              <button type="button" key={label} className={`lp-crm-nav-link ${activePage === label ? "active" : ""}`} onClick={() => selectPage(label)} title={collapsed ? label : undefined}>
-                <Icon className="lp-crm-nav-icon" />
-                {!collapsed && <span>{label}</span>}
-              </button>
-            ))}
-
-            <div className="lp-crm-nav-divider" />
-            {!collapsed && <div className="lp-crm-nav-label">More</div>}
-            {utilityMenu.map(({ label, icon: Icon }) => (
-              <button type="button" key={label} className={`lp-crm-nav-link ${activePage === label ? "active" : ""}`} onClick={() => selectPage(label)} title={collapsed ? label : undefined}>
-                <Icon className="lp-crm-nav-icon" />
-                {!collapsed && <span>{label}</span>}
-              </button>
+            {sections.map((section, sectionIndex) => (
+              <div key={`nav-section-${sectionIndex}`}>
+                <div className="lp-crm-nav-divider" />
+                {!collapsed && <div className="lp-crm-nav-label">{section.label}</div>}
+                {section.items.map(({ label, icon: Icon }, itemIndex) => (
+                  <button type="button" key={`nav-item-${sectionIndex}-${itemIndex}`} className={`lp-crm-nav-link ${activePage === label ? "active" : ""}`} onClick={() => selectPage(label)} title={collapsed ? label : undefined}>
+                    <Icon className="lp-crm-nav-icon" />
+                    {!collapsed && <span>{label}</span>}
+                  </button>
+                ))}
+              </div>
             ))}
           </nav>
 
@@ -511,41 +543,43 @@ function DashboardPreview() {
                 <ThemeIcon size={18} />
               </button>
 
-              <button type="button" className="lp-crm-icon-btn" onClick={() => setShowNotifications((value) => !value)} title="Notifications" aria-label="Notifications">
-                <Bell size={18} />
-                <span className="lp-crm-notification-dot" />
-              </button>
+              <div ref={notificationRef} className="lp-crm-notification-wrap">
+                <button type="button" className="lp-crm-icon-btn" onClick={() => setShowNotifications((value) => !value)} title="Notifications" aria-label="Notifications">
+                  <Bell size={18} />
+                  <span className="lp-crm-notification-dot" />
+                </button>
+
+                {showNotifications && (
+                  <div className="lp-crm-notification-panel">
+                    <div className="lp-crm-notification-head">
+                      <span>Notifications</span>
+                      <button type="button" className="lp-crm-search-clear" onClick={() => setShowNotifications(false)}>
+                        <X size={14} />
+                      </button>
+                    </div>
+
+                    <div className="lp-crm-notification-item">
+                      <div className="lp-crm-notification-title">New lead assigned to sales team</div>
+                      <div className="lp-crm-notification-meta">2 hours ago</div>
+                    </div>
+
+                    <div className="lp-crm-notification-item">
+                      <div className="lp-crm-notification-title">Acme Industries proposal updated</div>
+                      <div className="lp-crm-notification-meta">4 hours ago</div>
+                    </div>
+
+                    <div className="lp-crm-notification-item">
+                      <div className="lp-crm-notification-title">Team meeting scheduled</div>
+                      <div className="lp-crm-notification-meta">Yesterday</div>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               <button type="button" className="lp-crm-profile" title="Profile" aria-label="Profile">
                 <span className="lp-crm-avatar">BR</span>
               </button>
             </div>
-
-            {showNotifications && (
-              <div className="lp-crm-notification-panel">
-                <div className="lp-crm-notification-head">
-                  <span>Notifications</span>
-                  <button type="button" className="lp-crm-search-clear" onClick={() => setShowNotifications(false)}>
-                    <X size={14} />
-                  </button>
-                </div>
-
-                <div className="lp-crm-notification-item">
-                  <div className="lp-crm-notification-title">New lead assigned to sales team</div>
-                  <div className="lp-crm-notification-meta">2 hours ago</div>
-                </div>
-
-                <div className="lp-crm-notification-item">
-                  <div className="lp-crm-notification-title">Acme Industries proposal updated</div>
-                  <div className="lp-crm-notification-meta">4 hours ago</div>
-                </div>
-
-                <div className="lp-crm-notification-item">
-                  <div className="lp-crm-notification-title">Team meeting scheduled</div>
-                  <div className="lp-crm-notification-meta">Yesterday</div>
-                </div>
-              </div>
-            )}
           </header>
 
           <main className="lp-crm-content">
@@ -595,8 +629,8 @@ function DashboardHome({ period, setPeriod, periodLabel, showActions, setShowAct
 
           {showActions && (
             <div className="lp-crm-quick-menu">
-              {quickActions.map(({ label, icon: Icon }) => (
-                <button type="button" key={label} onClick={() => setShowActions(false)}>
+              {quickActions.map(({ label, icon: Icon }, index) => (
+                <button type="button" key={`quick-menu-${index}`} onClick={() => setShowActions(false)}>
                   <Icon size={15} />
                   {label}
                 </button>
@@ -607,11 +641,11 @@ function DashboardHome({ period, setPeriod, periodLabel, showActions, setShowAct
       </div>
 
       <div className="lp-crm-stat-grid">
-        {stats.map((stat) => {
+        {stats.map((stat, index) => {
           const Icon = stat.icon;
 
           return (
-            <article className="lp-crm-stat" key={stat.title}>
+            <article className="lp-crm-stat" key={`dashboard-stat-${index}`}>
               <div className="lp-crm-stat-top">
                 <div className="lp-crm-stat-icon">
                   <Icon size={19} />
@@ -719,8 +753,8 @@ function DashboardHome({ period, setPeriod, periodLabel, showActions, setShowAct
           </div>
 
           <div className="lp-crm-source-list">
-            {leadSources.map((source) => (
-              <div className="lp-crm-source-row" key={source.label}>
+            {leadSources.map((source, index) => (
+              <div className="lp-crm-source-row" key={`lead-source-${index}`}>
                 <div className="lp-crm-source-top">
                   <span className="lp-crm-source-name">{source.label}</span>
                   <span className="lp-crm-source-count">
@@ -778,11 +812,11 @@ function DashboardHome({ period, setPeriod, periodLabel, showActions, setShowAct
           </div>
 
           <div className="lp-crm-list">
-            {activities.map((activity) => {
+            {activities.map((activity, index) => {
               const Icon = activity.icon;
 
               return (
-                <div className="lp-crm-list-item" key={activity.title}>
+                <div className="lp-crm-list-item" key={`dashboard-activity-${index}`}>
                   <div className={`lp-crm-activity-icon ${activity.tone}`}>
                     <Icon size={14} />
                   </div>
@@ -814,8 +848,8 @@ function DashboardHome({ period, setPeriod, periodLabel, showActions, setShowAct
           </div>
 
           <div className="lp-crm-list">
-            {tasks.map((task) => (
-              <div className="lp-crm-task-item" key={task.title}>
+            {tasks.map((task, index) => (
+              <div className="lp-crm-task-item" key={`dashboard-task-${index}`}>
                 <div className="lp-crm-task-check">
                   <CheckCircle2 size={13} />
                 </div>
@@ -860,8 +894,8 @@ function DashboardHome({ period, setPeriod, periodLabel, showActions, setShowAct
             </thead>
 
             <tbody>
-              {deals.map((deal) => (
-                <tr key={deal.name}>
+              {deals.map((deal, index) => (
+                <tr key={`dashboard-deal-${index}`}>
                   <td>
                     <span className="lp-crm-deal-name">{deal.name}</span>
                   </td>
@@ -908,8 +942,8 @@ function DashboardHome({ period, setPeriod, periodLabel, showActions, setShowAct
           </div>
 
           <div className="lp-crm-team-list">
-            {teamPerformance.map((member) => (
-              <div className="lp-crm-team-row" key={member.name}>
+            {teamPerformance.map((member, index) => (
+              <div className="lp-crm-team-row" key={`team-member-${index}`}>
                 <div className="lp-crm-team-avatar">{member.initials}</div>
 
                 <div className="lp-crm-team-main">
@@ -965,8 +999,8 @@ function DashboardHome({ period, setPeriod, periodLabel, showActions, setShowAct
         </div>
 
         <div className="lp-crm-quick-grid">
-          {quickActions.map(({ label, icon: Icon }) => (
-            <button type="button" className="lp-crm-quick-card" key={label}>
+          {quickActions.map(({ label, icon: Icon }, index) => (
+            <button type="button" className="lp-crm-quick-card" key={`quick-action-${index}`}>
               <span className="lp-crm-quick-icon">
                 <Icon size={16} />
               </span>
@@ -985,826 +1019,938 @@ function DashboardHome({ period, setPeriod, periodLabel, showActions, setShowAct
 }
 
 function PreviewPage({ page, selectPage }) {
-  const config = {
-    Tags: {
-      icon: Tag,
-      subtitle: "Manage tags in your CRM workspace",
-      stats: [
-        ["Total", "48"],
-        ["Active", "36"],
-        ["Updated Today", "12"],
-        ["Status", "Healthy"],
-      ],
-    },
-    Meetings: {
-      icon: CalendarDays,
-      subtitle: "Manage meetings in your CRM workspace",
-      stats: [
-        ["Total", "48"],
-        ["Active", "36"],
-        ["Updated Today", "12"],
-        ["Status", "Healthy"],
-      ],
-    },
-    "Sales Report": {
-      icon: BarChart3,
-      subtitle: "Manage sales report in your CRM workspace",
-      stats: [
-        ["Total", "48"],
-        ["Active", "36"],
-        ["Updated Today", "12"],
-        ["Status", "Healthy"],
-      ],
-    },
-    "Leads Report": {
-      icon: Target,
-      subtitle: "Manage leads report in your CRM workspace",
-      stats: [
-        ["Total", "48"],
-        ["Active", "36"],
-        ["Updated Today", "12"],
-        ["Status", "Healthy"],
-      ],
-    },
-    "Deals Report": {
-      icon: CircleDollarSign,
-      subtitle: "Manage deals report in your CRM workspace",
-      stats: [
-        ["Total", "48"],
-        ["Active", "36"],
-        ["Updated Today", "12"],
-        ["Status", "Healthy"],
-      ],
-    },
-    "Activity Report": {
-      icon: Activity,
-      subtitle: "Manage activity report in your CRM workspace",
-      stats: [
-        ["Total", "48"],
-        ["Active", "36"],
-        ["Updated Today", "12"],
-        ["Status", "Healthy"],
-      ],
-    },
-    Email: {
-      icon: FileText,
-      subtitle: "Manage email in your CRM workspace",
-      stats: [
-        ["Total", "48"],
-        ["Active", "36"],
-        ["Updated Today", "12"],
-        ["Status", "Healthy"],
-      ],
-    },
-    WhatsApp: {
-      icon: MessageCircle,
-      subtitle: "Manage whatsapp in your CRM workspace",
-      stats: [
-        ["Total", "48"],
-        ["Active", "36"],
-        ["Updated Today", "12"],
-        ["Status", "Healthy"],
-      ],
-    },
-    SMS: {
-      icon: Smartphone,
-      subtitle: "Manage sms in your CRM workspace",
-      stats: [
-        ["Total", "48"],
-        ["Active", "36"],
-        ["Updated Today", "12"],
-        ["Status", "Healthy"],
-      ],
-    },
-    "Communication History": {
-      icon: FileText,
-      subtitle: "Manage communication history in your CRM workspace",
-      stats: [
-        ["Total", "48"],
-        ["Active", "36"],
-        ["Updated Today", "12"],
-        ["Status", "Healthy"],
-      ],
-    },
-    Forms: {
-      icon: FileText,
-      subtitle: "Manage forms in your CRM workspace",
-      stats: [
-        ["Total", "48"],
-        ["Active", "36"],
-        ["Updated Today", "12"],
-        ["Status", "Healthy"],
-      ],
-    },
-    "Public Links": {
-      icon: Link2,
-      subtitle: "Manage public links in your CRM workspace",
-      stats: [
-        ["Total", "48"],
-        ["Active", "36"],
-        ["Updated Today", "12"],
-        ["Status", "Healthy"],
-      ],
-    },
-    QR: {
-      icon: QrCode,
-      subtitle: "Manage qr in your CRM workspace",
-      stats: [
-        ["Total", "48"],
-        ["Active", "36"],
-        ["Updated Today", "12"],
-        ["Status", "Healthy"],
-      ],
-    },
-    "Sources / Campaigns": {
-      icon: Globe,
-      subtitle: "Manage sources / campaigns in your CRM workspace",
-      stats: [
-        ["Total", "48"],
-        ["Active", "36"],
-        ["Updated Today", "12"],
-        ["Status", "Healthy"],
-      ],
-    },
-    Automations: {
-      icon: Workflow,
-      subtitle: "Manage automations in your CRM workspace",
-      stats: [
-        ["Total", "48"],
-        ["Active", "36"],
-        ["Updated Today", "12"],
-        ["Status", "Healthy"],
-      ],
-    },
-    Workflows: {
-      icon: Network,
-      subtitle: "Manage workflows in your CRM workspace",
-      stats: [
-        ["Total", "48"],
-        ["Active", "36"],
-        ["Updated Today", "12"],
-        ["Status", "Healthy"],
-      ],
-    },
-    Webhooks: {
-      icon: Link2,
-      subtitle: "Manage webhooks in your CRM workspace",
-      stats: [
-        ["Total", "48"],
-        ["Active", "36"],
-        ["Updated Today", "12"],
-        ["Status", "Healthy"],
-      ],
-    },
-    Members: {
-      icon: UsersRound,
-      subtitle: "Manage members in your CRM workspace",
-      stats: [
-        ["Total", "48"],
-        ["Active", "36"],
-        ["Updated Today", "12"],
-        ["Status", "Healthy"],
-      ],
-    },
-    Roles: {
-      icon: ShieldCheck,
-      subtitle: "Manage roles in your CRM workspace",
-      stats: [
-        ["Total", "48"],
-        ["Active", "36"],
-        ["Updated Today", "12"],
-        ["Status", "Healthy"],
-      ],
-    },
-    Permissions: {
-      icon: ShieldCheck,
-      subtitle: "Manage permissions in your CRM workspace",
-      stats: [
-        ["Total", "48"],
-        ["Active", "36"],
-        ["Updated Today", "12"],
-        ["Status", "Healthy"],
-      ],
-    },
-    Integrations: {
-      icon: Network,
-      subtitle: "Manage integrations in your CRM workspace",
-      stats: [
-        ["Total", "48"],
-        ["Active", "36"],
-        ["Updated Today", "12"],
-        ["Status", "Healthy"],
-      ],
-    },
-    Subscription: {
-      icon: CreditCard,
-      subtitle: "Manage subscription in your CRM workspace",
-      stats: [
-        ["Total", "48"],
-        ["Active", "36"],
-        ["Updated Today", "12"],
-        ["Status", "Healthy"],
-      ],
-    },
+  const pageData = {
     Leads: {
       icon: Target,
-      subtitle: "Manage and track your sales leads",
+      subtitle: "Capture, qualify and manage every sales opportunity.",
       stats: [
         ["Total Leads", "342"],
         ["New Today", "28"],
         ["Qualified", "186"],
         ["Conversion", "68%"],
       ],
+      columns: ["Lead", "Owner", "Source", "Status", "Last Activity"],
+      rows: [
+        ["Rohan Mehta", "Rahul Sharma", "Website", "New", "10 min ago"],
+        ["Ananya Verma", "Priya Singh", "Google Ads", "Qualified", "42 min ago"],
+        ["Karan Malhotra", "Amit Kumar", "Referral", "Contacted", "1 hr ago"],
+        ["Sneha Kapoor", "Neha Singh", "Facebook", "New", "2 hrs ago"],
+        ["Arjun Patel", "Vikas", "Website", "Converted", "Yesterday"],
+        ["Meera Joshi", "Rahul Sharma", "Campaign", "Qualified", "Yesterday"],
+      ],
     },
     Contacts: {
       icon: ContactRound,
-      subtitle: "Manage your customer contacts",
+      subtitle: "Keep customer contacts organized, searchable and actionable.",
       stats: [
         ["Total Contacts", "1,842"],
         ["New This Month", "126"],
         ["Active", "1,604"],
         ["Archived", "238"],
       ],
+      columns: ["Contact", "Company", "Owner", "Status", "Last Activity"],
+      rows: [
+        ["Riya Sharma", "Acme Industries", "Rahul Sharma", "Active", "10 min ago"],
+        ["Aditya Kumar", "Nova Technologies", "Priya Singh", "Active", "42 min ago"],
+        ["Pooja Verma", "Vertex Solutions", "Amit Kumar", "Inactive", "1 hr ago"],
+        ["Nikhil Singh", "Bluewave Retail", "Neha Singh", "Active", "2 hrs ago"],
+        ["Kavita Rao", "Orion Enterprises", "Vikas", "Active", "Yesterday"],
+        ["Aman Gupta", "Summit Group", "Rahul Sharma", "Active", "Yesterday"],
+      ],
     },
     Companies: {
       icon: Building2,
-      subtitle: "Manage organizations and business accounts",
+      subtitle: "Manage organizations, accounts, owners and business relationships.",
       stats: [
         ["Companies", "486"],
         ["Active", "421"],
         ["New This Month", "32"],
-        ["Accounts", "184"],
+        ["Prospects", "65"],
+      ],
+      columns: ["Company", "Industry", "Owner", "Status", "Updated"],
+      rows: [
+        ["Acme Industries", "Manufacturing", "Rahul Sharma", "Active", "Today"],
+        ["Nova Technologies", "Technology", "Priya Singh", "Active", "2 hrs ago"],
+        ["Vertex Solutions", "SaaS", "Amit Kumar", "Prospect", "5 hrs ago"],
+        ["Bluewave Retail", "Retail", "Neha Singh", "Active", "Yesterday"],
+        ["Orion Enterprises", "Consulting", "Vikas", "Active", "Yesterday"],
+        ["Summit Group", "Finance", "Rahul Sharma", "Inactive", "2 days ago"],
+      ],
+    },
+    Tags: {
+      icon: Tag,
+      subtitle: "Organize CRM records with reusable labels and customer segments.",
+      stats: [
+        ["Total Tags", "21"],
+        ["Active", "20"],
+        ["Used Records", "1,284"],
+        ["Unused", "1"],
+      ],
+      columns: ["Tag", "Color", "Used On", "Records", "Status"],
+      rows: [
+        ["VIP Customer", "Purple", "Contacts", "186", "Active"],
+        ["Hot Lead", "Red", "Leads", "94", "Active"],
+        ["Follow Up", "Orange", "Leads", "132", "Active"],
+        ["High Value", "Green", "Deals", "76", "Active"],
+        ["Website", "Blue", "Leads", "210", "Active"],
+        ["Support", "Slate", "Contacts", "58", "Active"],
       ],
     },
     Deals: {
       icon: CircleDollarSign,
-      subtitle: "Track opportunities across your sales pipeline",
+      subtitle: "Track opportunities from first conversation to closed revenue.",
       stats: [
         ["Active Deals", "128"],
         ["Pipeline", "₹28.6L"],
         ["Won This Month", "₹8.4L"],
         ["Win Rate", "72%"],
       ],
+      columns: ["Deal", "Owner", "Value", "Stage", "Probability"],
+      rows: [
+        ["Acme Industries", "Rahul Sharma", "₹4,80,000", "Proposal", "72%"],
+        ["Nova Technologies", "Priya Singh", "₹3,25,000", "Negotiation", "84%"],
+        ["Vertex Solutions", "Amit Kumar", "₹2,10,000", "Qualified", "56%"],
+        ["Bluewave Retail", "Neha Singh", "₹1,85,000", "New", "32%"],
+        ["Orion Enterprises", "Vikas", "₹1,42,000", "Proposal", "68%"],
+        ["Summit Group", "Rahul Sharma", "₹96,000", "Won", "100%"],
+      ],
     },
-    Activities: {
-      icon: Activity,
-      subtitle: "Track calls, meetings and customer interactions",
+    Pipelines: {
+      icon: GitBranch,
+      subtitle: "Control sales pipelines, stages and opportunity movement.",
       stats: [
-        ["Activities", "684"],
-        ["Calls", "218"],
-        ["Meetings", "146"],
-        ["Emails", "320"],
+        ["Pipelines", "4"],
+        ["Stages", "18"],
+        ["Open Deals", "128"],
+        ["Pipeline Value", "₹28.6L"],
+      ],
+      columns: ["Pipeline", "Owner", "Open Deals", "Value", "Status"],
+      rows: [
+        ["New Business", "Rahul Sharma", "42", "₹8.4L", "Active"],
+        ["Enterprise Sales", "Priya Singh", "31", "₹7.1L", "Active"],
+        ["Partner Sales", "Amit Kumar", "28", "₹6.8L", "Active"],
+        ["Renewals", "Neha Singh", "19", "₹6.3L", "Active"],
+        ["Inbound Sales", "Vikas", "8", "₹2.4L", "Active"],
+        ["Archived Pipeline", "Rahul Sharma", "0", "₹0", "Archived"],
       ],
     },
     Tasks: {
       icon: CheckSquare,
-      subtitle: "Manage your team's upcoming work",
+      subtitle: "Plan follow-ups, deadlines and work across your sales team.",
       stats: [
         ["Open Tasks", "24"],
         ["Due Today", "8"],
         ["Completed", "76%"],
         ["Overdue", "3"],
       ],
-    },
-    Pipelines: {
-      icon: GitBranch,
-      subtitle: "Manage your sales process and opportunity stages",
-      stats: [
-        ["Pipelines", "4"],
-        ["Stages", "18"],
-        ["Open Deals", "128"],
-        ["Value", "₹28.6L"],
+      columns: ["Task", "Assignee", "Priority", "Status", "Due"],
+      rows: [
+        ["Call Premium Client", "Rahul Sharma", "High", "In Progress", "Today · 11:30 AM"],
+        ["Review New Proposal", "Priya Singh", "Medium", "Pending", "Today · 2:00 PM"],
+        ["Sales Team Meeting", "Amit Kumar", "Urgent", "Pending", "Today · 4:30 PM"],
+        ["Update Lead Pipeline", "Neha Singh", "Low", "Completed", "Tomorrow"],
+        ["Follow Up With Client", "Vikas", "High", "Pending", "Tomorrow"],
+        ["Prepare Sales Report", "Rahul Sharma", "Medium", "Completed", "2 days ago"],
       ],
     },
-    Reports: {
-      icon: BarChart3,
-      subtitle: "Analyze business performance and sales activity",
+    Activities: {
+      icon: Activity,
+      subtitle: "Track calls, meetings, emails and every customer touchpoint.",
       stats: [
-        ["Reports", "24"],
-        ["Revenue", "₹12.48L"],
-        ["Growth", "+18.6%"],
-        ["Conversion", "68%"],
+        ["Activities", "684"],
+        ["Calls", "218"],
+        ["Meetings", "146"],
+        ["Emails", "320"],
+      ],
+      columns: ["Activity", "Related To", "Owner", "Outcome", "Time"],
+      rows: [
+        ["Follow-up Call", "Rohan Mehta", "Rahul Sharma", "Completed", "10 min ago"],
+        ["Proposal Sent", "Acme Industries", "Priya Singh", "Sent", "42 min ago"],
+        ["Client Meeting", "Nova Technologies", "Amit Kumar", "Completed", "1 hr ago"],
+        ["Lead Assignment", "Karan Malhotra", "Neha Singh", "Completed", "2 hrs ago"],
+        ["Deal Negotiation", "Vertex Solutions", "Vikas", "In Progress", "3 hrs ago"],
+        ["Account Review", "Orion Enterprises", "Rahul Sharma", "Completed", "Yesterday"],
+      ],
+    },
+    Notes: {
+      icon: FileText,
+      subtitle: "Keep important customer, deal and team notes in one place.",
+      stats: [
+        ["Total Notes", "326"],
+        ["Added Today", "18"],
+        ["Pinned", "42"],
+        ["Shared", "86"],
+      ],
+      columns: ["Note", "Related Record", "Created By", "Type", "Updated"],
+      rows: [
+        ["Pricing discussion", "Acme Industries", "Rahul Sharma", "Deal", "10 min ago"],
+        ["Demo feedback", "Rohan Mehta", "Priya Singh", "Lead", "42 min ago"],
+        ["Renewal terms", "Orion Enterprises", "Amit Kumar", "Company", "1 hr ago"],
+        ["Support summary", "Riya Sharma", "Neha Singh", "Contact", "2 hrs ago"],
+        ["Meeting minutes", "Nova Technologies", "Vikas", "Meeting", "Yesterday"],
+        ["Campaign notes", "Website Leads", "Rahul Sharma", "Campaign", "Yesterday"],
+      ],
+    },
+    Files: {
+      icon: FolderOpen,
+      subtitle: "Store and access documents connected to your CRM records.",
+      stats: [
+        ["Files", "1,284"],
+        ["Uploaded Today", "34"],
+        ["Shared", "186"],
+        ["Storage", "68%"],
+      ],
+      columns: ["File", "Related To", "Uploaded By", "Size", "Updated"],
+      rows: [
+        ["Acme Proposal.pdf", "Acme Industries", "Rahul Sharma", "2.4 MB", "10 min ago"],
+        ["Product Brochure.pdf", "Nova Technologies", "Priya Singh", "4.8 MB", "42 min ago"],
+        ["Contract_v2.pdf", "Vertex Solutions", "Amit Kumar", "1.7 MB", "1 hr ago"],
+        ["Pricing Sheet.xlsx", "Bluewave Retail", "Neha Singh", "920 KB", "2 hrs ago"],
+        ["Meeting Notes.docx", "Orion Enterprises", "Vikas", "680 KB", "Yesterday"],
+        ["Campaign Brief.pdf", "Website Campaign", "Rahul Sharma", "3.2 MB", "Yesterday"],
+      ],
+    },
+    Meetings: {
+      icon: CalendarDays,
+      subtitle: "Schedule and track customer meetings, demos and reviews.",
+      stats: [
+        ["Meetings", "48"],
+        ["Today", "6"],
+        ["Upcoming", "24"],
+        ["Completed", "18"],
+      ],
+      columns: ["Meeting", "Attendee", "Owner", "Status", "Schedule"],
+      rows: [
+        ["Sales Discovery", "Rohan Mehta", "Rahul Sharma", "Confirmed", "Today · 10:30 AM"],
+        ["Product Demo", "Nova Technologies", "Priya Singh", "Confirmed", "Today · 1:00 PM"],
+        ["Team Review", "Sales Team", "Amit Kumar", "Scheduled", "Today · 4:30 PM"],
+        ["Proposal Review", "Acme Industries", "Neha Singh", "Confirmed", "Tomorrow · 11:00 AM"],
+        ["Follow-up Meeting", "Orion Enterprises", "Vikas", "Scheduled", "Tomorrow · 3:00 PM"],
+        ["Quarterly Review", "Summit Group", "Rahul Sharma", "Scheduled", "Fri · 2:00 PM"],
       ],
     },
     Calendar: {
       icon: CalendarDays,
-      subtitle: "Manage meetings, events and important dates",
+      subtitle: "See meetings, tasks, events and deadlines in one calendar.",
       stats: [
         ["Today", "6"],
         ["This Week", "24"],
         ["Meetings", "14"],
         ["Events", "10"],
       ],
+      columns: ["Event", "Calendar", "Owner", "Status", "Date"],
+      rows: [
+        ["Sales Meeting", "Sales Calendar", "Rahul Sharma", "Confirmed", "Today · 10:30 AM"],
+        ["Client Demo", "Client Calendar", "Priya Singh", "Confirmed", "Today · 1:00 PM"],
+        ["Team Review", "Team Calendar", "Amit Kumar", "Scheduled", "Tomorrow · 4:30 PM"],
+        ["Proposal Meeting", "Sales Calendar", "Neha Singh", "Confirmed", "Tomorrow · 11:00 AM"],
+        ["Follow-up Meeting", "Client Calendar", "Vikas", "Scheduled", "2 days ago"],
+        ["Quarterly Review", "Management", "Rahul Sharma", "Scheduled", "3 days ago"],
+      ],
+    },
+    Email: {
+      icon: Mail,
+      subtitle: "Send customer emails, track delivery and manage conversations.",
+      stats: [
+        ["Sent Today", "186"],
+        ["Delivered", "98.4%"],
+        ["Opened", "72%"],
+        ["Replies", "38"],
+      ],
+      columns: ["Subject", "Recipient", "Sender", "Status", "Sent"],
+      rows: [
+        ["Proposal for Acme Industries", "Acme Industries", "Rahul Sharma", "Delivered", "10 min ago"],
+        ["Product Demo Follow-up", "Nova Technologies", "Priya Singh", "Opened", "42 min ago"],
+        ["Pricing Information", "Vertex Solutions", "Amit Kumar", "Replied", "1 hr ago"],
+        ["Welcome to BR30 CRM", "Rohan Mehta", "Neha Singh", "Delivered", "2 hrs ago"],
+        ["Renewal Reminder", "Orion Enterprises", "Vikas", "Opened", "Yesterday"],
+        ["Campaign Update", "Website Leads", "Rahul Sharma", "Delivered", "Yesterday"],
+      ],
+    },
+    WhatsApp: {
+      icon: MessageCircle,
+      subtitle: "Manage WhatsApp conversations and customer follow-ups.",
+      stats: [
+        ["Messages Today", "248"],
+        ["Delivered", "96%"],
+        ["Replies", "82"],
+        ["Unread", "14"],
+      ],
+      columns: ["Conversation", "Contact", "Owner", "Status", "Last Message"],
+      rows: [
+        ["Acme Industries", "Rohan Mehta", "Rahul Sharma", "Active", "10 min ago"],
+        ["Nova Technologies", "Priya Shah", "Priya Singh", "Replied", "42 min ago"],
+        ["Vertex Solutions", "Karan Malhotra", "Amit Kumar", "Unread", "1 hr ago"],
+        ["Bluewave Retail", "Sneha Kapoor", "Neha Singh", "Active", "2 hrs ago"],
+        ["Orion Enterprises", "Kavita Rao", "Vikas", "Replied", "Yesterday"],
+        ["Summit Group", "Aman Gupta", "Rahul Sharma", "Closed", "Yesterday"],
+      ],
+    },
+    SMS: {
+      icon: Smartphone,
+      subtitle: "Send transactional and sales SMS with delivery tracking.",
+      stats: [
+        ["Sent Today", "412"],
+        ["Delivered", "97.2%"],
+        ["Replies", "64"],
+        ["Failed", "9"],
+      ],
+      columns: ["Message", "Recipient", "Campaign", "Status", "Sent"],
+      rows: [
+        ["Your demo is confirmed", "Rohan Mehta", "Demo Follow-up", "Delivered", "10 min ago"],
+        ["Proposal ready for review", "Kavita Rao", "Sales", "Delivered", "42 min ago"],
+        ["Payment reminder", "Aman Gupta", "Billing", "Replied", "1 hr ago"],
+        ["Meeting reminder", "Pooja Verma", "Meetings", "Delivered", "2 hrs ago"],
+        ["Welcome message", "Nikhil Singh", "Onboarding", "Delivered", "Yesterday"],
+        ["Follow-up reminder", "Arjun Patel", "Leads", "Failed", "Yesterday"],
+      ],
+    },
+    "Communication History": {
+      icon: FileText,
+      subtitle: "Review the complete communication timeline across channels.",
+      stats: [
+        ["Interactions", "2,846"],
+        ["Calls", "684"],
+        ["Messages", "1,462"],
+        ["Emails", "700"],
+      ],
+      columns: ["Channel", "Contact", "Owner", "Outcome", "Time"],
+      rows: [
+        ["Email", "Rohan Mehta", "Rahul Sharma", "Opened", "10 min ago"],
+        ["WhatsApp", "Priya Shah", "Priya Singh", "Replied", "42 min ago"],
+        ["Call", "Karan Malhotra", "Amit Kumar", "Completed", "1 hr ago"],
+        ["SMS", "Sneha Kapoor", "Neha Singh", "Delivered", "2 hrs ago"],
+        ["Meeting", "Kavita Rao", "Vikas", "Completed", "Yesterday"],
+        ["Email", "Aman Gupta", "Rahul Sharma", "Replied", "Yesterday"],
+      ],
+    },
+    Forms: {
+      icon: FileText,
+      subtitle: "Create lead capture forms and track incoming submissions.",
+      stats: [
+        ["Forms", "12"],
+        ["Active", "9"],
+        ["Submissions", "1,284"],
+        ["Conversion", "14.8%"],
+      ],
+      columns: ["Form", "Submissions", "Conversion", "Status", "Updated"],
+      rows: [
+        ["Website Contact Form", "486", "18.4%", "Active", "Today"],
+        ["Demo Request", "328", "21.7%", "Active", "Today"],
+        ["Lead Capture", "214", "12.9%", "Active", "Yesterday"],
+        ["Partner Inquiry", "96", "9.4%", "Active", "Yesterday"],
+        ["Newsletter Signup", "142", "8.1%", "Active", "2 days ago"],
+        ["Support Request", "18", "—", "Paused", "3 days ago"],
+      ],
+    },
+    "Public Links": {
+      icon: Link2,
+      subtitle: "Share secure public forms and CRM entry links.",
+      stats: [
+        ["Links", "18"],
+        ["Active", "14"],
+        ["Clicks", "3,842"],
+        ["Submissions", "684"],
+      ],
+      columns: ["Link", "Purpose", "Clicks", "Status", "Created"],
+      rows: [
+        ["/demo-request", "Demo Request", "1,284", "Active", "Today"],
+        ["/contact-sales", "Contact Sales", "842", "Active", "Yesterday"],
+        ["/lead-capture", "Lead Capture", "684", "Active", "Yesterday"],
+        ["/partner", "Partner Inquiry", "418", "Active", "2 days ago"],
+        ["/campaign-diwali", "Diwali Campaign", "386", "Active", "3 days ago"],
+        ["/support", "Support Request", "228", "Paused", "4 days ago"],
+      ],
+    },
+    QR: {
+      icon: QrCode,
+      subtitle: "Create trackable QR codes for campaigns and offline lead capture.",
+      stats: [
+        ["QR Codes", "16"],
+        ["Active", "12"],
+        ["Scans", "4,286"],
+        ["Leads", "386"],
+      ],
+      columns: ["QR Code", "Campaign", "Scans", "Leads", "Status"],
+      rows: [
+        ["BR30 Brochure", "Offline Sales", "1,284", "142", "Active"],
+        ["Diwali Offer", "Diwali Campaign", "986", "96", "Active"],
+        ["Store Visit", "Retail", "742", "64", "Active"],
+        ["Product Demo", "Demo Campaign", "518", "48", "Active"],
+        ["Partner Meet", "Partner", "426", "24", "Active"],
+        ["Feedback QR", "Customer Feedback", "330", "12", "Paused"],
+      ],
+    },
+    "Sources / Campaigns": {
+      icon: Globe,
+      subtitle: "Track lead sources, campaigns and marketing attribution.",
+      stats: [
+        ["Sources", "21"],
+        ["Campaigns", "14"],
+        ["Leads", "1,284"],
+        ["Attributed", "86%"],
+      ],
+      columns: ["Source / Campaign", "Leads", "Conversion", "Spend", "Status"],
+      rows: [
+        ["Website", "342", "18.6%", "₹24,000", "Active"],
+        ["Google Ads", "286", "14.2%", "₹48,000", "Active"],
+        ["Facebook", "218", "11.8%", "₹31,500", "Active"],
+        ["Referral", "186", "24.7%", "₹0", "Active"],
+        ["Diwali Campaign", "142", "19.4%", "₹18,000", "Active"],
+        ["WhatsApp", "110", "22.1%", "₹4,500", "Active"],
+      ],
+    },
+    Automations: {
+      icon: Workflow,
+      subtitle: "Automate CRM actions when records or business events change.",
+      stats: [
+        ["Automations", "18"],
+        ["Active", "14"],
+        ["Runs Today", "486"],
+        ["Success", "98.6%"],
+      ],
+      columns: ["Automation", "Trigger", "Action", "Status", "Last Run"],
+      rows: [
+        ["New Lead Assignment", "Lead Created", "Assign to Sales", "Active", "10 min ago"],
+        ["Hot Lead Alert", "Lead Score > 80", "Notify Owner", "Active", "42 min ago"],
+        ["Deal Follow-up", "Stage Changed", "Create Task", "Active", "1 hr ago"],
+        ["Customer Welcome", "Deal Won", "Send Email", "Active", "2 hrs ago"],
+        ["Overdue Task Alert", "Task Overdue", "Notify Manager", "Active", "Yesterday"],
+        ["Inactive Lead", "7 Days No Activity", "Create Task", "Paused", "2 days ago"],
+      ],
+    },
+    Workflows: {
+      icon: Network,
+      subtitle: "Build repeatable multi-step processes for your sales team.",
+      stats: [
+        ["Workflows", "9"],
+        ["Active", "7"],
+        ["Executions", "1,284"],
+        ["Success", "97.8%"],
+      ],
+      columns: ["Workflow", "Entity", "Steps", "Status", "Last Run"],
+      rows: [
+        ["Lead Qualification", "Lead", "5", "Active", "10 min ago"],
+        ["New Customer Onboarding", "Contact", "8", "Active", "42 min ago"],
+        ["Deal Approval", "Deal", "6", "Active", "1 hr ago"],
+        ["Renewal Process", "Company", "7", "Active", "2 hrs ago"],
+        ["Sales Follow-up", "Lead", "4", "Active", "Yesterday"],
+        ["Support Escalation", "Contact", "5", "Paused", "2 days ago"],
+      ],
+    },
+    Webhooks: {
+      icon: Link2,
+      subtitle: "Connect BR30 CRM with external systems and event endpoints.",
+      stats: [
+        ["Webhooks", "14"],
+        ["Active", "11"],
+        ["Deliveries Today", "2,846"],
+        ["Success", "99.1%"],
+      ],
+      columns: ["Endpoint", "Event", "Deliveries", "Status", "Last Delivery"],
+      rows: [
+        ["Sales Platform", "lead.created", "684", "Active", "10 min ago"],
+        ["ERP Integration", "deal.updated", "486", "Active", "42 min ago"],
+        ["Marketing Sync", "contact.created", "328", "Active", "1 hr ago"],
+        ["Support System", "ticket.created", "218", "Active", "2 hrs ago"],
+        ["Billing System", "deal.won", "142", "Active", "Yesterday"],
+        ["Analytics", "activity.created", "96", "Paused", "2 days ago"],
+      ],
+    },
+    Sales: {
+      icon: BarChart3,
+      subtitle: "Monitor revenue, sales performance and pipeline movement.",
+      stats: [
+        ["Revenue", "₹12.48L"],
+        ["Won Deals", "42"],
+        ["Win Rate", "72%"],
+        ["Growth", "+18.6%"],
+      ],
+      columns: ["Metric", "Current", "Previous", "Change", "Trend"],
+      rows: [
+        ["Revenue", "₹12.48L", "₹10.52L", "+18.6%", "Up"],
+        ["Won Deals", "42", "36", "+16.7%", "Up"],
+        ["Average Deal", "₹2.14L", "₹1.88L", "+13.8%", "Up"],
+        ["Win Rate", "72%", "67%", "+5.0%", "Up"],
+        ["Sales Cycle", "18 days", "21 days", "-14.3%", "Improved"],
+        ["Forecast", "₹16.8L", "₹14.2L", "+18.3%", "Up"],
+      ],
+    },
+    Leads: {
+      icon: Target,
+      subtitle: "Measure lead volume, qualification and conversion performance.",
+      stats: [
+        ["New Leads", "342"],
+        ["Qualified", "186"],
+        ["Conversion", "68%"],
+        ["Cost / Lead", "₹184"],
+      ],
+      columns: ["Source", "Leads", "Qualified", "Converted", "Conversion"],
+      rows: [
+        ["Website", "130", "82", "44", "33.8%"],
+        ["Google Ads", "92", "48", "18", "19.6%"],
+        ["Referral", "65", "42", "26", "40.0%"],
+        ["Facebook", "32", "8", "4", "12.5%"],
+        ["WhatsApp", "15", "6", "3", "20.0%"],
+        ["Campaigns", "8", "0", "0", "0%"],
+      ],
+    },
+    Deals: {
+      icon: CircleDollarSign,
+      subtitle: "Analyze deal stages, values, wins and sales forecasting.",
+      stats: [
+        ["Open Deals", "128"],
+        ["Pipeline", "₹28.6L"],
+        ["Won", "₹8.4L"],
+        ["Forecast", "₹16.8L"],
+      ],
+      columns: ["Stage", "Deals", "Value", "Win Rate", "Movement"],
+      rows: [
+        ["New", "42", "₹8.4L", "32%", "+12%"],
+        ["Qualified", "31", "₹6.8L", "56%", "+8%"],
+        ["Proposal", "28", "₹7.1L", "72%", "+14%"],
+        ["Negotiation", "19", "₹6.3L", "84%", "+18%"],
+        ["Won", "42", "₹8.4L", "100%", "+16%"],
+        ["Lost", "12", "₹2.1L", "0%", "-4%"],
+      ],
+    },
+    Activity: {
+      icon: Activity,
+      subtitle: "Measure team activity, customer engagement and follow-up health.",
+      stats: [
+        ["Activities", "684"],
+        ["Completed", "612"],
+        ["Overdue", "18"],
+        ["Completion", "89%"],
+      ],
+      columns: ["Activity Type", "Count", "Completed", "Pending", "Rate"],
+      rows: [
+        ["Calls", "218", "202", "16", "92.7%"],
+        ["Meetings", "146", "136", "10", "93.2%"],
+        ["Emails", "320", "274", "46", "85.6%"],
+        ["Tasks", "184", "164", "20", "89.1%"],
+        ["Notes", "126", "118", "8", "93.7%"],
+        ["Follow-ups", "96", "82", "14", "85.4%"],
+      ],
     },
     Team: {
       icon: UsersRound,
-      subtitle: "Monitor team activity and performance",
+      subtitle: "See team performance, workload and sales ownership.",
       stats: [
         ["Team Members", "24"],
         ["Active", "21"],
         ["Top Performer", "Rahul"],
         ["Deals Closed", "87"],
       ],
+      columns: ["Member", "Department", "Open Tasks", "Deals", "Performance"],
+      rows: [
+        ["Rahul Sharma", "Sales", "8", "28", "94%"],
+        ["Priya Singh", "Sales", "6", "24", "91%"],
+        ["Amit Kumar", "Business", "7", "19", "87%"],
+        ["Neha Singh", "Sales", "5", "16", "84%"],
+        ["Vikas", "Management", "3", "12", "82%"],
+        ["Karan Mehta", "Support", "9", "8", "76%"],
+      ],
+    },
+    Members: {
+      icon: UsersRound,
+      subtitle: "Manage business members, roles, access and team assignments.",
+      stats: [
+        ["Members", "24"],
+        ["Active", "21"],
+        ["Pending", "2"],
+        ["Suspended", "1"],
+      ],
+      columns: ["Member", "Email", "Role", "Status", "Last Active"],
+      rows: [
+        ["Rahul Sharma", "rahul@br30crm.com", "Sales Manager", "Active", "Now"],
+        ["Priya Singh", "priya@br30crm.com", "Sales Executive", "Active", "10 min ago"],
+        ["Amit Kumar", "amit@br30crm.com", "Business", "Active", "42 min ago"],
+        ["Neha Singh", "neha@br30crm.com", "Sales Executive", "Active", "1 hr ago"],
+        ["Vikas", "vikas@br30crm.com", "Admin", "Active", "2 hrs ago"],
+        ["Karan Mehta", "karan@br30crm.com", "Support", "Pending", "Yesterday"],
+      ],
+    },
+    Roles: {
+      icon: ShieldCheck,
+      subtitle: "Define business roles and control access across CRM modules.",
+      stats: [
+        ["Roles", "8"],
+        ["Active", "7"],
+        ["Members Assigned", "24"],
+        ["Custom", "5"],
+      ],
+      columns: ["Role", "Members", "Permissions", "Status", "Updated"],
+      rows: [
+        ["Administrator", "2", "All Access", "Active", "Today"],
+        ["Sales Manager", "4", "42 permissions", "Active", "Today"],
+        ["Sales Executive", "9", "31 permissions", "Active", "Yesterday"],
+        ["Support", "3", "18 permissions", "Active", "Yesterday"],
+        ["Business", "5", "24 permissions", "Active", "2 days ago"],
+        ["Viewer", "1", "12 permissions", "Active", "3 days ago"],
+      ],
+    },
+    Permissions: {
+      icon: ShieldCheck,
+      subtitle: "Review granular access controls for CRM resources and actions.",
+      stats: [
+        ["Permissions", "84"],
+        ["Granted", "76"],
+        ["Restricted", "8"],
+        ["Roles", "8"],
+      ],
+      columns: ["Module", "View", "Create", "Edit", "Delete"],
+      rows: [
+        ["Leads", "Allowed", "Allowed", "Allowed", "Restricted"],
+        ["Contacts", "Allowed", "Allowed", "Allowed", "Restricted"],
+        ["Companies", "Allowed", "Allowed", "Allowed", "Restricted"],
+        ["Deals", "Allowed", "Allowed", "Allowed", "Restricted"],
+        ["Tasks", "Allowed", "Allowed", "Allowed", "Allowed"],
+        ["Reports", "Allowed", "Restricted", "Restricted", "Restricted"],
+      ],
     },
     Notifications: {
       icon: BellRing,
-      subtitle: "Stay updated with important CRM activity",
+      subtitle: "Stay on top of assignments, reminders, alerts and CRM events.",
       stats: [
         ["Unread", "8"],
         ["Today", "14"],
         ["Mentions", "5"],
         ["Alerts", "3"],
       ],
-    },
-    Templates: {
-      icon: FileText,
-      subtitle: "Manage reusable communication templates",
-      stats: [
-        ["Templates", "36"],
-        ["Emails", "18"],
-        ["Documents", "10"],
-        ["Messages", "8"],
+      columns: ["Notification", "Source", "Type", "Status", "Time"],
+      rows: [
+        ["New Lead Assigned", "Rahul Sharma", "Assignment", "Unread", "10 min ago"],
+        ["Proposal Updated", "Priya Singh", "Deal", "Read", "42 min ago"],
+        ["Meeting Reminder", "Amit Kumar", "Reminder", "Unread", "1 hr ago"],
+        ["Deal Stage Changed", "Neha Singh", "Deal", "Read", "2 hrs ago"],
+        ["New Comment Received", "Vikas", "Comment", "Unread", "Yesterday"],
+        ["Task Completed", "Rahul Sharma", "Task", "Read", "Yesterday"],
       ],
     },
-    Announcements: {
-      icon: Megaphone,
-      subtitle: "Share important updates with your team",
-      stats: [
-        ["Published", "18"],
-        ["Drafts", "4"],
-        ["Scheduled", "3"],
-        ["Views", "1.8K"],
-      ],
-    },
-    "Audit Log": {
+    "Audit Logs": {
       icon: ShieldCheck,
-      subtitle: "Review workspace activity and security events",
+      subtitle: "Review workspace actions, security events and change history.",
       stats: [
         ["Events", "2,846"],
         ["Today", "126"],
         ["Users", "24"],
         ["Alerts", "3"],
       ],
+      columns: ["Action", "Actor", "Module", "Result", "Time"],
+      rows: [
+        ["Login", "Rahul Sharma", "Authentication", "Success", "10 min ago"],
+        ["Deal Updated", "Priya Singh", "Deals", "Success", "42 min ago"],
+        ["Lead Created", "Amit Kumar", "Leads", "Success", "1 hr ago"],
+        ["Contact Updated", "Neha Singh", "Contacts", "Success", "2 hrs ago"],
+        ["Settings Changed", "Vikas", "Settings", "Success", "Yesterday"],
+        ["Role Updated", "Rahul Sharma", "Team", "Success", "Yesterday"],
+      ],
+    },
+    "CRM Tools": {
+      icon: Wrench,
+      subtitle: "Manage security, data operations, attribution and workspace utilities.",
+      stats: [
+        ["API Keys", "6"],
+        ["Imports", "28"],
+        ["Sessions", "24"],
+        ["Tools Active", "9"],
+      ],
+      columns: ["Tool", "Operation", "Records", "Status", "Last Run"],
+      rows: [
+        ["API Keys", "Credential Management", "6", "Active", "Today"],
+        ["Import / Export", "CSV Import", "1,284", "Completed", "10 min ago"],
+        ["Duplicates", "Duplicate Scan", "42", "Resolved", "42 min ago"],
+        ["Lead Attribution", "Attribution Sync", "684", "Active", "1 hr ago"],
+        ["Sessions", "Session Review", "24", "Healthy", "2 hrs ago"],
+        ["Social Leads", "Webhook Intake", "186", "Active", "Yesterday"],
+      ],
+    },
+    Analytics: {
+      icon: BarChart3,
+      subtitle: "Explore business performance, trends and CRM conversion metrics.",
+      stats: [
+        ["Revenue", "₹12.48L"],
+        ["Leads", "342"],
+        ["Conversion", "68%"],
+        ["Growth", "+18.6%"],
+      ],
+      columns: ["Metric", "Current", "Previous", "Change", "Status"],
+      rows: [
+        ["Revenue", "₹12.48L", "₹10.52L", "+18.6%", "Growing"],
+        ["Leads", "342", "274", "+24.8%", "Growing"],
+        ["Contacts", "1,842", "1,704", "+8.1%", "Growing"],
+        ["Deals", "128", "114", "+12.3%", "Growing"],
+        ["Activities", "684", "612", "+11.8%", "Healthy"],
+        ["Conversion", "68%", "63%", "+5.0%", "Improved"],
+      ],
+    },
+    Integrations: {
+      icon: Network,
+      subtitle: "Connect external platforms and keep your CRM data synchronized.",
+      stats: [
+        ["Integrations", "8"],
+        ["Connected", "6"],
+        ["Errors", "1"],
+        ["Available", "18"],
+      ],
+      columns: ["Integration", "Category", "Status", "Last Sync", "Records"],
+      rows: [
+        ["Paytm", "Payments", "Connected", "10 min ago", "684"],
+        ["Email Provider", "Communication", "Connected", "42 min ago", "1,284"],
+        ["WhatsApp", "Communication", "Connected", "1 hr ago", "842"],
+        ["Google Calendar", "Calendar", "Connected", "2 hrs ago", "146"],
+        ["Webhooks", "Developer", "Connected", "Yesterday", "2,846"],
+        ["Social Leads", "Marketing", "Error", "Yesterday", "186"],
+      ],
+    },
+    Subscription: {
+      icon: CreditCard,
+      subtitle: "Monitor your CRM plan, usage, billing and workspace limits.",
+      stats: [
+        ["Plan", "Business"],
+        ["Members", "24 / 50"],
+        ["Storage", "68%"],
+        ["Renewal", "18 Nov"],
+      ],
+      columns: ["Resource", "Used", "Limit", "Usage", "Status"],
+      rows: [
+        ["Members", "24", "50", "48%", "Healthy"],
+        ["Contacts", "1,842", "10,000", "18%", "Healthy"],
+        ["Leads", "342", "5,000", "7%", "Healthy"],
+        ["Storage", "6.8 GB", "10 GB", "68%", "Healthy"],
+        ["API Requests", "42K", "100K", "42%", "Healthy"],
+        ["Automations", "14", "25", "56%", "Healthy"],
+      ],
     },
     Settings: {
       icon: Settings,
-      subtitle: "Manage workspace preferences and configuration",
+      subtitle: "Manage workspace preferences, security and configuration.",
       stats: [
         ["Workspace", "Active"],
         ["Members", "24"],
         ["Integrations", "8"],
         ["Security", "Good"],
       ],
+      columns: ["Setting", "Area", "Owner", "Status", "Updated"],
+      rows: [
+        ["Workspace Profile", "Workspace", "Admin", "Active", "Today"],
+        ["Team Preferences", "Team", "Rahul Sharma", "Active", "Yesterday"],
+        ["Notification Settings", "Notifications", "Priya Singh", "Active", "Yesterday"],
+        ["Security Settings", "Security", "Amit Kumar", "Good", "2 days ago"],
+        ["Integrations", "Connections", "Neha Singh", "Connected", "2 days ago"],
+        ["Billing Settings", "Subscription", "Vikas", "Active", "3 days ago"],
+      ],
     },
-  }[page] || { icon: LayoutDashboard, subtitle: "CRM workspace preview", stats: [] };
+  };
+
+  const config = pageData[page] || {
+    icon: LayoutDashboard,
+    subtitle: `Manage ${page.toLowerCase()} in your CRM workspace.`,
+    stats: [
+      ["Records", "126"],
+      ["Active", "98"],
+      ["Today", "18"],
+      ["Status", "Healthy"],
+    ],
+    columns: ["Name", "Owner", "Status", "Activity", "Updated"],
+    rows: [
+      [`${page} Record 01`, "Rahul Sharma", "Active", "Updated", "Today"],
+      [`${page} Record 02`, "Priya Singh", "Active", "Created", "Today"],
+      [`${page} Record 03`, "Amit Kumar", "Pending", "Reviewed", "Yesterday"],
+      [`${page} Record 04`, "Neha Singh", "Active", "Updated", "Yesterday"],
+      [`${page} Record 05`, "Vikas", "Completed", "Reviewed", "2 days ago"],
+      [`${page} Record 06`, "Rahul Sharma", "Active", "Updated", "3 days ago"],
+    ],
+  };
 
   const Icon = config.icon;
-
-  const rowsByPage = {
-    Leads: [
-      ["Rohan Mehta", "Rahul Sharma", "New", "10 min ago"],
-      ["Ananya Verma", "Priya Singh", "Qualified", "42 min ago"],
-      ["Karan Malhotra", "Amit Kumar", "Contacted", "1 hr ago"],
-      ["Sneha Kapoor", "Neha Singh", "New", "2 hrs ago"],
-      ["Arjun Patel", "Vikas", "Converted", "Yesterday"],
-      ["Meera Joshi", "Rahul Sharma", "Qualified", "Yesterday"],
-    ],
-
-    Contacts: [
-      ["Riya Sharma", "Acme Industries", "Active", "10 min ago"],
-      ["Aditya Kumar", "Nova Technologies", "Active", "42 min ago"],
-      ["Pooja Verma", "Vertex Solutions", "Inactive", "1 hr ago"],
-      ["Nikhil Singh", "Bluewave Retail", "Active", "2 hrs ago"],
-      ["Kavita Rao", "Orion Enterprises", "Active", "Yesterday"],
-      ["Aman Gupta", "Summit Group", "Active", "Yesterday"],
-    ],
-
-    Companies: [
-      ["Acme Industries", "Rahul Sharma", "Active", "Today"],
-      ["Nova Technologies", "Priya Singh", "Active", "2 hrs ago"],
-      ["Vertex Solutions", "Amit Kumar", "Prospect", "5 hrs ago"],
-      ["Bluewave Retail", "Neha Singh", "Active", "Yesterday"],
-      ["Orion Enterprises", "Vikas", "Active", "Yesterday"],
-      ["Summit Group", "Rahul Sharma", "Inactive", "2 days ago"],
-    ],
-
-    Deals: [
-      ["Acme Industries Deal", "Rahul Sharma", "Proposal", "Today"],
-      ["Nova Technologies Deal", "Priya Singh", "Negotiation", "2 hrs ago"],
-      ["Vertex Solutions Deal", "Amit Kumar", "Qualified", "5 hrs ago"],
-      ["Bluewave Retail Deal", "Neha Singh", "New", "Yesterday"],
-      ["Orion Enterprises Deal", "Vikas", "Proposal", "Yesterday"],
-      ["Summit Group Deal", "Rahul Sharma", "Won", "2 days ago"],
-    ],
-
-    Activities: [
-      ["Follow-up Call", "Rahul Sharma", "Completed", "10 min ago"],
-      ["Proposal Sent", "Priya Singh", "Completed", "42 min ago"],
-      ["Client Meeting", "Amit Kumar", "In Progress", "1 hr ago"],
-      ["Lead Assignment", "Neha Singh", "Completed", "2 hrs ago"],
-      ["Deal Negotiation", "Vikas", "In Progress", "3 hrs ago"],
-      ["Account Review", "Rahul Sharma", "Completed", "Yesterday"],
-    ],
-
-    Tasks: [
-      ["Call Premium Client", "Rahul Sharma", "In Progress", "Today"],
-      ["Review New Proposal", "Priya Singh", "Pending", "Today"],
-      ["Sales Team Meeting", "Amit Kumar", "Pending", "Today"],
-      ["Update Lead Pipeline", "Neha Singh", "Completed", "Tomorrow"],
-      ["Follow Up With Client", "Vikas", "Pending", "Tomorrow"],
-      ["Prepare Sales Report", "Rahul Sharma", "Completed", "2 days ago"],
-    ],
-
-    Pipelines: [
-      ["New Leads", "Rahul Sharma", "Active", "Today"],
-      ["Qualified", "Priya Singh", "Active", "Today"],
-      ["Proposal", "Amit Kumar", "Active", "Yesterday"],
-      ["Negotiation", "Neha Singh", "Active", "Yesterday"],
-      ["Closed Won", "Vikas", "Completed", "2 days ago"],
-      ["Closed Lost", "Rahul Sharma", "Completed", "3 days ago"],
-    ],
-
-    Reports: [
-      ["Revenue Report", "Rahul Sharma", "Completed", "Today"],
-      ["Sales Performance", "Priya Singh", "Completed", "Yesterday"],
-      ["Lead Conversion", "Amit Kumar", "In Progress", "Yesterday"],
-      ["Pipeline Report", "Neha Singh", "Completed", "2 days ago"],
-      ["Team Performance", "Vikas", "Completed", "2 days ago"],
-      ["Activity Report", "Rahul Sharma", "Completed", "3 days ago"],
-    ],
-
-    Calendar: [
-      ["Sales Meeting", "Rahul Sharma", "Confirmed", "Today"],
-      ["Client Demo", "Priya Singh", "Confirmed", "Today"],
-      ["Team Review", "Amit Kumar", "Scheduled", "Tomorrow"],
-      ["Proposal Meeting", "Neha Singh", "Confirmed", "Tomorrow"],
-      ["Follow-up Meeting", "Vikas", "Scheduled", "2 days ago"],
-      ["Quarterly Review", "Rahul Sharma", "Scheduled", "3 days ago"],
-    ],
-
-    Team: [
-      ["Rahul Sharma", "Sales", "Active", "Today"],
-      ["Priya Singh", "Sales", "Active", "Today"],
-      ["Amit Kumar", "Business", "Active", "Yesterday"],
-      ["Neha Singh", "Sales", "Active", "Yesterday"],
-      ["Vikas", "Management", "Active", "Yesterday"],
-      ["Karan Mehta", "Support", "Inactive", "2 days ago"],
-    ],
-
-    Notifications: [
-      ["New Lead Assigned", "Rahul Sharma", "Unread", "10 min ago"],
-      ["Proposal Updated", "Priya Singh", "Read", "42 min ago"],
-      ["Meeting Reminder", "Amit Kumar", "Unread", "1 hr ago"],
-      ["Deal Stage Changed", "Neha Singh", "Read", "2 hrs ago"],
-      ["New Comment Received", "Vikas", "Unread", "Yesterday"],
-      ["Task Completed", "Rahul Sharma", "Read", "Yesterday"],
-    ],
-
-    Templates: [
-      ["Welcome Email", "Rahul Sharma", "Active", "Today"],
-      ["Sales Proposal", "Priya Singh", "Active", "Yesterday"],
-      ["Follow-up Message", "Amit Kumar", "Active", "Yesterday"],
-      ["Meeting Reminder", "Neha Singh", "Draft", "2 days ago"],
-      ["Invoice Email", "Vikas", "Active", "2 days ago"],
-      ["Lead Introduction", "Rahul Sharma", "Draft", "3 days ago"],
-    ],
-
-    Announcements: [
-      ["Q4 Sales Target", "Rahul Sharma", "Published", "Today"],
-      ["New CRM Features", "Priya Singh", "Published", "Yesterday"],
-      ["Team Meeting Update", "Amit Kumar", "Scheduled", "Yesterday"],
-      ["Holiday Notice", "Neha Singh", "Published", "2 days ago"],
-      ["Sales Incentive Plan", "Vikas", "Published", "2 days ago"],
-      ["System Maintenance", "Rahul Sharma", "Scheduled", "3 days ago"],
-    ],
-
-    "Audit Log": [
-      ["Login Activity", "Rahul Sharma", "Active", "10 min ago"],
-      ["Deal Updated", "Priya Singh", "Completed", "42 min ago"],
-      ["Lead Created", "Amit Kumar", "Completed", "1 hr ago"],
-      ["Contact Updated", "Neha Singh", "Completed", "2 hrs ago"],
-      ["Settings Changed", "Vikas", "Completed", "Yesterday"],
-      ["User Role Updated", "Rahul Sharma", "Completed", "Yesterday"],
-    ],
-
-    Settings: [
-      ["Workspace Settings", "Admin", "Active", "Today"],
-      ["Team Preferences", "Rahul Sharma", "Active", "Yesterday"],
-      ["Notification Settings", "Priya Singh", "Active", "Yesterday"],
-      ["Security Settings", "Amit Kumar", "Good", "2 days ago"],
-      ["Integrations", "Neha Singh", "Connected", "2 days ago"],
-      ["Billing Settings", "Vikas", "Active", "3 days ago"],
-    ],
-  };
-
-  const rows = rowsByPage[page] || [
-    [`${page} activity`, "Rahul Sharma", "Active", "Today"],
-    [`${page} update`, "Priya Singh", "Completed", "2 hrs ago"],
-    [`${page} record`, "Amit Kumar", "In Progress", "Yesterday"],
-    [`${page} review`, "Neha Singh", "Active", "Yesterday"],
-    [`${page} configuration`, "Vikas", "Updated", "2 days ago"],
-  ];
-
-  const performanceByPage = {
-    Leads: [
-      ["Lead qualification", "88%", 88, ""],
-      ["Lead conversion", "68%", 68, "green"],
-      ["Follow-up completion", "91%", 91, "orange"],
-    ],
-    Contacts: [
-      ["Contact activity", "82%", 82, ""],
-      ["Data completeness", "94%", 94, "green"],
-      ["Contact engagement", "76%", 76, "orange"],
-    ],
-    Companies: [
-      ["Account coverage", "86%", 86, ""],
-      ["Active accounts", "91%", 91, "green"],
-      ["Account growth", "74%", 74, "orange"],
-    ],
-    Deals: [
-      ["Pipeline progress", "84%", 84, ""],
-      ["Target achievement", "72%", 72, "green"],
-      ["Deal completion", "91%", 91, "orange"],
-    ],
-    Activities: [
-      ["Activity completion", "89%", 89, ""],
-      ["Call completion", "78%", 78, "green"],
-      ["Meeting completion", "93%", 93, "orange"],
-    ],
-    Tasks: [
-      ["Task completion", "76%", 76, ""],
-      ["Due today completion", "84%", 84, "green"],
-      ["On-time delivery", "91%", 91, "orange"],
-    ],
-    Pipelines: [
-      ["Stage progression", "81%", 81, ""],
-      ["Pipeline coverage", "89%", 89, "green"],
-      ["Stage completion", "73%", 73, "orange"],
-    ],
-    Reports: [
-      ["Report generation", "92%", 92, ""],
-      ["Data accuracy", "96%", 96, "green"],
-      ["Report usage", "78%", 78, "orange"],
-    ],
-    Calendar: [
-      ["Meeting attendance", "87%", 87, ""],
-      ["Schedule completion", "94%", 94, "green"],
-      ["Event completion", "81%", 81, "orange"],
-    ],
-    Team: [
-      ["Team productivity", "84%", 84, ""],
-      ["Target achievement", "91%", 91, "green"],
-      ["Team completion", "88%", 88, "orange"],
-    ],
-    Notifications: [
-      ["Notification delivery", "98%", 98, ""],
-      ["Read rate", "82%", 82, "green"],
-      ["Response rate", "71%", 71, "orange"],
-    ],
-    Templates: [
-      ["Template usage", "79%", 79, ""],
-      ["Email delivery", "96%", 96, "green"],
-      ["Template completion", "88%", 88, "orange"],
-    ],
-    Announcements: [
-      ["Announcement reach", "91%", 91, ""],
-      ["Read rate", "86%", 86, "green"],
-      ["Engagement", "72%", 72, "orange"],
-    ],
-    "Audit Log": [
-      ["Log coverage", "99%", 99, ""],
-      ["Security checks", "96%", 96, "green"],
-      ["Audit completion", "93%", 93, "orange"],
-    ],
-    Settings: [
-      ["Configuration", "92%", 92, ""],
-      ["Security health", "96%", 96, "green"],
-      ["Workspace readiness", "88%", 88, "orange"],
-    ],
-  };
-
-  const performanceRows = performanceByPage[page] || [
-    ["Current performance", "84%", 84, ""],
-    ["Target achievement", "72%", 72, "green"],
-    ["Team completion", "91%", 91, "orange"],
-  ];
-
-  const recentActivityByPage = {
-    Leads: [
-      ["New lead created", "Rohan Mehta", "10 min ago"],
-      ["Lead qualified", "Ananya Verma", "42 min ago"],
-      ["Lead assigned", "Karan Malhotra", "1 hr ago"],
-    ],
-    Contacts: [
-      ["Contact added", "Riya Sharma", "10 min ago"],
-      ["Contact updated", "Aditya Kumar", "42 min ago"],
-      ["Contact archived", "Pooja Verma", "1 hr ago"],
-    ],
-    Companies: [
-      ["New company added", "Acme Industries", "10 min ago"],
-      ["Account updated", "Nova Technologies", "42 min ago"],
-      ["Company assigned", "Vertex Solutions", "1 hr ago"],
-    ],
-    Deals: [
-      ["Deal stage updated", "Acme Industries Deal", "10 min ago"],
-      ["Proposal sent", "Nova Technologies Deal", "42 min ago"],
-      ["Deal qualified", "Vertex Solutions Deal", "1 hr ago"],
-    ],
-    Activities: [
-      ["Client call completed", "Rahul Sharma", "10 min ago"],
-      ["Meeting scheduled", "Priya Singh", "42 min ago"],
-      ["Email sent", "Amit Kumar", "1 hr ago"],
-    ],
-    Tasks: [
-      ["Task completed", "Call Premium Client", "10 min ago"],
-      ["Task assigned", "Review New Proposal", "42 min ago"],
-      ["Task due today", "Sales Team Meeting", "1 hr ago"],
-    ],
-    Pipelines: [
-      ["Lead moved to Qualified", "Rahul Sharma", "10 min ago"],
-      ["Deal moved to Proposal", "Priya Singh", "42 min ago"],
-      ["Deal moved to Negotiation", "Amit Kumar", "1 hr ago"],
-    ],
-    Reports: [
-      ["Revenue report generated", "Rahul Sharma", "10 min ago"],
-      ["Sales report updated", "Priya Singh", "42 min ago"],
-      ["Conversion report viewed", "Amit Kumar", "1 hr ago"],
-    ],
-    Calendar: [
-      ["Client demo scheduled", "Rahul Sharma", "10 min ago"],
-      ["Sales meeting confirmed", "Priya Singh", "42 min ago"],
-      ["Team review added", "Amit Kumar", "1 hr ago"],
-    ],
-    Team: [
-      ["New team member added", "Karan Mehta", "10 min ago"],
-      ["Target updated", "Rahul Sharma", "42 min ago"],
-      ["Performance reviewed", "Priya Singh", "1 hr ago"],
-    ],
-    Notifications: [
-      ["New lead notification", "Rahul Sharma", "10 min ago"],
-      ["Deal update notification", "Priya Singh", "42 min ago"],
-      ["Task reminder", "Amit Kumar", "1 hr ago"],
-    ],
-    Templates: [
-      ["Welcome Email used", "Rahul Sharma", "10 min ago"],
-      ["Sales Proposal updated", "Priya Singh", "42 min ago"],
-      ["Follow-up template used", "Amit Kumar", "1 hr ago"],
-    ],
-    Announcements: [
-      ["Announcement published", "Rahul Sharma", "10 min ago"],
-      ["Team update scheduled", "Priya Singh", "42 min ago"],
-      ["Announcement viewed", "Amit Kumar", "1 hr ago"],
-    ],
-    "Audit Log": [
-      ["Login activity recorded", "Rahul Sharma", "10 min ago"],
-      ["Deal update recorded", "Priya Singh", "42 min ago"],
-      ["Settings change recorded", "Vikas", "1 hr ago"],
-    ],
-    Settings: [
-      ["Workspace settings updated", "Admin", "10 min ago"],
-      ["Notification settings changed", "Rahul Sharma", "42 min ago"],
-      ["Security settings reviewed", "Amit Kumar", "1 hr ago"],
-    ],
-  };
-
-  const performanceRowsForPage = performanceRows;
-  const recentActivities = recentActivityByPage[page] || [
-    [`${page} created`, "Rahul Sharma", "10 min ago"],
-    [`${page} updated`, "Priya Singh", "42 min ago"],
-    [`${page} action completed`, "Amit Kumar", "1 hr ago"],
-  ];
+  const actionLabel = ["Reports", "Sales", "Leads", "Deals", "Activity"].includes(page) ? "View report" : "View";
 
   return (
     <section className="lp-crm-page">
       <div className="lp-crm-page-head">
-        <div>
-          <div className="lp-crm-page-eyebrow">CRM workspace</div>
-          <h1 className="lp-crm-page-title">{page}</h1>
-          <p className="lp-crm-page-subtitle">{config.subtitle}</p>
+        <div className="lp-crm-page-heading-wrap">
+          <div>
+            <h2 className="lp-crm-page-title">{page}</h2>
+            <p className="lp-crm-page-subtitle">{config.subtitle}</p>
+          </div>
         </div>
 
         <div className="lp-crm-page-actions">
           <button type="button" className="lp-crm-page-btn">
-            <RefreshCw size={13} />
-            Refresh
+            <RefreshCw size={13} /> Refresh
           </button>
-
           <button type="button" className="lp-crm-page-btn primary">
-            <Plus size={13} />
-            Add New
+            <Plus size={13} /> {page === "Analytics" || page === "CRM Tools" ? "Open tools" : `Add ${page === "Sources / Campaigns" ? "Source" : page.slice(0, -1) || "Record"}`}
           </button>
         </div>
       </div>
 
-      <div className="lp-crm-page-grid">
-        {config.stats.map(([label, value]) => (
-          <div className="lp-crm-page-stat" key={label}>
+      <div className="lp-crm-page-stat-grid">
+        {config.stats.map(([label, value], index) => (
+          <div className="lp-crm-page-stat" key={`page-stat-${index}`}>
             <div className="lp-crm-page-stat-label">{label}</div>
             <div className="lp-crm-page-stat-value">{value}</div>
           </div>
         ))}
       </div>
 
-      <div className="lp-crm-page-card">
-        <div className="lp-crm-page-card-head">
-          <div>
-            <div className="lp-crm-page-card-title">{page} overview</div>
-            <div className="lp-crm-page-card-sub">Preview data for the landing page demonstration</div>
+      <div className="lp-crm-page-grid">
+        <section className="lp-crm-page-card lp-crm-page-table-card">
+          <div className="lp-crm-panel-head">
+            <div>
+              <div className="lp-crm-panel-title">Recent {page} records</div>
+              <div className="lp-crm-panel-subtitle">Sample workspace data for demonstration</div>
+            </div>
+            <button type="button" className="lp-crm-panel-link">
+              <Filter size={13} /> Filter
+            </button>
           </div>
 
-          <Icon size={18} color="var(--preview-muted)" />
-        </div>
-
-        <div className="lp-crm-table-wrap">
-          <table className="lp-crm-page-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Owner</th>
-                <th>Status</th>
-                <th>Updated</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {rows.map((row, index) => (
-                <tr key={`${row[0]}-${index}`}>
-                  <td>
-                    <strong>{row[0]}</strong>
-                  </td>
-                  <td>{row[1]}</td>
-                  <td>
-                    <span className={`lp-crm-badge ${row[2] === "Completed" ? "green" : row[2] === "In Progress" ? "orange" : ""}`}>{row[2]}</span>
-                  </td>
-                  <td>{row[3]}</td>
+          <div className="lp-crm-table-wrap">
+            <table className="lp-crm-table">
+              <thead>
+                <tr>
+                  {config.columns.map((column) => (
+                    <th key={column}>{column}</th>
+                  ))}
+                  <th>Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div className="lp-crm-columns equal" style={{ marginTop: "14px" }}>
-        <div className="lp-crm-page-card">
-          <div className="lp-crm-page-card-head">
-            <div>
-              <div className="lp-crm-page-card-title">Performance overview</div>
-              <div className="lp-crm-page-card-sub">Sample performance metrics</div>
-            </div>
-            <TrendingUp size={17} color="var(--preview-success)" />
+              </thead>
+              <tbody>
+                {config.rows.map((row, index) => (
+                  <tr key={`${page}-${index}`}>
+                    {row.map((cell, cellIndex) => (
+                      <td key={`${page}-${index}-${cellIndex}`}>{cellIndex === row.length - 1 ? <span className="lp-crm-muted">{cell}</span> : cellIndex === 0 ? <strong>{cell}</strong> : cell}</td>
+                    ))}
+                    <td>
+                      <div style={{ display: "flex", gap: 5 }}>
+                        <button type="button" className="lp-crm-icon-btn" title={actionLabel}>
+                          <Eye size={13} />
+                        </button>
+                        <button type="button" className="lp-crm-icon-btn" title="More actions">
+                          <MoreHorizontal size={13} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
 
-          <div className="lp-crm-pipeline-body">
-            {performanceRowsForPage.map(([label, value, width, tone]) => (
-              <div className="lp-crm-pipeline-row" key={label}>
-                <div className="lp-crm-pipeline-label">
-                  <span>{label}</span>
-                  <span>{value}</span>
-                </div>
+          <div className="lp-crm-page-footer">
+            <span>Showing 1–6 of {config.stats[0]?.[1] || "126"} records</span>
+            <div className="lp-crm-page-pagination">
+              <button type="button" className="lp-crm-page-btn">
+                <ChevronLeft size={13} />
+              </button>
+              <button type="button" className="lp-crm-page-btn">
+                <ChevronRight size={13} />
+              </button>
+            </div>
+          </div>
+        </section>
 
-                <div className="lp-crm-track">
-                  <div className={`lp-crm-fill ${tone}`} style={{ width: `${width}%` }} />
-                </div>
+        <aside className="lp-crm-page-side">
+          <section className="lp-crm-page-card">
+            <div className="lp-crm-panel-head">
+              <div>
+                <div className="lp-crm-panel-title">Workspace snapshot</div>
+                <div className="lp-crm-panel-subtitle">Current {page.toLowerCase()} health</div>
               </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="lp-crm-page-card">
-          <div className="lp-crm-page-card-head">
-            <div>
-              <div className="lp-crm-page-card-title">Recent activity</div>
-              <div className="lp-crm-page-card-sub">Latest workspace updates</div>
+              <TrendingUp size={16} color="var(--preview-muted)" />
             </div>
-            <Clock3 size={17} color="var(--preview-muted)" />
-          </div>
 
-          <div className="lp-crm-list">
-            {recentActivities.map(([title, name, time, tone, Icon]) => {
-              const ActivityIcon = Icon || Activity;
-
-              return (
-                <div className="lp-crm-list-item" key={`${title}-${name}`}>
-                  <div className={`lp-crm-activity-icon ${tone || "primary"}`}>
-                    <ActivityIcon size={13} />
+            <div className="lp-crm-pipeline-body">
+              {[
+                ["Processed", "86%", 86, ""],
+                ["Completed", "74%", 74, "green"],
+                ["On target", "91%", 91, "orange"],
+              ].map(([label, value, width, tone]) => (
+                <div className="lp-crm-pipeline-row" key={label}>
+                  <div className="lp-crm-pipeline-label">
+                    <span>{label}</span>
+                    <span>{value}</span>
                   </div>
+                  <div className="lp-crm-track">
+                    <div className={`lp-crm-fill ${tone}`} style={{ width: `${width}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
 
+          <section className="lp-crm-page-card">
+            <div className="lp-crm-panel-head">
+              <div>
+                <div className="lp-crm-panel-title">Recent activity</div>
+                <div className="lp-crm-panel-subtitle">Latest changes in this module</div>
+              </div>
+              <Activity size={16} color="var(--preview-muted)" />
+            </div>
+
+            <div className="lp-crm-list">
+              {config.rows.slice(0, 4).map((row, index) => (
+                <div className="lp-crm-list-item" key={`activity-${index}`}>
+                  <div className="lp-crm-activity-icon primary">
+                    <Activity size={13} />
+                  </div>
                   <div className="lp-crm-list-main">
-                    <div className="lp-crm-list-title">{title}</div>
+                    <div className="lp-crm-list-title">{row[0]}</div>
                     <div className="lp-crm-list-meta">
-                      {name} · {time}
+                      {row[1]} · {row[row.length - 1]}
                     </div>
                   </div>
+                  <ChevronRight className="lp-crm-list-arrow" size={14} />
                 </div>
-              );
-            })}
-          </div>
-        </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="lp-crm-page-card">
+            <div className="lp-crm-panel-head">
+              <div>
+                <div className="lp-crm-panel-title">Quick actions</div>
+                <div className="lp-crm-panel-subtitle">Common {page.toLowerCase()} actions</div>
+              </div>
+              <Plus size={16} color="var(--preview-muted)" />
+            </div>
+
+            <div className="lp-crm-quick-grid">
+              <button type="button" className="lp-crm-quick-card">
+                <span className="lp-crm-quick-icon">
+                  <Plus size={15} />
+                </span>
+                <span className="lp-crm-quick-label">Create new</span>
+              </button>
+              <button type="button" className="lp-crm-quick-card">
+                <span className="lp-crm-quick-icon">
+                  <Filter size={15} />
+                </span>
+                <span className="lp-crm-quick-label">Filter records</span>
+              </button>
+              <button type="button" className="lp-crm-quick-card">
+                <span className="lp-crm-quick-icon">
+                  <ArrowUpRight size={15} />
+                </span>
+                <span className="lp-crm-quick-label">Export</span>
+              </button>
+              <button type="button" className="lp-crm-quick-card">
+                <span className="lp-crm-quick-icon">
+                  <MoreHorizontal size={15} />
+                </span>
+                <span className="lp-crm-quick-label">More actions</span>
+              </button>
+            </div>
+          </section>
+        </aside>
       </div>
 
       <div className="lp-crm-footer-note">
         <Clock3 size={11} />
-        This section is a hard-coded CRM preview for demonstration.
+        This CRM preview uses realistic sample data. No live workspace data is connected.
       </div>
     </section>
   );

@@ -330,8 +330,6 @@ function AdminAnnouncement() {
           totalPages: Number(responsePagination.totalPages) || 0,
         });
       } catch (err) {
-        console.error("Admin Announcements load error:", err);
-
         const message = getApiErrorMessage(err, "Unable to load announcements.");
 
         setError(message);
@@ -431,8 +429,6 @@ function AdminAnnouncement() {
       setPreviewItem(announcement || item);
       setShowPreview(true);
     } catch (err) {
-      console.error("Announcement view error:", err);
-
       const message = getApiErrorMessage(err, "Unable to load announcement details.");
 
       await Swal.fire({
@@ -690,12 +686,8 @@ function AdminAnnouncement() {
         ...EMPTY_FORM,
       });
 
-      loadItems(isEditing ? pagination.page : 1, true).catch((refreshError) => {
-        console.error("Announcement refresh after save error:", refreshError);
-      });
+      loadItems(isEditing ? pagination.page : 1, true).catch((refreshError) => {});
     } catch (err) {
-      console.error("Announcement save error:", err);
-
       const message = getApiErrorMessage(err, "Unable to save announcement.");
 
       setError(message);

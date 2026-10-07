@@ -510,9 +510,7 @@ function Tasks() {
     if (!members.length || !tags.length) {
       try {
         await loadOptions();
-      } catch (error) {
-        console.error("Unable to load task options:", error);
-      }
+      } catch (error) {}
     }
   };
 

@@ -58,7 +58,6 @@ function ProtectedRoute() {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }
 
-  /* My Profile is intentionally outside the permission matrix. */
   if (location.pathname === "/profile") {
     return <Outlet />;
   }

@@ -373,9 +373,7 @@ export default function Forms() {
       } else {
         await copyText(url, "Link copied");
       }
-    } catch {
-      // User cancelled native share.
-    }
+    } catch {}
   };
 
   const openPublic = (item) => {
@@ -441,9 +439,7 @@ export default function Forms() {
       } else {
         await copyText(qrPublicUrl, "QR link copied");
       }
-    } catch {
-      // User cancelled native share.
-    }
+    } catch {}
   };
 
   const addField = () => {

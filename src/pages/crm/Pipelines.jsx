@@ -372,7 +372,7 @@ export default function Pipelines() {
     const result = await showAuthAlert({
       icon: "warning",
       title: "Delete Pipeline?",
-      text: "This pipeline will be deactivated. Are you sure you want to continue?",
+      text: "This pipeline will be permanently deleted. Are you sure you want to continue?",
       showCancelButton: true,
       confirmButtonText: "Delete",
       cancelButtonText: "Cancel",
@@ -390,7 +390,7 @@ export default function Pipelines() {
       await showAuthAlert({
         icon: "success",
         title: "Deleted",
-        text: "Pipeline deactivated successfully.",
+        text: "Pipeline deleted successfully.",
         confirmButtonText: "Done",
       });
     } catch (err) {
@@ -895,7 +895,7 @@ export default function Pipelines() {
         </div>
       </div>
 
-      {/* PIPELINE CREATE / EDIT / VIEW MODAL */}
+      {}
       {modal && (
         <div
           className="crm-modal-backdrop"
@@ -1186,7 +1186,7 @@ export default function Pipelines() {
         </div>
       )}
 
-      {/* STAGE CREATE / EDIT MODAL */}
+      {}
       {stageModal && (
         <div
           className="crm-modal-backdrop"

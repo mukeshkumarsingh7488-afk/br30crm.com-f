@@ -49,8 +49,6 @@ function ForgotPassword() {
         },
       });
     } catch (error) {
-      console.error("Forgot password error:", error);
-
       const status = error?.response?.status;
       const data = error?.response?.data;
 
@@ -69,7 +67,7 @@ function ForgotPassword() {
   return (
     <AuthLayout>
       <div className="auth-login-layout">
-        {/* LEFT SIDE */}
+        {}
         <div className="auth-login-intro">
           <div className="auth-intro-badge">
             <KeyRound size={15} />
@@ -111,7 +109,7 @@ function ForgotPassword() {
           </div>
         </div>
 
-        {/* RIGHT SIDE */}
+        {}
         <div className="auth-card">
           <div className="auth-card-header">
             <div className="auth-icon">

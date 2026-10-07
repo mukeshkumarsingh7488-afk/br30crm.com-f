@@ -3,11 +3,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import useBusiness from "../../hooks/useBusiness";
 import { showAuthAlert } from "../../components/auth/authAlert";
 
-/* ============================================================
-   MEETINGS PAGE STYLES
-   Injected into <head> so the page styles are applied reliably
-   even when the global CRM stylesheet is loaded separately.
-   ============================================================ */
 const MEETINGS_PAGE_CSS = String.raw`
         .br30-meet-crm-resource-page{padding:24px 26px 40px}
         .br30-meet-crm-resource-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
@@ -181,10 +176,6 @@ import { getContacts } from "../../api/contact.api";
 import { getLeads } from "../../api/lead.api";
 import { getCompanies } from "../../api/company.api";
 import { getDeals } from "../../api/deal.api";
-
-/* ============================================================
-   HELPERS
-   ============================================================ */
 
 const showError = (title, text) =>
   showAuthAlert({
@@ -446,10 +437,6 @@ function normalizeMeeting(meeting) {
   };
 }
 
-/* ============================================================
-   SEARCHABLE SELECT
-   ============================================================ */
-
 function SearchableSelect({ value, options, onChange, placeholder = "Select...", disabled = false, loading = false, emptyText = "No records found." }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -553,10 +540,6 @@ function SearchableSelect({ value, options, onChange, placeholder = "Select...",
   );
 }
 
-/* ============================================================
-   MEETINGS
-   ============================================================ */
-
 function Meetings() {
   const { businessId, loading: businessLoading, error: businessError } = useBusiness();
 
@@ -600,10 +583,6 @@ function Meetings() {
 
   const [error, setError] = useState("");
 
-  /* ==========================================================
-     LOAD MEETINGS
-     ========================================================== */
-
   const loadMeetings = useCallback(async () => {
     if (!businessId) {
       setLoading(false);
@@ -638,8 +617,6 @@ function Meetings() {
 
       setMeetings(rows);
     } catch (err) {
-      console.error("Failed to load meetings:", err);
-
       setError(getErrorMessage(err, "Failed to load meetings."));
 
       setMeetings([]);
@@ -647,10 +624,6 @@ function Meetings() {
       setLoading(false);
     }
   }, [businessId, statusFilter, fromDate, toDate]);
-
-  /* ==========================================================
-     LOAD BUSINESS MEMBERS
-     ========================================================== */
 
   const loadMembers = useCallback(async () => {
     if (!businessId) return;
@@ -669,16 +642,11 @@ function Meetings() {
 
       setMembers(Array.isArray(rows) ? rows : []);
     } catch (err) {
-      console.error("Failed to load business members:", err);
       setMembers([]);
     } finally {
       setMembersLoading(false);
     }
   }, [businessId]);
-
-  /* ==========================================================
-     LOAD RELATED CRM RECORDS
-     ========================================================== */
 
   const loadRelatedRecords = useCallback(async () => {
     if (!businessId) return;
@@ -717,7 +685,6 @@ function Meetings() {
 
       setDeals(extractRows(results[3], ["deals", "items", "results"]));
     } catch (err) {
-      console.error("Failed to load related CRM records:", err);
     } finally {
       setRecordsLoading(false);
     }
@@ -733,10 +700,6 @@ function Meetings() {
     loadMembers();
     loadRelatedRecords();
   }, [businessId, loadMembers, loadRelatedRecords]);
-
-  /* ==========================================================
-     SEARCH / FILTER
-     ========================================================== */
 
   const resetFilters = () => {
     setSearch("");
@@ -797,10 +760,6 @@ function Meetings() {
     });
   }, [page, limit, totalFiltered, totalPages]);
 
-  /* ==========================================================
-     FORM
-     ========================================================== */
-
   const openCreateModal = () => {
     setEditingMeeting(null);
 
@@ -848,10 +807,6 @@ function Meetings() {
     }));
   };
 
-  /* ==========================================================
-     MEMBER OPTIONS
-     ========================================================== */
-
   const memberOptions = useMemo(() => {
     const seen = new Set();
 
@@ -873,10 +828,6 @@ function Meetings() {
       })
       .filter(Boolean);
   }, [members]);
-
-  /* ==========================================================
-     RELATED OPTIONS
-     ========================================================== */
 
   const relatedOptions = useMemo(() => {
     if (form.relatedType === "CONTACT") {
@@ -950,10 +901,6 @@ function Meetings() {
     return [];
   }, [form.relatedType, contacts, leads, companies, deals]);
 
-  /* ==========================================================
-     ATTENDEES
-     ========================================================== */
-
   const addAttendee = (memberId) => {
     if (!memberId) return;
 
@@ -999,10 +946,6 @@ function Meetings() {
       attendees: previous.attendees.filter((_, itemIndex) => itemIndex !== index),
     }));
   };
-
-  /* ==========================================================
-     REMINDERS
-     ========================================================== */
 
   const addReminder = () => {
     if (form.reminders.length >= 20) {
@@ -1050,10 +993,6 @@ function Meetings() {
       reminders: previous.reminders.filter((_, reminderIndex) => reminderIndex !== index),
     }));
   };
-
-  /* ==========================================================
-     VALIDATION
-     ========================================================== */
 
   const validateForm = () => {
     if (!form.title.trim()) {
@@ -1146,10 +1085,6 @@ function Meetings() {
     return true;
   };
 
-  /* ==========================================================
-     SUBMIT
-     ========================================================== */
-
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -1219,17 +1154,11 @@ function Meetings() {
 
       await loadMeetings();
     } catch (err) {
-      console.error("Failed to save meeting:", err);
-
       await showError("Unable to save meeting", getErrorMessage(err, "Something went wrong while saving the meeting."));
     } finally {
       setSaving(false);
     }
   };
-
-  /* ==========================================================
-     DELETE
-     ========================================================== */
 
   const handleDelete = async (meeting) => {
     setExpandedMenu(null);
@@ -1261,8 +1190,6 @@ function Meetings() {
 
       await loadMeetings();
     } catch (err) {
-      console.error("Failed to delete meeting:", err);
-
       crmSwal({
         icon: "error",
         title: "Unable to delete meeting",
@@ -1270,10 +1197,6 @@ function Meetings() {
       });
     }
   };
-
-  /* ==========================================================
-     STATUS
-     ========================================================== */
 
   const changeStatus = async (meeting, status) => {
     setExpandedMenu(null);
@@ -1344,8 +1267,6 @@ function Meetings() {
 
       await loadMeetings();
     } catch (err) {
-      console.error("Failed to update meeting status:", err);
-
       crmSwal({
         icon: "error",
         title: "Unable to update status",
@@ -1353,10 +1274,6 @@ function Meetings() {
       });
     }
   };
-
-  /* ==========================================================
-     STATS
-     ========================================================== */
 
   const stats = useMemo(() => {
     const source = Array.isArray(meetings) ? meetings : [];
@@ -1383,10 +1300,6 @@ function Meetings() {
       cancelled,
     };
   }, [meetings]);
-
-  /* ==========================================================
-     RELATED LABEL
-     ========================================================== */
 
   const getRelatedDisplay = (meeting) => {
     const type = meeting?.relatedTo?.type;
@@ -1441,10 +1354,6 @@ function Meetings() {
     };
   };
 
-  /* ==========================================================
-     RENDER
-     ========================================================== */
-
   return (
     <>
       <style>{MEETINGS_PAGE_CSS}</style>
@@ -1477,9 +1386,7 @@ function Meetings() {
           </div>
         </div>
 
-        {/* ====================================================
-            STATS
-            ==================================================== */}
+        {}
 
         <div className="br30-meet-meetings-stats-grid">
           <div className="br30-meet-meetings-stat-card">
@@ -1538,9 +1445,7 @@ function Meetings() {
           </div>
         </div>
 
-        {/* ====================================================
-            FILTERS
-            ==================================================== */}
+        {}
 
         <div className="br30-meet-meetings-toolbar">
           <div className="br30-meet-crm-search-wrap br30-meet-meetings-search-wrap">
@@ -1611,9 +1516,7 @@ function Meetings() {
           )}
         </div>
 
-        {/* ====================================================
-            ERROR
-            ==================================================== */}
+        {}
 
         {error && (
           <div className="br30-meet-meetings-error">
@@ -1625,9 +1528,7 @@ function Meetings() {
           </div>
         )}
 
-        {/* ====================================================
-            TABLE
-            ==================================================== */}
+        {}
 
         <div className="br30-meet-crm-resource-card br30-meet-meetings-card">
           <div className="br30-meet-meetings-table-wrap">
@@ -1810,9 +1711,7 @@ function Meetings() {
         </div>
       </div>
 
-      {/* ======================================================
-          MEETING MODAL
-          ====================================================== */}
+      {}
 
       {showModal && (
         <div
@@ -1837,7 +1736,7 @@ function Meetings() {
 
             <form className="br30-meet-meeting-form" onSubmit={handleSubmit}>
               <div className="br30-meet-meeting-form-grid">
-                {/* Title */}
+                {}
 
                 <div className="br30-meet-crm-form-group br30-meet-full">
                   <label>
@@ -1847,7 +1746,7 @@ function Meetings() {
                   <input type="text" className="br30-meet-crm-input" placeholder="Enter meeting title" value={form.title} onChange={(event) => updateForm("title", event.target.value)} maxLength={200} required />
                 </div>
 
-                {/* Date */}
+                {}
 
                 <div className="br30-meet-crm-form-group">
                   <label>
@@ -1865,7 +1764,7 @@ function Meetings() {
                   <input type="datetime-local" className="br30-meet-crm-input" value={form.endAt} onChange={(event) => updateForm("endAt", event.target.value)} required />
                 </div>
 
-                {/* Timezone */}
+                {}
 
                 <div className="br30-meet-crm-form-group">
                   <label>Timezone</label>
@@ -1873,7 +1772,7 @@ function Meetings() {
                   <input type="text" className="br30-meet-crm-input" value={form.timezone} onChange={(event) => updateForm("timezone", event.target.value)} />
                 </div>
 
-                {/* Organizer */}
+                {}
 
                 <div className="br30-meet-crm-form-group">
                   <label>Organizer</label>
@@ -1881,7 +1780,7 @@ function Meetings() {
                   <SearchableSelect value={form.organizerId} options={memberOptions} onChange={(value) => updateForm("organizerId", value)} placeholder="Select organizer" loading={membersLoading} emptyText="No business members found." />
                 </div>
 
-                {/* Status */}
+                {}
 
                 {editingMeeting && (
                   <div className="br30-meet-crm-form-group">
@@ -1901,7 +1800,7 @@ function Meetings() {
                   </div>
                 )}
 
-                {/* Location */}
+                {}
 
                 <div className="br30-meet-crm-form-group">
                   <label>Location</label>
@@ -1909,7 +1808,7 @@ function Meetings() {
                   <input type="text" className="br30-meet-crm-input" placeholder="Office / Client location" value={form.location} onChange={(event) => updateForm("location", event.target.value)} maxLength={500} />
                 </div>
 
-                {/* Meeting URL */}
+                {}
 
                 <div className="br30-meet-crm-form-group">
                   <label>Meeting URL</label>
@@ -1917,7 +1816,7 @@ function Meetings() {
                   <input type="url" className="br30-meet-crm-input" placeholder="https://meet.google.com/..." value={form.meetingUrl} onChange={(event) => updateForm("meetingUrl", event.target.value)} />
                 </div>
 
-                {/* Description */}
+                {}
 
                 <div className="br30-meet-crm-form-group br30-meet-full">
                   <label>Description</label>
@@ -1925,7 +1824,7 @@ function Meetings() {
                   <textarea className="br30-meet-crm-textarea" placeholder="Enter meeting description..." value={form.description} onChange={(event) => updateForm("description", event.target.value)} maxLength={5000} rows={4} />
                 </div>
 
-                {/* Related CRM */}
+                {}
 
                 <div className="br30-meet-meeting-form-section br30-meet-full">
                   <div className="br30-meet-meeting-section-title">Related CRM Record</div>
@@ -1970,7 +1869,7 @@ function Meetings() {
                   </div>
                 </div>
 
-                {/* Attendees */}
+                {}
 
                 <div className="br30-meet-meeting-form-section br30-meet-full">
                   <div className="br30-meet-meeting-section-title">Attendees</div>
@@ -2009,7 +1908,7 @@ function Meetings() {
                   )}
                 </div>
 
-                {/* Reminders */}
+                {}
 
                 <div className="br30-meet-meeting-form-section br30-meet-full">
                   <div className="br30-meet-meeting-section-title-row">
@@ -2053,7 +1952,7 @@ function Meetings() {
                   ))}
                 </div>
 
-                {/* Notes */}
+                {}
 
                 <div className="br30-meet-crm-form-group br30-meet-full">
                   <label>Notes</label>
@@ -2061,7 +1960,7 @@ function Meetings() {
                   <textarea className="br30-meet-crm-textarea" placeholder="Internal meeting notes..." value={form.notes} onChange={(event) => updateForm("notes", event.target.value)} maxLength={5000} rows={3} />
                 </div>
 
-                {/* Outcome */}
+                {}
 
                 {editingMeeting && form.status === "COMPLETED" && (
                   <div className="br30-meet-crm-form-group br30-meet-full">
@@ -2071,7 +1970,7 @@ function Meetings() {
                   </div>
                 )}
 
-                {/* Cancellation */}
+                {}
 
                 {editingMeeting && form.status === "CANCELLED" && (
                   <div className="br30-meet-crm-form-group br30-meet-full">
