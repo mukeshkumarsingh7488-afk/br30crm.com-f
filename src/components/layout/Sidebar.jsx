@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { NavLink, useNavigate } from "react-router-dom";
+import { logout } from "../../api/auth";
 
 import {
   Activity,
@@ -214,9 +215,14 @@ function Sidebar({ collapsed, mobileOpen, sidebarMode = "rail", onToggle, onMobi
 
     if (!result.isConfirmed) return;
 
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "/";
+    try {
+      await logout();
+    } catch (error) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    }
+
+    window.location.href = "/login";
   };
 
   const cycleTheme = () => {
