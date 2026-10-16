@@ -37,6 +37,8 @@ export default function PublicForm() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [retryKey, setRetryKey] = useState(0);
+  const [retrying, setRetrying] = useState(false);
 
   const query = useMemo(() => Object.fromEntries(searchParams.entries()), [searchParams]);
 
@@ -60,6 +62,7 @@ export default function PublicForm() {
 
   useEffect(() => {
     let mounted = true;
+    let retryTimer;
 
     const loadForm = async () => {
       if (!businessId || !slug) {
@@ -69,23 +72,47 @@ export default function PublicForm() {
       }
 
       setLoading(true);
+      setRetrying(false);
       setError("");
 
-      try {
-        const response = await api.get(`/public-forms/public/${businessId}/${encodeURIComponent(slug)}`, { params: query });
-        const data = unwrap(response);
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          const response = await api.get(`/public-forms/public/${businessId}/${encodeURIComponent(slug)}`, { params: query });
 
-        if (!mounted) return;
+          const data = unwrap(response);
 
-        const fields = Array.isArray(data?.fields) ? data.fields : [];
+          if (!mounted) return;
 
-        setForm(data);
-        setValues(getInitialValues(fields));
-      } catch (err) {
-        if (!mounted) return;
-        setError(getErrorMessage(err));
-      } finally {
-        if (mounted) setLoading(false);
+          const fields = Array.isArray(data?.fields) ? data.fields : [];
+
+          setForm(data);
+          setValues(getInitialValues(fields));
+          setError("");
+          setRetrying(false);
+          setLoading(false);
+          return;
+        } catch (err) {
+          if (!mounted) return;
+
+          const status = err?.response?.status;
+
+          const shouldRetry = !status || status === 408 || status === 429 || status >= 500;
+
+          if (!shouldRetry || attempt === 3) {
+            setError(shouldRetry ? "The form is taking too long to load. Please try again." : getErrorMessage(err));
+            setRetrying(false);
+            setLoading(false);
+            return;
+          }
+
+          setRetrying(true);
+
+          await new Promise((resolve) => {
+            retryTimer = setTimeout(resolve, 1500);
+          });
+
+          if (!mounted) return;
+        }
       }
     };
 
@@ -93,8 +120,9 @@ export default function PublicForm() {
 
     return () => {
       mounted = false;
+      clearTimeout(retryTimer);
     };
-  }, [businessId, slug, query]);
+  }, [businessId, slug, query, retryKey]);
 
   const handleChange = (field, value) => {
     setValues((previous) => ({
@@ -188,7 +216,7 @@ export default function PublicForm() {
         <div className="public-form-page">
           <div className="public-form-shell public-form-state">
             <div className="public-form-spinner" />
-            <p>Loading form...</p>
+            <p>{retrying ? "Connection interrupted. Retrying automatically..." : "Loading form..."}</p>
           </div>
         </div>
 
@@ -213,10 +241,21 @@ export default function PublicForm() {
             <div className="public-form-error-icon">!</div>
             <h2>Unable to open form</h2>
             <p>{error}</p>
+            <button
+              type="button"
+              className="public-form-retry-btn"
+              onClick={() => {
+                setError("");
+                setRetrying(false);
+                setRetryKey((key) => key + 1);
+              }}>
+              Retry
+            </button>
           </div>
         </div>
 
         <style>{`
+          .public-form-retry-btn{margin-top:8px;padding:11px 24px;border:0;border-radius:9px;background:#2563eb;color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s}.public-form-retry-btn:hover{background:#1d4ed8}
           .public-form-page{min-height:100vh;background:#f6f8fb;color:#172033;display:flex;align-items:center;justify-content:center;padding:40px 18px;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;box-sizing:border-box}
           .public-form-shell{width:100%;max-width:680px}
           .public-form-state{min-height:240px;background:#fff;border:1px solid #e5e9f0;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:30px;box-shadow:0 10px 35px rgba(20,30,50,.06);box-sizing:border-box}
