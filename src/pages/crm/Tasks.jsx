@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Check, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Eye, Filter, Pencil, Plus, RefreshCw, Search, Tag, Trash2, UserCheck, X } from "lucide-react";
+import { Check, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Eye, Filter, Inbox, Mail, MessageSquare, Pencil, Plus, RefreshCw, Search, Send, Tag, Trash2, UserCheck, X } from "lucide-react";
 
 import useBusiness from "../../hooks/useBusiness";
 import AssigneeDetailsPopup from "../../components/crm/AssigneeDetailsPopup";
@@ -8,6 +8,7 @@ import { isManagementRole } from "../../utils/permissions";
 import { assignTask, completeTask, createTask, deleteTask, getTaskById, getTasks, updateTask } from "../../api/task.api";
 
 import { getAssignmentMembers } from "../../api/crm.api";
+import { addTaskCommunication, getTaskCommunications } from "../../api/note.api";
 import api from "../../api/api";
 
 import { showAuthAlert } from "../../components/auth/authAlert";
@@ -245,6 +246,19 @@ function Tasks() {
   const [error, setError] = useState("");
 
   const [modal, setModal] = useState(null);
+
+  // Task communication history (manual email log / internal notes)
+  const [communicationModal, setCommunicationModal] = useState(null);
+  const [communications, setCommunications] = useState([]);
+  const [communicationsLoading, setCommunicationsLoading] = useState(false);
+  const [communicationSaving, setCommunicationSaving] = useState(false);
+  const [communicationError, setCommunicationError] = useState("");
+  const [communicationForm, setCommunicationForm] = useState({
+    communicationType: "INCOMING_EMAIL",
+    subject: "",
+    content: "",
+    occurredAt: formatDateTimeLocal(new Date()),
+  });
 
   const [form, setForm] = useState(EMPTY_FORM);
 
@@ -517,24 +531,73 @@ function Tasks() {
   const openView = async (task) => {
     if (!businessId || !task?._id) return;
 
-    setSaving(true);
     setError("");
+    const isLeadTask = String(task?.relatedTo?.type || "").toUpperCase() === "LEAD";
+
+    setModal({
+      mode: "view",
+      task,
+      relatedLead: null,
+      relatedLeadLoading: isLeadTask,
+      relatedLeadError: "",
+    });
+
+    const extractRecord = (response, keys, fallback = null) => {
+      let value = response;
+      for (let depth = 0; depth < 8; depth += 1) {
+        if (!value || typeof value !== "object" || Array.isArray(value)) break;
+        const key = keys.find((item) => value[item] && typeof value[item] === "object" && !Array.isArray(value[item]));
+        if (key) {
+          value = value[key];
+          continue;
+        }
+        if (value.data && typeof value.data === "object" && !Array.isArray(value.data)) {
+          value = value.data;
+          continue;
+        }
+        return value;
+      }
+      return fallback;
+    };
 
     try {
-      const response = await getTaskById(businessId, task._id);
+      const taskResponse = await getTaskById(businessId, task._id);
+      const currentTask = extractRecord(taskResponse, ["task"], task) || task;
+      const relatedType = String(currentTask?.relatedTo?.type || task?.relatedTo?.type || "").toUpperCase();
+      const rawRelatedId = currentTask?.relatedTo?.id ?? task?.relatedTo?.id;
+      const relatedId = getId(rawRelatedId);
 
-      const data = unwrap(response);
+      let relatedLead = null;
+      let relatedLeadError = "";
 
-      const currentTask = data?.task || data || task;
+      if (relatedType === "LEAD" && relatedId) {
+        try {
+          // Same business-scoped endpoint used above in this page to resolve related Lead names.
+          const leadResponse = await api.get(`/leads/business/${businessId}/${relatedId}`);
+          relatedLead = extractRecord(leadResponse, ["lead"], null);
+
+          if (!relatedLead || typeof relatedLead !== "object" || Array.isArray(relatedLead)) {
+            relatedLead = null;
+            relatedLeadError = "The linked Lead details could not be read from the API response.";
+          }
+        } catch (leadError) {
+          console.error("Unable to load linked Lead details:", leadError);
+          relatedLeadError = getErrorMessage(leadError, "Unable to load the linked Lead details.");
+        }
+      } else if (relatedType === "LEAD") {
+        relatedLeadError = "This task is linked to a Lead, but the Lead ID is missing.";
+      }
 
       setModal({
         mode: "view",
         task: currentTask,
+        relatedLead,
+        relatedLeadLoading: false,
+        relatedLeadError,
       });
     } catch (err) {
+      setModal(null);
       await showError("Unable to open task", getErrorMessage(err, "Unable to load task details."));
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -877,6 +940,110 @@ function Tasks() {
     );
   };
 
+  const loadTaskCommunications = async (taskId) => {
+    if (!businessId || !taskId) return;
+
+    setCommunicationsLoading(true);
+    setCommunicationError("");
+
+    try {
+      const response = await getTaskCommunications(businessId, taskId, {
+        page: 1,
+        limit: 100,
+        isArchived: false,
+      });
+      const rows = extractRows(response, ["notes", "items", "results"]);
+      setCommunications(Array.isArray(rows) ? rows : []);
+    } catch (err) {
+      setCommunications([]);
+      setCommunicationError(getErrorMessage(err, "Unable to load communication history."));
+    } finally {
+      setCommunicationsLoading(false);
+    }
+  };
+
+  const openCommunication = async (task) => {
+    if (!task?._id || !businessId) return;
+
+    setCommunicationModal(task);
+    setCommunications([]);
+    setCommunicationError("");
+    setCommunicationForm({
+      communicationType: "INCOMING_EMAIL",
+      subject: "",
+      content: "",
+      occurredAt: formatDateTimeLocal(new Date()),
+    });
+
+    await loadTaskCommunications(task._id);
+  };
+
+  const saveCommunication = async () => {
+    if (!businessId || !communicationModal?._id) return;
+
+    const content = String(communicationForm.content || "").trim();
+    const subject = String(communicationForm.subject || "").trim();
+    const communicationType = communicationForm.communicationType;
+
+    if (!content) {
+      setCommunicationError("Please enter the communication message or note.");
+      return;
+    }
+
+    const directionByType = {
+      INTERNAL_NOTE: "INTERNAL",
+      INCOMING_EMAIL: "INBOUND",
+      OUTGOING_EMAIL: "OUTBOUND",
+    };
+
+    setCommunicationSaving(true);
+    setCommunicationError("");
+
+    try {
+      await addTaskCommunication(businessId, communicationModal._id, {
+        title: subject || (communicationType === "INCOMING_EMAIL" ? "Incoming Email" : communicationType === "OUTGOING_EMAIL" ? "Outgoing Email" : "Internal Note"),
+        content,
+        communicationType,
+        direction: directionByType[communicationType] || "INTERNAL",
+        subject,
+        occurredAt: communicationForm.occurredAt ? new Date(communicationForm.occurredAt).toISOString() : new Date().toISOString(),
+      });
+
+      setCommunicationForm({
+        communicationType: "INCOMING_EMAIL",
+        subject: "",
+        content: "",
+        occurredAt: formatDateTimeLocal(new Date()),
+      });
+
+      await loadTaskCommunications(communicationModal._id);
+      await showSuccess("Communication Saved", "Task communication has been recorded.");
+    } catch (err) {
+      setCommunicationError(getErrorMessage(err, "Unable to save communication."));
+    } finally {
+      setCommunicationSaving(false);
+    }
+  };
+
+  const communicationTypeLabel = (type) => {
+    if (type === "INCOMING_EMAIL") return "Incoming Email";
+    if (type === "OUTGOING_EMAIL") return "Outgoing Email";
+    return "Internal Note";
+  };
+
+  const formatCommunicationDate = (value) => {
+    if (!value) return "—";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "—";
+    return date.toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   const stats = useMemo(() => {
     const total = Number(pagination.total || 0);
 
@@ -970,7 +1137,7 @@ function Tasks() {
         .tasks-filter-clear{height:37px;align-self:end}
         .tasks-error{white-space:pre-line;margin-bottom:12px;padding:10px 12px;border-radius:9px;background:color-mix(in srgb,var(--crm-danger) 10%,transparent);color:var(--crm-danger);font-size:13px}
         .tasks-card{border:1px solid var(--crm-border);background:var(--crm-surface);border-radius:14px;overflow:auto;box-shadow:var(--crm-shadow)}
-        .tasks-table-wrap{width:100%;max-height:340px;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable both-edges}.tasks-table{width:100%;min-width:1345px;border-collapse:collapse;table-layout:auto}.tasks-table th:nth-child(1),.tasks-table td:nth-child(1){min-width:250px;width:250px}.tasks-table th:nth-child(2),.tasks-table td:nth-child(2){min-width:125px;width:125px}.tasks-table th:nth-child(3),.tasks-table td:nth-child(3){min-width:120px;width:120px}.tasks-table th:nth-child(4),.tasks-table td:nth-child(4){min-width:135px;width:135px}.tasks-table th:nth-child(5),.tasks-table td:nth-child(5){min-width:245px;width:245px}.tasks-table th:nth-child(6),.tasks-table td:nth-child(6){min-width:200px;width:200px}.tasks-table th:nth-child(7),.tasks-table td:nth-child(7){min-width:145px;width:145px}.tasks-table th:nth-child(8),.tasks-table td:nth-child(8){min-width:125px;width:125px}.tasks-table th{position:sticky;top:0;z-index:3;text-align:left!important;min-width:100px;padding:13px 18px;white-space:nowrap}.tasks-table th:last-child,.tasks-table td:last-child{text-align:center}.tasks-table tbody tr{height:56px}.tasks-table td{white-space:nowrap}.tasks-table th,.tasks-table td{padding-left:18px;padding-right:18px}.tasks-table .crm-assignee-name{white-space:nowrap;display:inline-flex;align-items:center;cursor:pointer}
+        .tasks-table-wrap{width:100%;max-height:340px;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable both-edges}.tasks-table{width:100%;min-width:1490px;border-collapse:collapse;table-layout:auto}.tasks-table th:nth-child(1),.tasks-table td:nth-child(1){min-width:250px;width:250px}.tasks-table th:nth-child(2),.tasks-table td:nth-child(2){min-width:125px;width:125px}.tasks-table th:nth-child(3),.tasks-table td:nth-child(3){min-width:120px;width:120px}.tasks-table th:nth-child(4),.tasks-table td:nth-child(4){min-width:135px;width:135px}.tasks-table th:nth-child(5),.tasks-table td:nth-child(5){min-width:245px;width:245px}.tasks-table th:nth-child(6),.tasks-table td:nth-child(6){min-width:200px;width:200px}.tasks-table th:nth-child(7),.tasks-table td:nth-child(7){min-width:145px;width:145px}.tasks-table th:nth-child(8),.tasks-table td:nth-child(8){min-width:150px;width:150px}.tasks-table th:nth-child(9),.tasks-table td:nth-child(9){min-width:125px;width:125px}.tasks-table th{position:sticky;top:0;z-index:3;text-align:left!important;min-width:100px;padding:13px 18px;white-space:nowrap}.tasks-table th:last-child,.tasks-table td:last-child{text-align:center}.tasks-table tbody tr{height:56px}.tasks-table td{white-space:nowrap}.tasks-table th,.tasks-table td{padding-left:18px;padding-right:18px}.tasks-table .crm-assignee-name{white-space:nowrap;display:inline-flex;align-items:center;cursor:pointer}
         
         .tasks-table td{border-top:1px solid var(--crm-border);padding:12px 14px;font-size:13px;color:var(--crm-text);vertical-align:middle}
         .tasks-table tbody tr:hover{background:color-mix(in srgb,var(--crm-primary) 3%,transparent)}
@@ -992,6 +1159,22 @@ function Tasks() {
         .task-tags{display:flex;align-items:center;gap:4px;flex-wrap:wrap;max-width:180px}
         .task-tag{padding:4px 7px;border-radius:6px;background:var(--crm-surface-2);color:var(--crm-muted);font-size:13px}
         .tasks-actions{display:flex;align-items:center;gap:5px}
+        .tasks-communication-btn{height:30px;border:1px solid var(--crm-border);background:var(--crm-surface);color:var(--crm-primary);border-radius:8px;padding:0 9px;display:inline-flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;white-space:nowrap}
+        .tasks-communication-btn:hover{border-color:var(--crm-primary);background:var(--crm-surface-2)}
+        .tasks-communication-count{min-width:17px;height:17px;border-radius:999px;background:var(--crm-surface-2);display:inline-grid;place-items:center;font-size:11px;color:var(--crm-muted)}
+        .tasks-communication-panel{padding:18px 20px;display:grid;gap:14px}
+        .tasks-communication-form{border:1px solid var(--crm-border);border-radius:11px;padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:11px;background:var(--crm-surface)}
+        .tasks-communication-form .full{grid-column:1/-1}
+        .tasks-communication-history{display:grid;gap:10px;max-height:340px;overflow:auto}
+        .tasks-communication-entry{border:1px solid var(--crm-border);border-radius:10px;padding:12px;background:var(--crm-surface)}
+        .tasks-communication-entry-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+        .tasks-communication-entry-type{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--crm-primary)}
+        .tasks-communication-entry-date{font-size:11px;color:var(--crm-muted)}
+        .tasks-communication-entry-subject{font-size:13px;font-weight:500;color:var(--crm-text);margin-bottom:5px}
+        .tasks-communication-entry-content{font-size:13px;color:var(--crm-text);white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55}
+        .tasks-communication-entry-author{font-size:11px;color:var(--crm-muted);margin-top:9px}
+        .tasks-communication-error{padding:9px 11px;border-radius:8px;background:color-mix(in srgb,var(--crm-danger) 10%,transparent);color:var(--crm-danger);font-size:12px}
+        @media(max-width:600px){.tasks-communication-form{grid-template-columns:1fr}.tasks-communication-form .full{grid-column:auto}.tasks-communication-entry-top{align-items:flex-start;flex-direction:column}}
         .tasks-icon-btn{width:29px;height:29px;border:1px solid var(--crm-border);background:var(--crm-surface);color:var(--crm-muted);border-radius:8px;display:grid;place-items:center;cursor:pointer;padding:0}
         .tasks-icon-btn:hover{border-color:var(--crm-primary);color:var(--crm-primary);background:var(--crm-surface-2)}
         .tasks-icon-btn.complete:hover{border-color:var(--crm-success);color:var(--crm-success)}
@@ -1049,6 +1232,35 @@ function Tasks() {
         .tasks-view-grid{padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:15px}
         .tasks-view-item{display:grid;gap:5px}
         .tasks-view-item.full{grid-column:1/-1}
+        .tasks-modal:has(.tasks-related-lead-section){width:min(950px,100%)}
+.tasks-related-lead-section{margin:0 20px 20px;border:1px solid var(--crm-border);border-radius:12px;overflow:hidden;background:var(--crm-surface)}
+.tasks-related-lead-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;border-bottom:1px solid var(--crm-border)}
+.tasks-related-lead-heading h3{margin:4px 0;color:var(--crm-text);font-size:16px;font-weight:500}
+.tasks-related-lead-heading p{margin:0;color:var(--crm-muted);font-size:12px}
+.tasks-related-lead-eyebrow{font-size:10px;letter-spacing:.08em;color:var(--crm-primary);font-weight:600}
+.tasks-related-lead-type{padding:5px 9px;border-radius:7px;background:color-mix(in srgb,var(--crm-primary) 10%,transparent);color:var(--crm-primary);font-size:11px}
+.tasks-related-lead-profile{display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid var(--crm-border)}
+.tasks-related-lead-avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--crm-primary) 12%,transparent);color:var(--crm-primary);font-size:14px;flex:0 0 auto}
+.tasks-related-lead-identity{display:grid;gap:4px;min-width:0;flex:1}
+.tasks-related-lead-identity strong{color:var(--crm-text);font-size:14px;font-weight:500}
+.tasks-related-lead-identity span{color:var(--crm-muted);font-size:12px}
+.tasks-related-lead-badges{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tasks-lead-rating{padding:4px 8px;border-radius:999px;background:var(--crm-surface-2);color:var(--crm-muted);font-size:11px}
+.tasks-lead-rating.hot{background:color-mix(in srgb,var(--crm-danger) 12%,transparent);color:var(--crm-danger)}
+.tasks-lead-rating.warm{background:color-mix(in srgb,var(--crm-warning) 12%,transparent);color:var(--crm-warning)}
+.tasks-lead-rating.cold{background:color-mix(in srgb,var(--crm-info) 12%,transparent);color:var(--crm-info)}
+.tasks-related-lead-grid{padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.tasks-related-lead-item{display:grid;gap:5px;min-width:0}
+.tasks-related-lead-item.full{grid-column:1/-1}
+.tasks-related-custom-fields{display:grid;gap:10px;width:100%}
+.tasks-related-custom-field{display:grid;grid-template-columns:minmax(110px,.7fr) 1.3fr;gap:12px;padding:9px 10px;border:1px solid var(--crm-border);border-radius:8px;background:var(--crm-surface)}
+.tasks-related-custom-field-label{font-size:12px;color:var(--crm-muted);font-weight:500}
+.tasks-related-custom-field-value{font-size:13px;color:var(--crm-text);white-space:pre-wrap;overflow-wrap:anywhere}
+@media(max-width:600px){.tasks-related-custom-field{grid-template-columns:1fr;gap:5px}}
+.tasks-related-lead-label{font-size:11px;color:var(--crm-muted);text-transform:uppercase;letter-spacing:.04em}
+.tasks-related-lead-value{font-size:13px;color:var(--crm-text);white-space:pre-wrap;overflow-wrap:anywhere}
+.tasks-related-lead-description{padding:10px;background:var(--crm-surface-2);border-radius:8px}
+@media(max-width:700px){.tasks-related-lead-profile{align-items:flex-start;flex-wrap:wrap}.tasks-related-lead-grid{grid-template-columns:1fr}.tasks-related-lead-item.full{grid-column:auto}}
         .tasks-view-label{font-size:13px;font-weight:400;color:var(--crm-muted);text-transform:uppercase;letter-spacing:.04em}
         .tasks-view-value{font-size:13px;color:var(--crm-text);white-space:pre-wrap;word-break:break-word}
         .tasks-table .crm-assignee-name{white-space:nowrap;display:inline-flex;align-items:center;cursor:pointer}@media(max-width:900px){
@@ -1236,6 +1448,7 @@ function Tasks() {
                 <th>Assigned to</th>
                 <th>Related to</th>
                 <th>Tags</th>
+                <th>Communication</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -1243,13 +1456,13 @@ function Tasks() {
             <tbody>
               {loading || businessLoading ? (
                 <tr>
-                  <td colSpan={8}>
+                  <td colSpan={9}>
                     <div className="tasks-empty">Loading tasks...</div>
                   </td>
                 </tr>
               ) : tasks.length === 0 ? (
                 <tr>
-                  <td colSpan={8}>
+                  <td colSpan={9}>
                     <div className="tasks-empty">No tasks found.</div>
                   </td>
                 </tr>
@@ -1322,6 +1535,13 @@ function Tasks() {
 
                           {Array.isArray(task.tags) && task.tags.length > 3 ? <span className="task-tag">+{task.tags.length - 3}</span> : null}
                         </div>
+                      </td>
+
+                      <td>
+                        <button type="button" className="tasks-communication-btn" title="Open task communication history" onClick={() => openCommunication(task)}>
+                          <MessageSquare size={13} />
+                          Notes
+                        </button>
                       </td>
 
                       <td>
@@ -1466,6 +1686,147 @@ function Tasks() {
                     </div>
                   </div>
                 </div>
+
+                {modal.relatedLeadLoading && modal.task?.relatedTo?.type?.toUpperCase() === "LEAD" && (
+                  <div className="tasks-related-lead-section">
+                    <div className="tasks-related-lead-heading">
+                      <div>
+                        <h3>Lead Details</h3>
+                        <p>Loading linked lead information...</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {modal.relatedLeadError && (
+                  <div className="tasks-related-lead-section">
+                    <div className="tasks-related-lead-heading">
+                      <div>
+                        <h3>Lead Details unavailable</h3>
+                        <p>{modal.relatedLeadError}</p>
+                      </div>
+                      <span className="tasks-related-lead-type">LEAD</span>
+                    </div>
+                  </div>
+                )}
+
+                {modal.relatedLead && (
+                  <div className="tasks-related-lead-section">
+                    <div className="tasks-related-lead-heading">
+                      <div>
+                        <span className="tasks-related-lead-eyebrow">RELATED RECORD</span>
+
+                        <h3>Lead Details</h3>
+
+                        <p>Complete information of the lead linked to this task.</p>
+                      </div>
+
+                      <span className="tasks-related-lead-type">LEAD</span>
+                    </div>
+
+                    <div className="tasks-related-lead-profile">
+                      <div className="tasks-related-lead-avatar">
+                        {([modal.relatedLead?.firstName, modal.relatedLead?.lastName].filter(Boolean).join(" ").trim() || modal.relatedLead?.name || "LD")
+                          .split(/\s+/)
+                          .slice(0, 2)
+                          .map((part) => part[0])
+                          .join("")
+                          .toUpperCase()}
+                      </div>
+
+                      <div className="tasks-related-lead-identity">
+                        <strong>{modal.relatedLead?.name || [modal.relatedLead?.firstName, modal.relatedLead?.lastName].filter(Boolean).join(" ") || "Unnamed lead"}</strong>
+
+                        <span>{modal.relatedLead?.companyName || modal.relatedLead?.jobTitle || "Lead prospect"}</span>
+                      </div>
+
+                      <div className="tasks-related-lead-badges">
+                        <span className={`task-badge ${getStatusClass(modal.relatedLead?.status === "CONVERTED" ? "COMPLETED" : modal.relatedLead?.status === "LOST" || modal.relatedLead?.status === "UNQUALIFIED" ? "CANCELLED" : "IN_PROGRESS")}`}>{modal.relatedLead?.status || "—"}</span>
+
+                        <span className={`tasks-lead-rating ${String(modal.relatedLead?.rating || "").toLowerCase()}`}>{modal.relatedLead?.rating || "—"}</span>
+                      </div>
+                    </div>
+
+                    <div className="tasks-related-lead-grid">
+                      {[
+                        ["Email", modal.relatedLead?.email],
+                        ["Phone", modal.relatedLead?.phone],
+                        ["Company", modal.relatedLead?.companyName],
+                        ["Job title", modal.relatedLead?.jobTitle],
+                        [
+                          "Source",
+                          modal.relatedLead?.source
+                            ? String(modal.relatedLead.source)
+                                .replace(/[_-]+/g, " ")
+                                .replace(/\s+/g, " ")
+                                .replace(/\b\w/g, (letter) => letter.toUpperCase())
+                            : "—",
+                        ],
+                        ["Created", formatDate(modal.relatedLead?.createdAt)],
+                        ["Last contacted", formatDate(modal.relatedLead?.lastContactedAt)],
+                        ["Converted", formatDate(modal.relatedLead?.convertedAt)],
+                        [
+                          "Assigned user",
+                          typeof modal.relatedLead?.assignedTo === "object"
+                            ? [modal.relatedLead.assignedTo?.firstName, modal.relatedLead.assignedTo?.lastName].filter(Boolean).join(" ") || modal.relatedLead.assignedTo?.name || modal.relatedLead.assignedTo?.email || "Unassigned"
+                            : modal.relatedLead?.assignedTo || "Unassigned",
+                        ],
+                        ["Assigned team", modal.relatedLead?.assignedTeamId?.name || modal.relatedLead?.assignedTeamId?.slug || modal.relatedLead?.assignedTeamId || "Unassigned"],
+                        [
+                          "Tags",
+                          Array.isArray(modal.relatedLead?.tags)
+                            ? modal.relatedLead.tags
+                                .map((tag) => (typeof tag === "object" ? tag?.name || tag?.title || tag?.label || tag?.slug : tag))
+                                .filter(Boolean)
+                                .join(", ") || "—"
+                            : "—",
+                        ],
+                        ["Created / updated", `Created ${formatDate(modal.relatedLead?.createdAt)} • Updated ${formatDate(modal.relatedLead?.updatedAt)}`],
+                        ["Created by", modal.relatedLead?.createdBy?.name || modal.relatedLead?.createdBy?.email || "—"],
+                        ["Updated by", modal.relatedLead?.updatedBy?.name || modal.relatedLead?.updatedBy?.email || "—"],
+                        ["Converted contact", modal.relatedLead?.convertedContactId ? [modal.relatedLead.convertedContactId?.firstName, modal.relatedLead.convertedContactId?.lastName].filter(Boolean).join(" ") || modal.relatedLead.convertedContactId?.email || "Available" : "—"],
+                        ["Converted company", modal.relatedLead?.convertedCompanyId?.name || "—"],
+                        ["Converted deal", modal.relatedLead?.convertedDealId?.name || modal.relatedLead?.convertedDealId?._id || (modal.relatedLead?.convertedDealId ? "Available" : "—")],
+                      ].map(([label, value]) => (
+                        <div className="tasks-related-lead-item" key={label}>
+                          <div className="tasks-related-lead-label">{label}</div>
+                          <div className="tasks-related-lead-value">{value || "—"}</div>
+                        </div>
+                      ))}
+
+                      <div className="tasks-related-lead-item full">
+                        <div className="tasks-related-lead-label">Custom fields</div>
+
+                        <div className="tasks-related-lead-value tasks-related-lead-description">
+                          {modal.relatedLead?.customFields && Object.keys(modal.relatedLead.customFields).length > 0 ? (
+                            <div className="tasks-related-custom-fields">
+                              {Object.entries(modal.relatedLead.customFields).map(([key, value]) => (
+                                <div className="tasks-related-custom-field" key={key}>
+                                  <span className="tasks-related-custom-field-label">
+                                    {key
+                                      .replace(/([A-Z])/g, " $1")
+                                      .replace(/[_-]/g, " ")
+                                      .replace(/\b\w/g, (letter) => letter.toUpperCase())}
+                                  </span>
+
+                                  <span className="tasks-related-custom-field-value">{value === null || value === undefined || value === "" ? "—" : typeof value === "object" ? JSON.stringify(value, null, 2) : String(value)}</span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            "—"
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="tasks-related-lead-item full">
+                        <div className="tasks-related-lead-label">Description</div>
+
+                        <div className="tasks-related-lead-value tasks-related-lead-description">{modal.relatedLead?.description || "No description added."}</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="tasks-modal-foot">
                   <button type="button" className="tasks-btn" onClick={() => setModal(null)}>
@@ -1767,6 +2128,163 @@ function Tasks() {
           </div>
         </div>
       ) : null}
+      {communicationModal ? (
+        <div
+          className="tasks-modal-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !communicationSaving) {
+              setCommunicationModal(null);
+              setCommunications([]);
+            }
+          }}>
+          <div className="tasks-modal">
+            <div className="tasks-modal-head">
+              <div>
+                <h2 className="tasks-modal-title">Task Communication</h2>
+                <div className="tasks-field-help">{communicationModal.title || "Untitled task"}</div>
+              </div>
+              <button
+                type="button"
+                className="tasks-modal-close"
+                disabled={communicationSaving}
+                onClick={() => {
+                  if (!communicationSaving) {
+                    setCommunicationModal(null);
+                    setCommunications([]);
+                  }
+                }}>
+                <X size={17} />
+              </button>
+            </div>
+
+            <div className="tasks-communication-panel">
+              <div className="tasks-communication-form">
+                <div className="tasks-field">
+                  <label>Communication type *</label>
+                  <select
+                    value={communicationForm.communicationType}
+                    onChange={(event) =>
+                      setCommunicationForm((current) => ({
+                        ...current,
+                        communicationType: event.target.value,
+                      }))
+                    }>
+                    <option value="INCOMING_EMAIL">Incoming Email</option>
+                    <option value="OUTGOING_EMAIL">Outgoing Email</option>
+                    <option value="INTERNAL_NOTE">Internal Note</option>
+                  </select>
+                </div>
+
+                <div className="tasks-field">
+                  <label>Date &amp; time *</label>
+                  <input
+                    type="datetime-local"
+                    value={communicationForm.occurredAt}
+                    onChange={(event) =>
+                      setCommunicationForm((current) => ({
+                        ...current,
+                        occurredAt: event.target.value,
+                      }))
+                    }
+                  />
+                </div>
+
+                {communicationForm.communicationType !== "INTERNAL_NOTE" ? (
+                  <div className="tasks-field full">
+                    <label>Email subject</label>
+                    <input
+                      value={communicationForm.subject}
+                      onChange={(event) =>
+                        setCommunicationForm((current) => ({
+                          ...current,
+                          subject: event.target.value,
+                        }))
+                      }
+                      placeholder="Enter email subject"
+                      maxLength={500}
+                    />
+                  </div>
+                ) : null}
+
+                <div className="tasks-field full">
+                  <label>{communicationForm.communicationType === "INTERNAL_NOTE" ? "Internal note *" : "Email content / reply details *"}</label>
+                  <textarea
+                    value={communicationForm.content}
+                    onChange={(event) =>
+                      setCommunicationForm((current) => ({
+                        ...current,
+                        content: event.target.value,
+                      }))
+                    }
+                    placeholder="Write the communication details..."
+                    maxLength={10000}
+                  />
+                </div>
+
+                {communicationError ? <div className="tasks-communication-error full">{communicationError}</div> : null}
+
+                <div className="full" style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <button type="button" className="tasks-btn primary" disabled={communicationSaving} onClick={saveCommunication}>
+                    <Plus size={14} />
+                    {communicationSaving ? "Saving..." : "Save communication"}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <div className="tasks-view-label" style={{ marginBottom: 9 }}>
+                  Conversation history ({communications.length})
+                </div>
+
+                {communicationsLoading ? (
+                  <div className="tasks-empty">Loading communication history...</div>
+                ) : communicationError && !communications.length ? (
+                  <div className="tasks-communication-error">{communicationError}</div>
+                ) : communications.length ? (
+                  <div className="tasks-communication-history">
+                    {communications.map((entry) => {
+                      const type = entry.communicationType || "INTERNAL_NOTE";
+                      const author = entry.createdBy?.name || [entry.createdBy?.firstName, entry.createdBy?.lastName].filter(Boolean).join(" ") || entry.createdBy?.email || "CRM user";
+
+                      return (
+                        <div className="tasks-communication-entry" key={entry._id}>
+                          <div className="tasks-communication-entry-top">
+                            <span className="tasks-communication-entry-type">
+                              {type === "INCOMING_EMAIL" ? <Inbox size={14} /> : type === "OUTGOING_EMAIL" ? <Send size={14} /> : <MessageSquare size={14} />}
+                              {communicationTypeLabel(type)}
+                            </span>
+                            <span className="tasks-communication-entry-date">{formatCommunicationDate(entry.occurredAt || entry.createdAt)}</span>
+                          </div>
+
+                          {entry.subject ? <div className="tasks-communication-entry-subject">{entry.subject}</div> : null}
+
+                          <div className="tasks-communication-entry-content">{entry.content || "—"}</div>
+                          <div className="tasks-communication-entry-author">Added by {author}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="tasks-empty">No communication recorded for this task yet.</div>
+                )}
+              </div>
+            </div>
+
+            <div className="tasks-modal-foot">
+              <button
+                type="button"
+                className="tasks-btn"
+                onClick={() => {
+                  setCommunicationModal(null);
+                  setCommunications([]);
+                }}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       {assigneeDetail ? <AssigneeDetailsPopup detail={assigneeDetail} onClose={() => setAssigneeDetail(null)} /> : null}
     </div>
   );
